@@ -1,0 +1,42 @@
+<% content_for :title, "Registrieren" %>
+
+<h1 class="font-bold text-2xl">Konto erstellen</h1>
+
+<%= form_with model: @user, url: registration_path, class: "flex flex-col gap" do |form| %>
+  <div class="field">
+    <%= label_tag "church_name", "Name deiner Kirche", class: "field__label" %>
+    <%= text_field_tag "church[name]", @church.name, id: "church_name", required: true, class: "input" %>
+    <%= field_error(@church, :name) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :name, "Dein Name", class: "field__label" %>
+    <%= form.text_field :name, required: true, autocomplete: "name", class: "input" %>
+    <%= field_error(@user, :name) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :email_address, "E-Mail-Adresse", class: "field__label" %>
+    <%= form.email_field :email_address, required: true, autocomplete: "username", class: "input" %>
+    <%= field_error(@user, :email_address) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :password, "Passwort", class: "field__label" %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: 8, maxlength: 72, class: "input" %>
+    <p class="field__hint">Mindestens 8 Zeichen.</p>
+    <%= field_error(@user, :password) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :password_confirmation, "Passwort wiederholen", class: "field__label" %>
+    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "input" %>
+    <%= field_error(@user, :password_confirmation) %>
+  </div>
+
+  <%= form.submit "Registrieren", class: "btn btn--primary i-min" %>
+<% end %>
+
+<p class="text-sm text-subtle">
+  Schon registriert? <%= link_to "Anmelden", new_session_path, class: "font-medium text-link" %>
+</p>

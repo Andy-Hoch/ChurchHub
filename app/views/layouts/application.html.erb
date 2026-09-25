@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <%= render "shared/head" %>
+  </head>
+
+  <body class="sidebar-layout" data-controller="toggle-class" data-toggle-class-toggle-class="sidebar-layout--open">
+    <header id="header">
+      <button class="btn btn--borderless btn--icon hide@md" data-action="toggle-class#toggle" aria-label="Menü umschalten">
+        <span class="icon icon--panel-left" aria-hidden="true"></span>
+      </button>
+      <%= link_to "Kirchen-Hub", hub_path, class: "brand" %>
+      <span class="text-subtle text-sm"><%= current_church&.name %></span>
+
+      <div class="flex items-center gap mis-auto">
+        <span class="text-sm text-subtle show@md"><%= Current.user.name %></span>
+        <%= button_to "Abmelden", session_path, method: :delete, class: "btn btn--sm" %>
+      </div>
+    </header>
+
+    <aside id="sidebar">
+      <nav class="sidebar-menu" aria-label="Hauptnavigation">
+        <div class="sidebar-menu__content">
+          <div class="sidebar-menu__group">
+            <span class="sidebar-menu__group-label">Hub</span>
+            <div class="sidebar-menu__items">
+              <%= nav_link_to "Links", hub_path %>
+              <%= nav_link_to "Design", edit_hub_path %>
+              <%= nav_link_to "Einbinden", embed_hub_path %>
+            </div>
+          </div>
+
+          <div class="sidebar-menu__group">
+            <span class="sidebar-menu__group-label">Kirche</span>
+            <div class="sidebar-menu__items">
+              <%= nav_link_to "Einstellungen", edit_church_path %>
+              <%= nav_link_to "Neue Kirche", new_church_path %>
+            </div>
+          </div>
+        </div>
+
+        <% if Current.user.churches.many? %>
+          <%= form_with url: church_switch_path, method: :patch, class: "church-switch", data: { controller: "auto-submit" } do |form| %>
+            <%= form.label :church_id, "Kirche wechseln", class: "sidebar-menu__group-label" %>
+            <%= form.select :church_id, Current.user.churches.order(:name).map { |church| [ church.name, church.id ] }, { selected: current_church&.id }, class: "input", data: { action: "auto-submit#submit" } %>
+          <% end %>
+        <% end %>
+      </nav>
+    </aside>
+
+    <main id="main">
+      <%= render "shared/flash" %>
+      <div class="container">
+        <%= yield %>
+      </div>
+    </main>
+  </body>
+</html>

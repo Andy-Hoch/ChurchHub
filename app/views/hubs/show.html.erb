@@ -1,0 +1,37 @@
+<% content_for :title, "Links" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="font-bold text-2xl">Links</h1>
+    <p class="text-sm text-subtle">Diese Links erscheinen im Launcher auf eurer Webseite. Zum Sortieren einfach ziehen.</p>
+  </div>
+  <%= link_to "Link hinzufügen", new_hub_link_path, class: "btn btn--primary" %>
+</div>
+
+<% if @hub.links.any? %>
+  <ul class="list" data-controller="sortable" data-sortable-handle-value=".link-row__handle" aria-label="Links">
+    <% @hub.links.each do |link| %>
+      <li class="list-row link-row <%= "list-row--muted" unless link.visible? %>" data-url-value="<%= position_hub_link_path(link) %>">
+        <span class="link-row__handle" title="Ziehen zum Sortieren" aria-hidden="true">⋮⋮</span>
+        <span class="link-row__icon" aria-hidden="true"><%= link.icon.presence || "🔗" %></span>
+        <div class="link-row__body">
+          <div class="flex items-center gap-half">
+            <span class="font-medium"><%= link.title %></span>
+            <% unless link.visible? %><span class="badge badge--secondary">Ausgeblendet</span><% end %>
+          </div>
+          <span class="link-row__url"><%= link.url %></span>
+        </div>
+        <div class="link-row__actions">
+          <%= link_to "Bearbeiten", edit_hub_link_path(link), class: "btn btn--sm" %>
+          <%= button_to "Löschen", hub_link_path(link), method: :delete, class: "btn btn--sm btn--negative", form: { data: { turbo_confirm: "„#{link.title}“ wirklich löschen?" } } %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="empty-state">
+    <p class="font-medium">Noch keine Links</p>
+    <p class="text-sm text-subtle">Füge z. B. Gottesdienst-Stream, Termine, Spenden oder Kontakt hinzu.</p>
+    <%= link_to "Ersten Link hinzufügen", new_hub_link_path, class: "btn btn--primary" %>
+  </div>
+<% end %>

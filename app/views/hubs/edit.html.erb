@@ -1,0 +1,69 @@
+<% content_for :title, "Design" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="font-bold text-2xl">Design</h1>
+    <p class="text-sm text-subtle">Passe den Launcher an eure Webseite an. Die Vorschau aktualisiert sich sofort.</p>
+  </div>
+</div>
+
+<div class="design-grid" data-controller="theme-preview">
+  <%= form_with model: @hub, url: hub_path, method: :patch, class: "card flex flex-col gap", data: { theme_preview_target: "form", action: "input->theme-preview#update change->theme-preview#update" } do |form| %>
+    <div class="field">
+      <%= form.label :title, "Überschrift im Panel", class: "field__label" %>
+      <%= form.text_field :title, required: true, maxlength: 80, class: "input" %>
+      <%= field_error(@hub, :title) %>
+    </div>
+
+    <div class="field">
+      <%= form.label :button_label, "Button-Text", class: "field__label" %>
+      <%= form.text_field :button_label, required: true, maxlength: 30, class: "input" %>
+      <%= field_error(@hub, :button_label) %>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <%= form.label :primary_color, "Hauptfarbe", class: "field__label" %>
+        <%= form.color_field :primary_color, class: "input input--color" %>
+        <%= field_error(@hub, :primary_color) %>
+      </div>
+      <div class="field">
+        <%= form.label :text_color, "Textfarbe auf Hauptfarbe", class: "field__label" %>
+        <%= form.color_field :text_color, class: "input input--color" %>
+        <%= field_error(@hub, :text_color) %>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <%= form.label :button_icon, "Symbol", class: "field__label" %>
+        <%= form.select :button_icon, { "Kacheln" => "grid", "Menü" => "menu", "Herz" => "heart", "Kreuz" => "cross", "Link" => "link" }, {}, class: "input" %>
+      </div>
+      <div class="field">
+        <%= form.label :position, "Position", class: "field__label" %>
+        <%= form.select :position, { "Unten rechts" => "right", "Unten links" => "left" }, {}, class: "input" %>
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <%= form.label :color_scheme, "Panel-Farbschema", class: "field__label" %>
+        <%= form.select :color_scheme, { "Hell" => "light", "Dunkel" => "dark", "Wie System" => "auto" }, {}, class: "input" %>
+      </div>
+      <div class="field">
+        <%= form.label :corner_radius, "Eckenrundung", class: "field__label" %>
+        <%= form.range_field :corner_radius, in: 0..24, class: "input" %>
+      </div>
+    </div>
+
+    <div class="card__footer">
+      <%= form.submit "Speichern", class: "btn btn--primary" %>
+    </div>
+  <% end %>
+
+  <section class="hub-preview" aria-label="Vorschau">
+    <span class="hub-preview__label">Vorschau</span>
+    <div id="hub-preview" class="hub-preview__stage" data-theme-preview-target="stage"></div>
+    <script data-container="#hub-preview" data-open="true"><%= render partial: "embed/widget", formats: :js, locals: { hub: @hub } %></script>
+  </section>
+</div>

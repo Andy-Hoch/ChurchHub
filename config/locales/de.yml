@@ -1,0 +1,31 @@
+de:
+  activerecord:
+    models:
+      user: Konto
+      church: Kirche
+      hub: Hub
+      link: Link
+      membership: Mitgliedschaft
+    attributes:
+      user:
+        name: Name
+        email_address: E-Mail-Adresse
+        password: Passwort
+        password_confirmation: Passwortbestätigung
+      church:
+        name: Name
+        slug: Kurzname
+      hub:
+        title: Überschrift
+        button_label: Button-Text
+        primary_color: Hauptfarbe
+        text_color: Textfarbe
+        position: Position
+        button_icon: Symbol
+        color_scheme: Farbschema
+        corner_radius: Eckenrundung
+      link:
+        title: Titel
+        url: Adresse
+        description: Beschreibung
+        icon: Symbol
