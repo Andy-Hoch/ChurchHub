@@ -22,4 +22,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   root "pages#home"
+
+  # Must stay last: catches /<kirchenname> for the public hub page.
+  get ":slug", to: "public_hubs#show", as: :public_hub, constraints: { slug: Church::SLUG_FORMAT }
 end

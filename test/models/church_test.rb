@@ -12,4 +12,12 @@ class ChurchTest < ActiveSupport::TestCase
   test "normalizes slug" do
     assert_equal "st-marien", Church.new(slug: "St. Marien").slug
   end
+
+  test "rejects slugs reserved for app routes" do
+    church = Church.new(name: "Hub", slug: "hub")
+    assert_not church.valid?
+    assert church.errors.of_kind?(:slug, :exclusion)
+
+    assert_equal "embed-2", Church.create!(name: "Embed").slug
+  end
 end

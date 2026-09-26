@@ -19,6 +19,18 @@
   </div>
 
   <div class="card flex flex-col gap">
+    <label for="public_hub_url" class="field__label">Eigene Seite</label>
+    <p class="text-sm text-subtle">Euer Hub ist auch als eigene Seite erreichbar – ideal für QR-Codes, Social Media oder Newsletter.</p>
+    <div class="input input--actor flex items-center gap-half" data-controller="input-copyable">
+      <input id="public_hub_url" type="text" readonly value="<%= public_hub_url(@hub.church.slug) %>" class="code" data-input-copyable-target="input">
+      <button type="button" class="btn btn--sm btn--borderless btn--icon" data-action="input-copyable#copy" aria-label="Kopieren">
+        <span class="icon icon--copy" aria-hidden="true"></span>
+      </button>
+      <%= link_to "Öffnen", public_hub_url(@hub.church.slug), target: "_blank", rel: "noopener", class: "btn btn--sm" %>
+    </div>
+  </div>
+
+  <div class="card flex flex-col gap">
     <%= form_with model: @hub, url: hub_path, method: :patch, class: "flex items-center justify-between gap", data: { controller: "auto-submit" } do |form| %>
       <div>
         <div class="font-medium">Launcher aktiv</div>
