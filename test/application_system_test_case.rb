@@ -9,4 +9,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     fill_in "Passwort", with: password
     click_on "Anmelden"
   end
+
+  # Turbo marks <html aria-busy> while a visit (including a hover prefetch)
+  # is still rendering; filling a form before that finishes can get wiped.
+  def wait_for_turbo
+    assert_no_selector "html[aria-busy]", visible: :all
+  end
 end
