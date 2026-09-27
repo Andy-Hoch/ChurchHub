@@ -46,9 +46,17 @@ class DebugFlowTest < ApplicationSystemTestCase
 
   teardown do
     ActiveSupport::Notifications.unsubscribe(@subscriber)
+    Capybara.current_session.quit # every flow starts with a fresh Chrome, like the real test on CI
+  end
+
+  def browser_state
+    state = page.evaluate_script("[document.hasFocus(), document.visibilityState, document.readyState]") rescue [ "?" ]
+    targets = page.driver.browser.execute_cdp("Target.getTargets")["targetInfos"].map { "#{_1["type"]}:#{_1["url"][0, 40]}#{" ATTACHED" if _1["attached"]}" } rescue [ "?" ]
+    "focus=#{state[0]} visibility=#{state[1]} ready=#{state[2]} windows=#{page.driver.browser.window_handles.size} targets=#{targets.inspect}"
   end
 
   def step(name)
+    @steps << "  [#{name}] #{browser_state}"
     started = Time.now
     page.execute_script("window.__mark && window.__mark(#{("--- TEST: " + name).to_json})") rescue nil
     yield
@@ -58,7 +66,7 @@ class DebugFlowTest < ApplicationSystemTestCase
   def dump(outcome)
     browser_log = JSON.parse(page.evaluate_script("sessionStorage.getItem('__dbg')") || "[]") rescue [ "(could not read log)" ]
     puts "\n######## #{name} => #{outcome}"
-    puts "chrome #{page.driver.browser.capabilities.browser_version}" if name.end_with?("_0")
+    puts "chrome #{page.driver.browser.capabilities.browser_version}"
     puts "steps:", @steps.map { "  #{_1}" }
     puts "server:", @requests.map { "  #{_1}" }
     condensed = browser_log.chunk_while { |a, b| a[/input .*len=/] && a.split(" ")[1..2] == b.split(" ")[1..2] }
@@ -74,7 +82,17 @@ class DebugFlowTest < ApplicationSystemTestCase
         fill_in "Passwort", with: "password"
       end
       step("submit login") { click_on "Anmelden"; assert_selector "h1", text: "Links", wait: 10 }
-      step("click Link hinzufuegen") { click_on "Link hinzufügen"; assert_selector "h1", text: "Neuer Link", wait: 10 }
+      step("click Link hinzufuegen") do
+        click_on "Link hinzufügen"
+        if has_selector?("h1", text: "Neuer Link", wait: 2)
+          @steps << "  navigation within 2s"
+        elsif has_selector?("h1", text: "Neuer Link", wait: 8)
+          @steps << "  SLOW: navigation only after >2s"
+        else
+          @steps << "  LOST: no navigation within 10s"
+          flunk "click on Link hinzufuegen had no effect"
+        end
+      end
       step("fill title") { fill_in "Titel", with: "Spenden" }
       step("fill url") { fill_in "Adresse (URL)", with: "https://example.com/spenden" }
       step("values right after fill") do
@@ -85,7 +103,7 @@ class DebugFlowTest < ApplicationSystemTestCase
         @steps << "  title=#{find_field("Titel").value.inspect} url=#{find_field("Adresse (URL)").value.inspect}"
       end
       step("save") { click_on "Speichern"; assert_text "Link hinzugefügt.", wait: 10 }
-      dump("OK")
+      dump(@steps.any? { _1.include?("SLOW") || _1.include?('title=""') } ? "OK-BUT-SUSPICIOUS" : "OK")
     rescue Minitest::Assertion, Capybara::CapybaraError, Selenium::WebDriver::Error::WebDriverError => e
       @steps << "FAILED: #{e.class}: #{e.message.lines.first.strip}"
       dump("FAIL")
