@@ -58,4 +58,28 @@
       <% end %>
     <% end %>
   </section>
+
+  <% if owner %>
+    <section class="flex flex-col gap">
+      <h2 class="font-semibold text-lg">Kirche löschen</h2>
+
+      <div class="card flex flex-col gap">
+        <p class="text-sm">Löscht „<%= @church.name %>“ mit Hub und allen Links. Die Einbettung auf eurer Webseite und die eigene Seite funktionieren danach nicht mehr, und alle Mitglieder verlieren den Zugang. Das lässt sich nicht rückgängig machen.</p>
+
+        <% if Current.user.churches.one? %>
+          <p class="text-sm text-subtle">Das ist deine einzige Kirche, deshalb kannst du sie nicht einzeln löschen. Du kannst stattdessen <%= link_to "dein Konto löschen", edit_account_path, class: "font-medium text-link" %>.</p>
+        <% else %>
+          <%= form_with url: church_path, method: :delete, class: "flex flex-col gap" do |form| %>
+            <div class="field">
+              <%= form.label :confirmation, "Zum Bestätigen „#{@church.name}“ eintippen", class: "field__label" %>
+              <%= form.text_field :confirmation, required: true, autocomplete: "off", class: "input" %>
+            </div>
+            <div class="card__footer">
+              <%= form.submit "Kirche endgültig löschen", class: "btn btn--negative" %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+  <% end %>
 </div>
