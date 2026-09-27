@@ -1,0 +1,25 @@
+require "application_system_test_case"
+
+class ChurchDeletionTest < ApplicationSystemTestCase
+  test "owner deletes one of several churches by typing its name" do
+    church = churches(:one)
+    churches(:two).memberships.create!(user: users(:one))
+
+    sign_in_as users(:one)
+    assert_selector "h1", text: "Links"
+
+    select "Gemeinde Eins", from: "Kirche wechseln"
+    assert_selector "#header", text: "Gemeinde Eins"
+
+    click_on "Einstellungen"
+    assert_selector "h1", text: "Kirche"
+    wait_for_turbo
+
+    fill_in "Zum Bestätigen „Gemeinde Eins“ eintippen", with: "Gemeinde Eins"
+    click_on "Kirche endgültig löschen"
+
+    assert_text "„Gemeinde Eins“ wurde gelöscht."
+    assert_text "Andere Kirche"
+    assert_not Church.exists?(church.id)
+  end
+end

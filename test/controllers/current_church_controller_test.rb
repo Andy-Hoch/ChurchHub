@@ -30,6 +30,51 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "owner with several churches deletes the current church" do
+    church = churches(:one)
+    add_second_church_and_switch_to(church)
+
+    assert_difference [ "Church.count", "Hub.count" ], -1 do
+      assert_difference "Link.count", -3 do
+        delete church_path, params: { confirmation: "Gemeinde Eins" }
+      end
+    end
+
+    assert_redirected_to hub_path
+    assert_not Church.exists?(church.id)
+
+    follow_redirect!
+    assert_match "Andere Kirche", response.body
+  end
+
+  test "does not delete the church when the name does not match" do
+    add_second_church_and_switch_to(churches(:one))
+
+    assert_no_difference "Church.count" do
+      delete church_path, params: { confirmation: "Gemeinde" }
+    end
+
+    assert_redirected_to edit_church_path
+  end
+
+  test "does not delete the only church" do
+    assert_no_difference "Church.count" do
+      delete church_path, params: { confirmation: "Gemeinde Eins" }
+    end
+
+    assert_redirected_to edit_church_path
+    assert_match "Konto", flash[:alert]
+  end
+
+  test "admins cannot delete the church" do
+    memberships(:one).update!(role: :admin)
+    add_second_church_and_switch_to(churches(:one))
+
+    assert_no_difference "Church.count" do
+      delete church_path, params: { confirmation: "Gemeinde Eins" }
+    end
+  end
+
   test "switches between churches" do
     churches(:two).memberships.create!(user: users(:one))
 
@@ -38,4 +83,10 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
 
     assert_match "Andere Kirche", response.body
   end
+
+  private
+    def add_second_church_and_switch_to(church)
+      churches(:two).memberships.create!(user: users(:one))
+      patch church_switch_path, params: { church_id: church.id }
+    end
 end

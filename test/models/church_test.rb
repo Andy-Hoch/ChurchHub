@@ -19,5 +19,6 @@ class ChurchTest < ActiveSupport::TestCase
     assert church.errors.of_kind?(:slug, :exclusion)
 
     assert_equal "embed-2", Church.create!(name: "Embed").slug
+    assert_equal "account-2", Church.create!(name: "Account").slug
   end
 end

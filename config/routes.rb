@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
   resource :registration, only: %i[ new create ]
+  resource :account, only: %i[ edit destroy ]
 
   resource :hub, only: %i[ show edit update ] do
     get :embed
@@ -12,7 +13,7 @@ Rails.application.routes.draw do
   end
 
   resources :churches, only: %i[ new create ]
-  resource :church, only: %i[ edit update ], controller: :current_church do
+  resource :church, only: %i[ edit update destroy ], controller: :current_church do
     resources :memberships, only: %i[ create destroy ]
   end
   resource :church_switch, only: :update

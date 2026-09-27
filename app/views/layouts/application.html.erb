@@ -13,7 +13,7 @@
       <span class="text-subtle text-sm"><%= current_church&.name %></span>
 
       <div class="flex items-center gap mis-auto">
-        <span class="text-sm text-subtle show@md"><%= Current.user.name %></span>
+        <%= link_to Current.user.name, edit_account_path, class: "text-sm text-subtle show@md" %>
         <%= button_to "Abmelden", session_path, method: :delete, class: "btn btn--sm" %>
       </div>
     </header>
@@ -35,6 +35,13 @@
             <div class="sidebar-menu__items">
               <%= nav_link_to "Einstellungen", edit_church_path %>
               <%= nav_link_to "Neue Kirche", new_church_path %>
+            </div>
+          </div>
+
+          <div class="sidebar-menu__group">
+            <span class="sidebar-menu__group-label">Konto</span>
+            <div class="sidebar-menu__items">
+              <%= nav_link_to "Mein Konto", edit_account_path %>
             </div>
           </div>
         </div>
