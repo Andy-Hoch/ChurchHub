@@ -41,6 +41,7 @@
     ".link-description { display: block; font-size: 13px; color: light-dark(#71717a, #a1a1aa); }",
     ".empty { padding: 16px; margin: 0; color: light-dark(#71717a, #a1a1aa); }",
     "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
+    "@media (max-width: 640px) { :host(:not([data-inline])) .panel { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; max-height: none; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; } :host(:not([data-inline])) .header { position: sticky; top: 0; padding-top: max(14px, env(safe-area-inset-top)); } :host(:not([data-inline])) .panel:not([hidden]) + .button { display: none; } :host(:not([data-inline])) .close { padding: 8px; } }",
     "@media (prefers-reduced-motion: reduce) { .panel { animation: none; } .button { transition: none; } }"
   ].join("\n");
 
@@ -138,9 +139,27 @@
       close.addEventListener("click", function () { toggle(false, true); });
     }
 
+    var fullscreen = window.matchMedia("(max-width: 640px)");
+    var previousOverflow = null;
+
+    function lockScroll() {
+      var lock = open && !options.container && fullscreen.matches;
+      var html = document.documentElement;
+      if (lock && previousOverflow === null) {
+        previousOverflow = html.style.overflow;
+        html.style.overflow = "hidden";
+      } else if (!lock && previousOverflow !== null) {
+        html.style.overflow = previousOverflow;
+        previousOverflow = null;
+      }
+    }
+
+    if (fullscreen.addEventListener) fullscreen.addEventListener("change", lockScroll);
+
     function toggle(value, focus) {
       if (open === value) return;
       open = value;
+      lockScroll();
       render();
       if (!focus) return;
       var target = open ? root.querySelector(".link, .close") : root.querySelector(".button");
