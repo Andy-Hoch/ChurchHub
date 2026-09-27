@@ -6,10 +6,15 @@ class LinksTest < ApplicationSystemTestCase
     assert_selector "h1", text: "Links"
 
     click_on "Link hinzufügen"
+    assert_selector "h1", text: "Neuer Link"
+    wait_for_turbo
+
     fill_in "Titel", with: "Spenden"
     fill_in "Adresse (URL)", with: "https://example.com/spenden"
+    assert_field "Titel", with: "Spenden"
     click_on "Speichern"
 
+    assert_text "Link hinzugefügt."
     assert_selector "h1", text: "Links"
     assert_text "Spenden"
 
