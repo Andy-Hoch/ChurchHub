@@ -1,0 +1,9 @@
+one:
+  church: one
+  title: Gemeinde Eins
+  public_token: tokenone1234567890abcdef
+
+two:
+  church: two
+  title: Gemeinde Zwei
+  public_token: tokentwo1234567890abcdef

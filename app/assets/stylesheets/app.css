@@ -1,0 +1,258 @@
+/****************************************************************
+* App-specific styles
+*
+* Additions that CSS Zero does not ship. They follow the same
+* conventions: design tokens only, BEM-style blocks with
+* `--modifier` variants and component-level custom properties
+* that fall back to the global tokens. The generated CSS Zero
+* files stay untouched so they can be regenerated at any time.
+*****************************************************************/
+
+:root {
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/****************************************************************
+* Utilities
+*****************************************************************/
+
+.gap-double { column-gap: var(--column-gap, 1rem); row-gap: var(--row-gap, 2rem); }
+
+.code {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+/****************************************************************
+* Layout
+*****************************************************************/
+
+.sidebar-layout--open {
+  --sidebar-border-width: var(--border);
+  --sidebar-padding: var(--size-2);
+  --sidebar-visibility: visible;
+  --sidebar-width: var(--max-i-3xs);
+}
+
+.brand {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  white-space: nowrap;
+}
+
+.page-header {
+  align-items: start;
+  column-gap: var(--size-4);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  margin-block-end: var(--size-4);
+  row-gap: var(--size-2);
+}
+
+.church-switch {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--size-1);
+}
+
+/****************************************************************
+* Auth
+*****************************************************************/
+
+.auth {
+  display: flex;
+  flex-direction: column;
+  inline-size: var(--size-full);
+  max-inline-size: var(--auth-width, var(--max-i-sm));
+  padding: var(--size-4);
+  row-gap: var(--size-4);
+}
+
+.auth__brand {
+  font-size: var(--text-xl);
+}
+
+/****************************************************************
+* Field
+*****************************************************************/
+
+.field {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--field-gap, var(--size-1_5));
+}
+
+.field__label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+}
+
+.field__hint {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.field__error {
+  color: var(--color-text-negative);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.field--inline {
+  align-items: center;
+  column-gap: var(--size-2);
+  flex-direction: row;
+}
+
+.field-row {
+  display: grid;
+  gap: var(--size-4);
+  grid-template-columns: repeat(auto-fit, minmax(var(--size-40), 1fr));
+}
+
+.field_with_errors {
+  display: contents;
+}
+
+/****************************************************************
+* Input additions
+*****************************************************************/
+
+.input--short {
+  --input-inline-size: var(--size-24);
+}
+
+.input--color {
+  --input-block-size: var(--size-10);
+  --input-padding: var(--size-0_5);
+  cursor: pointer;
+}
+
+/****************************************************************
+* Flash
+*****************************************************************/
+
+.flash--alert {
+  border-color: var(--color-text-negative);
+  color: var(--color-text-negative);
+}
+
+/****************************************************************
+* Link row (sortable list of hub links)
+*****************************************************************/
+
+.link-row {
+  align-items: center;
+  background-color: var(--list-background, var(--color-surface));
+  column-gap: var(--size-3);
+  display: flex;
+}
+
+.link-row__handle {
+  color: var(--color-text-subtle);
+  cursor: grab;
+  letter-spacing: -0.2em;
+  padding-inline: var(--size-1);
+  user-select: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.link-row__icon {
+  font-size: var(--text-xl);
+  inline-size: var(--size-6);
+  text-align: center;
+}
+
+.link-row__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+
+.link-row__url {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-row__actions {
+  column-gap: var(--size-2);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.sortable-ghost {
+  opacity: var(--opacity-50);
+}
+
+/****************************************************************
+* Empty state
+*****************************************************************/
+
+.empty-state {
+  align-items: center;
+  border: 1px dashed var(--color-border-dark);
+  border-radius: var(--rounded-xl);
+  display: flex;
+  flex-direction: column;
+  padding: var(--size-10) var(--size-4);
+  row-gap: var(--size-2);
+  text-align: center;
+}
+
+/****************************************************************
+* Design editor with live preview
+*****************************************************************/
+
+.design-grid {
+  align-items: start;
+  display: grid;
+  gap: var(--size-6);
+  grid-template-columns: 1fr;
+
+  @media (width >= 64rem) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.hub-preview {
+  background-color: var(--color-border-light);
+  background-image: radial-gradient(var(--color-border) 1px, transparent 1px);
+  background-size: var(--size-4) var(--size-4);
+  border-radius: var(--rounded-xl);
+  border-width: var(--border);
+  min-block-size: var(--hub-preview-height, 36rem);
+  overflow: hidden;
+  position: relative;
+
+  @media (width >= 64rem) {
+    position: sticky;
+    inset-block-start: 0;
+  }
+}
+
+.hub-preview__label {
+  background-color: var(--color-surface);
+  border-radius: var(--rounded-full);
+  border-width: var(--border);
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  inset-block-start: var(--size-3);
+  inset-inline-start: var(--size-3);
+  padding: var(--size-0_5) var(--size-2);
+  position: absolute;
+  z-index: 1;
+}
+
+.hub-preview__stage {
+  inset: 0;
+  position: absolute;
+}

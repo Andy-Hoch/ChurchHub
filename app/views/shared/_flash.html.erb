@@ -1,0 +1,6 @@
+<% { alert: alert, notice: notice }.each do |type, message| %>
+  <% next if message.blank? %>
+  <div popover="manual" class="flash <%= "flash--alert" if type == :alert %>" style="--flash-position: 1rem" data-controller="flash" data-action="animationend->flash#hide" role="alert">
+    <div class="flash__content font-medium"><%= message %></div>
+  </div>
+<% end %>

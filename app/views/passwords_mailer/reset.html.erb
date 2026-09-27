@@ -1,0 +1,7 @@
+<p>
+  Du kannst dein Passwort über
+  <%= link_to "diesen Link", edit_password_url(@user.password_reset_token) %> zurücksetzen.
+</p>
+<p>
+  Der Link ist <%= distance_of_time_in_words(0, @user.password_reset_token_expires_in) %> gültig.
+</p>

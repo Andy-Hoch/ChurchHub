@@ -1,0 +1,38 @@
+<% content_for :title, "Einbinden" %>
+
+<div class="flex flex-col gap-double">
+  <div class="page-header">
+    <div>
+      <h1 class="font-bold text-2xl">Auf der Webseite einbinden</h1>
+      <p class="text-sm text-subtle">Füge diese Zeile vor dem schließenden <code>&lt;/body&gt;</code>-Tag eurer Webseite ein. Das funktioniert mit WordPress, Squarespace, Wix und jeder anderen Seite, die eigenes HTML erlaubt.</p>
+    </div>
+  </div>
+
+  <div class="card flex flex-col gap">
+    <label for="embed_snippet" class="field__label">Einbettungs-Code</label>
+    <div class="input input--actor flex items-center gap-half" data-controller="input-copyable">
+      <input id="embed_snippet" type="text" readonly value="<%= embed_snippet(@hub) %>" class="code" data-input-copyable-target="input">
+      <button type="button" class="btn btn--sm btn--borderless btn--icon" data-action="input-copyable#copy" aria-label="Kopieren">
+        <span class="icon icon--copy" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card flex flex-col gap">
+    <%= form_with model: @hub, url: hub_path, method: :patch, class: "flex items-center justify-between gap", data: { controller: "auto-submit" } do |form| %>
+      <div>
+        <div class="font-medium">Launcher aktiv</div>
+        <p class="text-sm text-subtle">Deaktiviert erscheint der Launcher auf keiner Webseite mehr.</p>
+      </div>
+      <%= form.check_box :enabled, class: "switch", aria: { label: "Launcher aktiv" }, data: { action: "auto-submit#submit" } %>
+    <% end %>
+  </div>
+
+  <div class="card flex flex-col gap">
+    <div>
+      <div class="font-medium">Code neu erzeugen</div>
+      <p class="text-sm text-subtle">Der bisherige Code funktioniert danach nicht mehr. Nutze das nur, wenn der Code missbraucht wird.</p>
+    </div>
+    <%= button_to "Neuen Code erzeugen", regenerate_token_hub_path, class: "btn btn--negative i-min", form: { data: { turbo_confirm: "Wirklich einen neuen Code erzeugen? Der alte hört sofort auf zu funktionieren." } } %>
+  </div>
+</div>

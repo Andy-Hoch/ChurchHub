@@ -1,0 +1,172 @@
+(function () {
+  "use strict";
+
+  var data = <%= json_escape(hub.embed_payload.to_json).html_safe %>;
+  var script = document.currentScript;
+  var options = (script && script.dataset) || {};
+
+  var ICONS = {
+    grid: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
+    menu: '<path d="M4 6h16M4 12h16M4 18h16"/>',
+    heart: '<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/>',
+    cross: '<path d="M12 2v20M6 8h12"/>',
+    link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
+    close: '<path d="M18 6 6 18M6 6l12 12"/>'
+  };
+
+  var STYLES = [
+    ":host { all: initial; }",
+    ".launcher { --radius: calc(var(--ph-radius) * 1px); color-scheme: var(--ph-scheme); font: 400 15px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; position: fixed; inset-block-end: 20px; z-index: 2147483000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }",
+    ".launcher--right { inset-inline-end: 20px; }",
+    ".launcher--left { inset-inline-start: 20px; align-items: flex-start; }",
+    ":host([data-inline]) .launcher { position: absolute; inset-block-end: 16px; }",
+    ":host([data-inline]) .launcher--right { inset-inline-end: 16px; }",
+    ":host([data-inline]) .launcher--left { inset-inline-start: 16px; }",
+    ".button { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 999px; background: var(--ph-primary); color: var(--ph-text); font-weight: 600; box-shadow: 0 10px 25px -5px rgb(0 0 0 / .25), 0 4px 6px -4px rgb(0 0 0 / .2); transition: transform .15s ease; }",
+    ".button:hover { transform: translateY(-1px); }",
+    ".button:active { transform: scale(.97); }",
+    ".button:focus-visible, .link:focus-visible, .close:focus-visible { outline: 2px solid var(--ph-primary); outline-offset: 2px; }",
+    ".icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }",
+    ".panel { box-sizing: border-box; width: min(360px, calc(100vw - 40px)); max-height: min(560px, calc(100vh - 110px)); overflow: auto; background: light-dark(#fff, #18181b); color: light-dark(#09090b, #fafafa); border: 1px solid light-dark(#e4e4e7, #3f3f46); border-radius: var(--radius); box-shadow: 0 20px 25px -5px rgb(0 0 0 / .15), 0 8px 10px -6px rgb(0 0 0 / .1); transform-origin: bottom right; animation: ph-in .18s ease-out; }",
+    ".launcher--left .panel { transform-origin: bottom left; }",
+    ".panel[hidden] { display: none; }",
+    ".header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; background: var(--ph-primary); color: var(--ph-text); }",
+    ".title { margin: 0; font-size: 16px; font-weight: 600; }",
+    ".close { all: unset; cursor: pointer; display: inline-flex; padding: 4px; border-radius: 6px; }",
+    ".list { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; }",
+    ".link { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: calc(var(--radius) * .66); color: inherit; text-decoration: none; }",
+    ".link:hover { background: light-dark(#f4f4f5, #27272a); }",
+    ".emoji { font-size: 20px; line-height: 1.2; width: 24px; text-align: center; flex-shrink: 0; }",
+    ".link-title { display: block; font-weight: 600; }",
+    ".link-description { display: block; font-size: 13px; color: light-dark(#71717a, #a1a1aa); }",
+    ".empty { padding: 16px; margin: 0; color: light-dark(#71717a, #a1a1aa); }",
+    "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
+    "@media (prefers-reduced-motion: reduce) { .panel { animation: none; } .button { transition: none; } }"
+  ].join("\n");
+
+  function svg(name) {
+    return '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || ICONS.grid) + "</svg>";
+  }
+
+  function safeUrl(url) {
+    return /^https?:\/\//i.test(url || "") ? url : null;
+  }
+
+  function el(tag, className, text) {
+    var node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+
+  function mount() {
+    var container = options.container ? document.querySelector(options.container) : document.body;
+    if (!container) return;
+
+    var previous = container.querySelector(":scope > [data-kirchen-hub]");
+    if (previous) previous.remove();
+
+    var host = document.createElement("div");
+    host.setAttribute("data-kirchen-hub", "");
+    if (options.container) host.setAttribute("data-inline", "");
+    var root = host.attachShadow({ mode: "open" });
+    var theme = Object.assign({}, data.theme);
+    var open = options.open === "true";
+
+    var style = el("style");
+    style.textContent = STYLES;
+    var launcher = el("div", "launcher");
+    root.append(style, launcher);
+    container.appendChild(host);
+
+    function render() {
+      host.style.setProperty("--ph-primary", theme.primaryColor);
+      host.style.setProperty("--ph-text", theme.textColor);
+      host.style.setProperty("--ph-radius", String(theme.cornerRadius));
+      host.style.setProperty("--ph-scheme", theme.colorScheme === "auto" ? "light dark" : theme.colorScheme);
+      launcher.className = "launcher launcher--" + (theme.position === "left" ? "left" : "right");
+      launcher.replaceChildren();
+
+      var panelId = "kirchen-hub-panel";
+      var panel = el("div", "panel");
+      panel.id = panelId;
+      panel.setAttribute("role", "dialog");
+      panel.setAttribute("aria-label", data.title);
+      panel.hidden = !open;
+
+      var header = el("div", "header");
+      var close = el("button", "close");
+      close.type = "button";
+      close.setAttribute("aria-label", "Schließen");
+      close.innerHTML = svg("close");
+      header.append(el("h2", "title", data.title), close);
+      panel.appendChild(header);
+
+      if (data.links.length === 0) {
+        panel.appendChild(el("p", "empty", "Noch keine Links vorhanden."));
+      } else {
+        var list = el("ul", "list");
+        data.links.forEach(function (item) {
+          var href = safeUrl(item.url);
+          if (!href) return;
+          var li = el("li");
+          var a = el("a", "link");
+          a.href = href;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.appendChild(el("span", "emoji", item.icon || "🔗")).setAttribute("aria-hidden", "true");
+          var text = el("span");
+          text.appendChild(el("span", "link-title", item.title));
+          if (item.description) text.appendChild(el("span", "link-description", item.description));
+          a.appendChild(text);
+          li.appendChild(a);
+          list.appendChild(li);
+        });
+        panel.appendChild(list);
+      }
+
+      var button = el("button", "button");
+      button.type = "button";
+      button.setAttribute("aria-expanded", String(open));
+      button.setAttribute("aria-controls", panelId);
+      button.innerHTML = svg(open ? "close" : theme.buttonIcon);
+      button.appendChild(el("span", null, theme.buttonLabel));
+
+      launcher.append(panel, button);
+
+      button.addEventListener("click", function () { toggle(!open, true); });
+      close.addEventListener("click", function () { toggle(false, true); });
+    }
+
+    function toggle(value, focus) {
+      if (open === value) return;
+      open = value;
+      render();
+      if (!focus) return;
+      var target = open ? root.querySelector(".link, .close") : root.querySelector(".button");
+      if (target) target.focus();
+    }
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && open && host.isConnected) toggle(false, true);
+    });
+
+    document.addEventListener("click", function (event) {
+      if (open && !options.container && host.isConnected && event.composedPath().indexOf(host) === -1) toggle(false, false);
+    });
+
+    host.addEventListener("kirchen-hub:update", function (event) {
+      Object.assign(theme, event.detail.theme || {});
+      if (event.detail.title) data.title = event.detail.title;
+      render();
+    });
+
+    render();
+  }
+
+  if (document.body) {
+    mount();
+  } else {
+    document.addEventListener("DOMContentLoaded", mount);
+  }
+})();

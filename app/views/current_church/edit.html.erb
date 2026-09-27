@@ -1,0 +1,61 @@
+<% content_for :title, "Kirche" %>
+<% owner = current_membership&.owner? %>
+
+<div class="flex flex-col gap-double">
+  <section class="flex flex-col gap">
+    <h1 class="font-bold text-2xl">Kirche</h1>
+
+    <%= form_with model: @church, url: church_path, method: :patch, class: "card flex flex-col gap" do |form| %>
+      <fieldset class="flex flex-col gap" <%= "disabled" unless owner %>>
+        <div class="field">
+          <%= form.label :name, "Name", class: "field__label" %>
+          <%= form.text_field :name, required: true, class: "input" %>
+          <%= field_error(@church, :name) %>
+        </div>
+        <div class="field">
+          <%= form.label :slug, "Kurzname", class: "field__label" %>
+          <%= form.text_field :slug, required: true, class: "input" %>
+          <p class="field__hint">Nur Kleinbuchstaben, Zahlen und Bindestriche.</p>
+          <%= field_error(@church, :slug) %>
+        </div>
+      </fieldset>
+      <% if owner %>
+        <div class="card__footer">
+          <%= form.submit "Speichern", class: "btn btn--primary" %>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <section class="flex flex-col gap">
+    <h2 class="font-semibold text-lg">Mitglieder</h2>
+
+    <ul class="list">
+      <% @church.memberships.includes(:user).order(:created_at).each do |membership| %>
+        <li class="list-row flex items-center gap">
+          <div class="flex-1 min-i-0">
+            <div class="font-medium"><%= membership.user.name %></div>
+            <div class="text-subtle"><%= membership.user.email_address %></div>
+          </div>
+          <span class="badge <%= "badge--primary" if membership.owner? %>"><%= membership.owner? ? "Besitzer" : "Admin" %></span>
+          <% if owner && membership.user != Current.user %>
+            <%= button_to "Entfernen", church_membership_path(membership), method: :delete, class: "btn btn--sm btn--negative", form: { data: { turbo_confirm: "#{membership.user.name} entfernen?" } } %>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+
+    <% if owner %>
+      <%= form_with url: church_memberships_path, class: "card flex flex-col gap" do |form| %>
+        <div class="field">
+          <%= form.label :email_address, "Mitglied hinzufügen", class: "field__label" %>
+          <div class="flex gap">
+            <%= form.email_field :email_address, required: true, placeholder: "E-Mail-Adresse eines registrierten Kontos", class: "input" %>
+            <%= form.submit "Hinzufügen", class: "btn" %>
+          </div>
+          <p class="field__hint">Die Person muss bereits ein Konto haben.</p>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+</div>

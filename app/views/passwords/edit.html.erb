@@ -1,0 +1,15 @@
+<% content_for :title, "Neues Passwort" %>
+
+<h1 class="font-bold text-2xl">Neues Passwort festlegen</h1>
+
+<%= form_with url: password_path(params[:token]), method: :put, class: "flex flex-col gap" do |form| %>
+  <div class="field">
+    <%= form.label :password, "Neues Passwort", class: "field__label" %>
+    <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: 8, maxlength: 72, class: "input" %>
+  </div>
+  <div class="field">
+    <%= form.label :password_confirmation, "Passwort wiederholen", class: "field__label" %>
+    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", minlength: 8, maxlength: 72, class: "input" %>
+  </div>
+  <%= form.submit "Speichern", class: "btn btn--primary i-min" %>
+<% end %>

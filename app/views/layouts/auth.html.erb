@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <%= render "shared/head" %>
+  </head>
+
+  <body class="centered-layout">
+    <%= render "shared/flash" %>
+    <main class="auth">
+      <%= link_to "Kirchen-Hub", root_path, class: "brand auth__brand" %>
+      <%= yield %>
+    </main>
+  </body>
+</html>

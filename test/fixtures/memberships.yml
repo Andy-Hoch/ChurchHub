@@ -1,0 +1,9 @@
+one:
+  user: one
+  church: one
+  role: owner
+
+two:
+  user: two
+  church: two
+  role: owner

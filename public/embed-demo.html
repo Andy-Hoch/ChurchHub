@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Embed-Demo</title>
+    <style>
+      body { font-family: Georgia, serif; margin: 0; background: #f5f1ea; color: #2b2b2b; }
+      header { background: #3b2f2f; color: #fff; padding: 24px; }
+      main { max-width: 720px; margin: 0 auto; padding: 24px; line-height: 1.6; }
+      label { font-family: system-ui, sans-serif; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <header><h1>Beispiel-Kirchengemeinde</h1></header>
+    <main>
+      <p>Diese Seite simuliert eine fremde Kirchen-Webseite, auf der der Launcher eingebunden ist.</p>
+      <form id="token-form">
+        <label>Hub-Token: <input name="token" size="30"></label>
+        <button>Laden</button>
+      </form>
+      <p>Tipp: <code>embed-demo.html?token=DEIN_TOKEN</code> (siehe Ausgabe von <code>bin/rails db:seed</code> oder Dashboard → Einbinden).</p>
+    </main>
+    <script>
+      var token = new URLSearchParams(location.search).get("token");
+      if (token) {
+        document.querySelector("[name=token]").value = token;
+        var s = document.createElement("script");
+        s.src = "/embed/" + encodeURIComponent(token) + ".js";
+        s.async = true;
+        document.body.appendChild(s);
+      }
+    </script>
+  </body>
+</html>

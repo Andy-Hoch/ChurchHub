@@ -1,0 +1,25 @@
+live:
+  hub: one
+  title: Gottesdienst live
+  url: https://example.com/live
+  icon: 📺
+  position: 0
+
+events:
+  hub: one
+  title: Termine
+  url: https://example.com/termine
+  position: 1
+
+hidden:
+  hub: one
+  title: Intern
+  url: https://example.com/intern
+  position: 2
+  visible: false
+
+other:
+  hub: two
+  title: Andere Kirche
+  url: https://example.org
+  position: 0
