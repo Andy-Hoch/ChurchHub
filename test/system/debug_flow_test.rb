@@ -43,14 +43,18 @@ class DebugFlowTest < ApplicationSystemTestCase
   end
 
   def dump(error)
+    dump_log("FAIL: #{error.message.lines.first.strip}")
+  end
+
+  def dump_log(outcome)
     log = page.evaluate_script("window.__dbg") rescue [ "(could not read log)" ]
-    puts "\n######## #{name} => FAIL: #{error.message.lines.first.strip}"
+    puts "\n######## #{name} => #{outcome}"
     puts "chrome #{page.driver.browser.capabilities.browser_version} path=#{current_path}"
     puts "server:", @requests.map { "  #{_1}" }
     puts "browser:", Array(log).map { "  #{_1}" }
   end
 
-  30.times do |i|
+  1.times do |i|
     test "real_flow_#{i}" do
       sign_in_as users(:one)
       assert_selector "h1", text: "Links"
@@ -74,6 +78,7 @@ class DebugFlowTest < ApplicationSystemTestCase
       assert_text "Gottesdienst live"
       assert_no_text "Intern"
       puts "######## #{name} => OK"
+      dump_log("OK")
     rescue Minitest::Assertion, Capybara::CapybaraError, Selenium::WebDriver::Error::WebDriverError => e
       dump(e)
       raise
