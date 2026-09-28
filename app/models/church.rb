@@ -3,13 +3,14 @@ class Church < ApplicationRecord
   # Top-level paths used by the app itself; a church with such a slug could
   # never be reached under /<slug>.
   RESERVED_SLUGS = %w[
-    session sessions passwords registration account hub church churches church_switch embed up
+    session sessions passwords registration account hub church churches church_switch embed up forms
     admin api assets rails cable manifest service-worker icon robots favicon
   ].freeze
 
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
   has_one :hub, dependent: :destroy
+  has_many :forms, dependent: :destroy
 
   normalizes :slug, with: ->(slug) { slug.to_s.parameterize }
 
