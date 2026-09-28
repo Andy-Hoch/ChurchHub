@@ -17,7 +17,13 @@ class EmbedSubmissionsController < ActionController::Base
   end
 
   def create
-    form = find_form
+    hub = Hub.includes(:church).find_by!(public_token: params[:token], enabled: true)
+    form = find_form(hub)
+
+    unless submission_allowed?(hub.church)
+      return render json: { error: "Das Formular ist für diese Webseite nicht freigegeben." }, status: :forbidden
+    end
+
     # Bots get a normal success response so they don't retry.
     return render(json: { ok: true }, status: :created) if spam?
 
@@ -41,9 +47,25 @@ class EmbedSubmissionsController < ActionController::Base
     end
 
     # Only forms that the hub actually offers can receive submissions.
-    def find_form
-      hub = Hub.find_by!(public_token: params[:token], enabled: true)
+    def find_form(hub)
       hub.links.kind_form.visible.where.not(form_id: nil).find_by!(form_id: params[:form_id]).form
+    end
+
+    # When the church limits the launcher to its website, submissions must
+    # come from there too. Like EmbedController, requests without Origin and
+    # Referer are let through; the launcher itself only runs on allowed pages.
+    def submission_allowed?(church)
+      return true unless church.embed_restricted?
+
+      host = request_origin_host
+      host.nil? || host == request.host || church.embed_allowed_host?(host)
+    end
+
+    def request_origin_host
+      origin = request.origin.presence || request.referer.presence
+      URI.parse(origin).host.presence if origin
+    rescue URI::InvalidURIError
+      nil
     end
 
     def spam?

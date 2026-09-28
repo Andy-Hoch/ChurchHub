@@ -10,7 +10,7 @@ class EmbedSubmissionsControllerTest < ActionDispatch::IntegrationTest
   def submit(form: forms(:prayer), token: hubs(:one).public_token, answers: valid_answers, **params)
     post embed_form_submissions_path(token, form),
       params: { answers: answers, consent: "1", website: "", elapsed_ms: "8000" }.merge(params),
-      headers: { "Origin" => "https://kirche.example" }
+      headers: { "Origin" => "https://www.gemeinde-eins.example" }
   end
 
   def valid_answers
@@ -81,6 +81,32 @@ class EmbedSubmissionsControllerTest < ActionDispatch::IntegrationTest
 
     submit token: "unbekannt"
     assert_response :not_found
+  end
+
+  test "checks the origin when the church restricts the launcher to its website" do
+    assert churches(:one).embed_restricted?
+
+    assert_difference -> { forms(:prayer).submissions.count } do
+      submit
+    end
+    assert_response :created
+
+    assert_no_difference "FormSubmission.count" do
+      post embed_form_submissions_path(hubs(:one).public_token, forms(:prayer)),
+        params: { answers: valid_answers, consent: "1", elapsed_ms: "8000" },
+        headers: { "Origin" => "https://fremd.example" }
+    end
+    assert_response :forbidden
+  end
+
+  test "accepts any origin without a website restriction" do
+    churches(:one).update!(website_url: nil)
+
+    post embed_form_submissions_path(hubs(:one).public_token, forms(:prayer)),
+      params: { answers: valid_answers, consent: "1", elapsed_ms: "8000" },
+      headers: { "Origin" => "https://fremd.example" }
+
+    assert_response :created
   end
 
   test "the launcher script contains the form" do
