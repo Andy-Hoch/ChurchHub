@@ -28,7 +28,7 @@ class HubsControllerTest < ActionDispatch::IntegrationTest
     patch hub_path, params: { hub: { primary_color: "#AA0000", position: "left" } }
 
     assert_redirected_to edit_hub_path
-    assert_equal "#aa0000", hubs(:one).reload.primary_color
+    assert_equal "oklch(46.34% 0.1902 29.23)", hubs(:one).reload.primary_color
     assert_equal "left", hubs(:one).position
   end
 

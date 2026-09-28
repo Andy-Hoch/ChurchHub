@@ -13,6 +13,16 @@ class HubTest < ActiveSupport::TestCase
     payload = hubs(:one).embed_payload
 
     assert_equal [ "Gottesdienst live", "Termine" ], payload[:links].map { |link| link[:title] }
-    assert_equal "#18181b", payload[:theme][:primaryColor]
+    assert_equal "oklch(21.03% 0.0059 285.89)", payload[:theme][:primaryColor]
+  end
+
+  test "converts hex colors from the color picker to oklch" do
+    hub = hubs(:one)
+    hub.update!(primary_color: "#AA0000", text_color: "oklch(100% 0 0)")
+
+    assert_equal "oklch(46.34% 0.1902 29.23)", hub.primary_color
+    assert_equal "oklch(100% 0 0)", hub.text_color
+    assert_equal "#aa0000", hub.primary_color_hex
+    assert_equal "#ffffff", hub.text_color_hex
   end
 end

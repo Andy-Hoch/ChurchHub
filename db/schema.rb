@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_25_130529) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_28_120000) do
   create_table "churches", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -24,8 +24,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_25_130529) do
     t.string "title", null: false
     t.string "public_token", null: false
     t.boolean "enabled", default: true, null: false
-    t.string "primary_color", default: "#18181b", null: false
-    t.string "text_color", default: "#ffffff", null: false
+    t.string "primary_color", default: "oklch(21.03% 0.0059 285.89)", null: false
+    t.string "text_color", default: "oklch(100% 0 0)", null: false
     t.string "position", default: "right", null: false
     t.string "button_label", default: "Links", null: false
     t.string "button_icon", default: "grid", null: false

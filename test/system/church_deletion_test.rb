@@ -10,6 +10,7 @@ class ChurchDeletionTest < ApplicationSystemTestCase
 
     select "Gemeinde Eins", from: "Kirche wechseln"
     assert_selector "#header", text: "Gemeinde Eins"
+    wait_for_turbo
 
     click_on "Einstellungen"
     assert_selector "h1", text: "Kirche"

@@ -24,12 +24,12 @@
     <div class="field-row">
       <div class="field">
         <%= form.label :primary_color, "Hauptfarbe", class: "field__label" %>
-        <%= form.color_field :primary_color, class: "input input--color" %>
+        <%= form.color_field :primary_color, value: @hub.primary_color_hex, class: "input input--color" %>
         <%= field_error(@hub, :primary_color) %>
       </div>
       <div class="field">
         <%= form.label :text_color, "Textfarbe auf Hauptfarbe", class: "field__label" %>
-        <%= form.color_field :text_color, class: "input input--color" %>
+        <%= form.color_field :text_color, value: @hub.text_color_hex, class: "input input--color" %>
         <%= field_error(@hub, :text_color) %>
       </div>
     </div>
