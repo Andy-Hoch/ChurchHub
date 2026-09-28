@@ -15,6 +15,7 @@ de:
       church:
         name: Name
         slug: Kurzname
+        website_url: Webseite
       hub:
         title: Überschrift
         button_label: Button-Text

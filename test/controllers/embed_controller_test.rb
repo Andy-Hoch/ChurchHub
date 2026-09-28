@@ -26,6 +26,41 @@ class EmbedControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_modified
   end
 
+  test "serves the script on the church website and its subdomains" do
+    [ "https://gemeinde-eins.example/", "https://www.gemeinde-eins.example/kontakt", "https://jugend.gemeinde-eins.example/" ].each do |referer|
+      get embed_path(hubs(:one).public_token, format: :js), headers: { "Referer" => referer }
+
+      assert_match "Gottesdienst live", response.body, referer
+      assert_match "gemeinde-eins.example", response.body
+    end
+    assert_equal "Referer", response.headers["Vary"]
+  end
+
+  test "refuses to serve the script on foreign websites" do
+    [ "https://fremd.example/", "https://gemeinde-eins.example.fremd.example/" ].each do |referer|
+      get embed_path(hubs(:one).public_token, format: :js), headers: { "Referer" => referer }
+
+      assert_response :success
+      assert_match "nicht freigegeben", response.body
+      assert_no_match "Gottesdienst", response.body
+    end
+  end
+
+  test "lets the script check the page host when no referer is sent" do
+    get embed_path(hubs(:one).public_token, format: :js)
+
+    assert_match "Gottesdienst live", response.body
+    assert_match %(["gemeinde-eins.example","www.example.com"]), response.body
+  end
+
+  test "serves the script everywhere when the church has no website" do
+    churches(:one).update!(website_url: "")
+    get embed_path(hubs(:one).public_token, format: :js), headers: { "Referer" => "https://fremd.example/" }
+
+    assert_match "Gottesdienst live", response.body
+    assert_match "var allowedHosts = null;", response.body
+  end
+
   test "returns harmless script for disabled or unknown hubs" do
     hubs(:one).update!(enabled: false)
 
