@@ -22,7 +22,7 @@
 }
 
 .list-row--muted {
-  --list-background: rgb(from var(--color-border-light) r g b / .5);
+  --list-background: oklch(from var(--color-border-light) l c h / .5);
 }
 
 .list-row--borderless {
@@ -30,7 +30,7 @@
 }
 
 .list-row--link:hover {
-  --list-background: rgb(from var(--color-border-light) r g b / .5);
+  --list-background: oklch(from var(--color-border-light) l c h / .5);
 }
 
 .list-row--link:focus-visible {
@@ -38,6 +38,6 @@
 }
 
 .list-row--check:has(:checked) {
-  --list-background: rgb(from var(--color-border-light) r g b / .5);
+  --list-background: oklch(from var(--color-border-light) l c h / .5);
   --list-border-color: var(--color-primary);
 }
