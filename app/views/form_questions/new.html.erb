@@ -1,0 +1,5 @@
+<% content_for :title, "Neue Frage" %>
+
+<p class="text-sm"><%= link_to "← #{@form.title}", form_path(@form), class: "text-subtle" %></p>
+<h1 class="font-bold text-2xl mbe-4">Neue Frage</h1>
+<%= render "form", form: @form, question: @question %>

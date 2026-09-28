@@ -1,14 +1,39 @@
-<%= form_with model: link, url: (link.new_record? ? hub_links_path : hub_link_path(link)), class: "card flex flex-col gap" do |form| %>
+<%= form_with model: link, url: (link.new_record? ? hub_links_path : hub_link_path(link)), class: "card flex flex-col gap", data: { controller: "toggle-fields" } do |form| %>
   <div class="field">
     <%= form.label :title, "Titel", class: "field__label" %>
     <%= form.text_field :title, required: true, maxlength: 80, autofocus: true, class: "input" %>
     <%= field_error(link, :title) %>
   </div>
 
-  <div class="field">
+  <fieldset class="field">
+    <legend class="field__label">Was passiert beim Klick?</legend>
+    <div class="choice-group">
+      <label class="choice">
+        <%= form.radio_button :kind, "link", data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
+        <span>Webseite öffnen</span>
+      </label>
+      <label class="choice">
+        <%= form.radio_button :kind, "form", data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
+        <span>Formular öffnen</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="field" data-toggle-fields-target="section" data-show-for="link">
     <%= form.label :url, "Adresse (URL)", class: "field__label" %>
     <%= form.url_field :url, required: true, placeholder: "https://", class: "input" %>
     <%= field_error(link, :url) %>
+  </div>
+
+  <div class="field" data-toggle-fields-target="section" data-show-for="form">
+    <%= form.label :form_id, "Formular", class: "field__label" %>
+    <% if @forms.any? %>
+      <%= form.collection_select :form_id, @forms, :id, :title, { include_blank: "Bitte wählen …" }, required: true, class: "input" %>
+      <p class="field__hint">Das Formular öffnet sich im Launcher im Vollbild, eine Frage nach der anderen.</p>
+    <% else %>
+      <p class="field__hint">Noch keine Formulare vorhanden. <%= link_to "Formular anlegen", new_form_path, class: "text-link" %></p>
+    <% end %>
+    <%= field_error(link, :form) %>
   </div>
 
   <div class="field">

@@ -1,6 +1,14 @@
 module ApplicationHelper
-  def nav_link_to(name, path)
-    link_to name, path, class: "btn sidebar-menu__button", aria: { current: ("page" if current_page?(path)) }
+  def nav_link_to(name, path, badge: nil)
+    link_to path, class: "btn sidebar-menu__button", aria: { current: ("page" if current_page?(path)) } do
+      safe_join([ name, (tag.span(badge, class: "badge badge--primary mis-auto") if badge) ])
+    end
+  end
+
+  def unread_submissions_count
+    return 0 unless current_church
+
+    FormSubmission.unread.joins(:form).where(forms: { church_id: current_church.id }).count
   end
 
   def field_error(record, attribute)

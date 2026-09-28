@@ -1,0 +1,37 @@
+<% content_for :title, "Formulare" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="font-bold text-2xl">Formulare</h1>
+    <p class="text-sm text-subtle">Formulare öffnen sich im Launcher im Vollbild und stellen eine Frage nach der anderen.</p>
+  </div>
+  <%= link_to "Formular anlegen", new_form_path, class: "btn btn--primary" %>
+</div>
+
+<% if @forms.any? %>
+  <ul class="list" aria-label="Formulare">
+    <% @forms.each do |form| %>
+      <li class="list-row link-row">
+        <div class="link-row__body">
+          <div class="flex items-center gap-half">
+            <%= link_to form.title, form_path(form), class: "font-medium" %>
+            <% if (unread = @unread_counts[form.id].to_i).positive? %>
+              <span class="badge badge--primary"><%= unread %> neu</span>
+            <% end %>
+          </div>
+          <span class="link-row__url"><%= pluralize(@submission_counts[form.id].to_i, "Einsendung", plural: "Einsendungen") %></span>
+        </div>
+        <div class="link-row__actions">
+          <%= link_to "Einsendungen", form_submissions_path(form), class: "btn btn--sm" %>
+          <%= link_to "Bearbeiten", form_path(form), class: "btn btn--sm" %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="empty-state">
+    <p class="font-medium">Noch keine Formulare</p>
+    <p class="text-sm text-subtle">Starte mit einer Vorlage, z. B. für Gebetsanliegen oder Kontaktanfragen.</p>
+    <%= link_to "Erstes Formular anlegen", new_form_path, class: "btn btn--primary" %>
+  </div>
+<% end %>

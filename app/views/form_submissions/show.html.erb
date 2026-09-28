@@ -1,0 +1,23 @@
+<% content_for :title, "Einsendung – #{@form.title}" %>
+
+<p class="text-sm"><%= link_to "← Einsendungen „#{@form.title}“", form_submissions_path(@form), class: "text-subtle" %></p>
+
+<div class="page-header">
+  <div>
+    <h1 class="font-bold text-2xl">Einsendung</h1>
+    <p class="text-sm text-subtle">Eingegangen am <%= l @submission.created_at, format: :long %></p>
+  </div>
+  <div class="flex items-center gap-half">
+    <%= button_to "Als ungelesen markieren", toggle_read_form_submission_path(@form, @submission), method: :patch, class: "btn btn--sm" %>
+    <%= button_to "Löschen", form_submission_path(@form, @submission), method: :delete, class: "btn btn--sm btn--negative", form: { data: { turbo_confirm: "Einsendung wirklich löschen?" } } %>
+  </div>
+</div>
+
+<dl class="card answers">
+  <% @submission.answers.each do |answer| %>
+    <div class="answers__item">
+      <dt class="answers__question"><%= answer["label"] %></dt>
+      <dd class="answers__value"><%= FormSubmission.format_value(answer).presence || tag.span("Keine Angabe", class: "text-subtle") %></dd>
+    </div>
+  <% end %>
+</dl>

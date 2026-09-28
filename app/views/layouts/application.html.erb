@@ -26,6 +26,7 @@
             <div class="sidebar-menu__items">
               <%= nav_link_to "Links", hub_path %>
               <%= nav_link_to "Design", edit_hub_path %>
+              <%= nav_link_to "Formulare", forms_path, badge: unread_submissions_count.nonzero? %>
               <%= nav_link_to "Einbinden", embed_hub_path %>
             </div>
           </div>

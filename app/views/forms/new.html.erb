@@ -1,0 +1,32 @@
+<% content_for :title, "Neues Formular" %>
+
+<div class="page-header">
+  <div>
+    <h1 class="font-bold text-2xl">Neues Formular</h1>
+    <p class="text-sm text-subtle">Wähle eine Vorlage und passe sie danach an – oder starte mit einem leeren Formular.</p>
+  </div>
+</div>
+
+<div class="template-grid mbe-4">
+  <% FormTemplate.all.each do |template| %>
+    <%= button_to forms_path, params: { template: template.key }, class: "template-card" do %>
+      <span class="template-card__icon" aria-hidden="true"><%= template.icon %></span>
+      <span class="font-medium"><%= template.name %></span>
+      <span class="text-sm text-subtle"><%= template.description %></span>
+      <span class="text-xs text-subtle"><%= pluralize(template.questions.size, "Frage", plural: "Fragen") %></span>
+    <% end %>
+  <% end %>
+</div>
+
+<%= form_with model: @form, url: forms_path, class: "card flex flex-col gap" do |form| %>
+  <h2 class="font-medium">Leeres Formular</h2>
+  <div class="field">
+    <%= form.label :title, "Titel", class: "field__label" %>
+    <%= form.text_field :title, required: true, maxlength: 80, class: "input" %>
+    <%= field_error(@form, :title) %>
+  </div>
+  <div class="card__footer flex items-center gap">
+    <%= form.submit "Anlegen", class: "btn btn--primary" %>
+    <%= link_to "Abbrechen", forms_path, class: "btn btn--borderless" %>
+  </div>
+<% end %>

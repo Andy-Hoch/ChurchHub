@@ -65,3 +65,6 @@ end
 
 gem "css-zero", "~> 4.3"
 gem "rails-i18n", "~> 8.1"
+
+# CSV export of form submissions (no longer a default gem since Ruby 3.4)
+gem "csv"

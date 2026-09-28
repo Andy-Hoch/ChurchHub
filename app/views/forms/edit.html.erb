@@ -1,0 +1,71 @@
+<% content_for :title, "Einstellungen – #{@form.title}" %>
+
+<%= render "header", form: @form, current: :settings %>
+
+<%= form_with model: @form, url: form_path(@form), method: :patch, class: "card flex flex-col gap" do |form| %>
+  <div class="field">
+    <%= form.label :title, "Titel", class: "field__label" %>
+    <%= form.text_field :title, required: true, maxlength: 80, class: "input" %>
+    <%= field_error(@form, :title) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :intro, "Begrüßungstext (optional)", class: "field__label" %>
+    <%= form.text_area :intro, rows: 3, maxlength: 1000, class: "input" %>
+    <p class="field__hint">Erscheint vor der ersten Frage. Ohne Text startet das Formular direkt mit der ersten Frage.</p>
+    <%= field_error(@form, :intro) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :thank_you_message, "Danke-Text (optional)", class: "field__label" %>
+    <%= form.text_area :thank_you_message, rows: 2, maxlength: 1000, placeholder: "Vielen Dank! Wir haben deine Angaben erhalten.", class: "input" %>
+    <%= field_error(@form, :thank_you_message) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :submit_label, "Text des Absenden-Buttons (optional)", class: "field__label" %>
+    <%= form.text_field :submit_label, maxlength: 30, placeholder: "Absenden", class: "input" %>
+    <%= field_error(@form, :submit_label) %>
+  </div>
+
+  <h2 class="font-medium mbs-2">Benachrichtigung</h2>
+  <div class="field">
+    <%= form.label :notification_emails, "E-Mail an (optional)", class: "field__label" %>
+    <%= form.text_field :notification_emails, placeholder: "pastor@gemeinde.de, buero@gemeinde.de", class: "input" %>
+    <p class="field__hint">Mehrere Adressen mit Komma trennen. Die E-Mail enthält nur einen Hinweis und einen Link, keine Antworten.</p>
+    <%= field_error(@form, :notification_emails) %>
+  </div>
+
+  <h2 class="font-medium mbs-2">Datenschutz</h2>
+  <div class="field">
+    <%= form.label :consent_text, "Einwilligungstext (optional)", class: "field__label" %>
+    <%= form.text_area :consent_text, rows: 2, maxlength: 1000, placeholder: "Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden.", class: "input" %>
+    <p class="field__hint">Wenn ausgefüllt, muss vor dem Absenden ein Häkchen gesetzt werden.</p>
+    <%= field_error(@form, :consent_text) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :privacy_url, "Link zur Datenschutzerklärung (optional)", class: "field__label" %>
+    <%= form.url_field :privacy_url, placeholder: "https://", class: "input" %>
+    <%= field_error(@form, :privacy_url) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :retention_months, "Einsendungen automatisch löschen", class: "field__label" %>
+    <%= form.select :retention_months, [ [ "Nie", nil ] ] + Form::RETENTION_OPTIONS.map { |months| [ "nach #{pluralize(months, "Monat", plural: "Monaten")}", months ] }, {}, class: "input" %>
+    <%= field_error(@form, :retention_months) %>
+  </div>
+
+  <div class="card__footer flex items-center gap">
+    <%= form.submit "Speichern", class: "btn btn--primary" %>
+    <%= link_to "Abbrechen", form_path(@form), class: "btn btn--borderless" %>
+  </div>
+<% end %>
+
+<div class="card flex flex-col gap mbs-4">
+  <h2 class="font-medium">Formular löschen</h2>
+  <p class="text-sm text-subtle">Löscht das Formular mit allen Fragen und Einsendungen. Verknüpfte Buttons werden im Launcher ausgeblendet.</p>
+  <div>
+    <%= button_to "Formular löschen", form_path(@form), method: :delete, class: "btn btn--negative", form: { data: { turbo_confirm: "„#{@form.title}“ mit allen Einsendungen wirklich löschen?" } } %>
+  </div>
+</div>
