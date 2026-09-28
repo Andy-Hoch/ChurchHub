@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_28_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_29_100003) do
   create_table "churches", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -18,6 +18,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_130000) do
     t.datetime "updated_at", null: false
     t.string "website_url"
     t.index ["slug"], name: "index_churches_on_slug", unique: true
+  end
+
+  create_table "form_questions", force: :cascade do |t|
+    t.integer "form_id", null: false
+    t.string "kind", default: "short_text", null: false
+    t.string "label", null: false
+    t.string "help_text"
+    t.boolean "required", default: false, null: false
+    t.json "choices", default: [], null: false
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_id", "position"], name: "index_form_questions_on_form_id_and_position"
+    t.index ["form_id"], name: "index_form_questions_on_form_id"
+  end
+
+  create_table "form_submissions", force: :cascade do |t|
+    t.integer "form_id", null: false
+    t.json "answers", default: [], null: false
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["form_id", "created_at"], name: "index_form_submissions_on_form_id_and_created_at"
+  end
+
+  create_table "forms", force: :cascade do |t|
+    t.integer "church_id", null: false
+    t.string "title", null: false
+    t.text "intro"
+    t.text "thank_you_message"
+    t.string "submit_label"
+    t.string "notification_emails"
+    t.text "consent_text"
+    t.string "privacy_url"
+    t.integer "retention_months"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["church_id"], name: "index_forms_on_church_id"
   end
 
   create_table "hubs", force: :cascade do |t|
@@ -41,13 +79,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_130000) do
   create_table "links", force: :cascade do |t|
     t.integer "hub_id", null: false
     t.string "title", null: false
-    t.string "url", null: false
+    t.string "url"
     t.string "description"
     t.string "icon"
     t.integer "position", default: 0, null: false
     t.boolean "visible", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "kind", default: "link", null: false
+    t.integer "form_id"
+    t.index ["form_id"], name: "index_links_on_form_id"
     t.index ["hub_id", "position"], name: "index_links_on_hub_id_and_position"
     t.index ["hub_id"], name: "index_links_on_hub_id"
   end
@@ -81,7 +122,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_28_130000) do
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
   end
 
+  add_foreign_key "form_questions", "forms"
+  add_foreign_key "form_submissions", "forms"
+  add_foreign_key "forms", "churches"
   add_foreign_key "hubs", "churches"
+  add_foreign_key "links", "forms", on_delete: :nullify
   add_foreign_key "links", "hubs"
   add_foreign_key "memberships", "churches"
   add_foreign_key "memberships", "users"

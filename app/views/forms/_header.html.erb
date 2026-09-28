@@ -1,0 +1,23 @@
+<div class="page-header">
+  <div>
+    <p class="text-sm"><%= link_to "← Alle Formulare", forms_path, class: "text-subtle" %></p>
+    <h1 class="font-bold text-2xl"><%= form.title %></h1>
+    <% if form.links.any? %>
+      <p class="text-sm text-subtle">Im Hub als Button „<%= form.links.map(&:title).to_sentence %>“ verknüpft.</p>
+    <% else %>
+      <p class="text-sm text-subtle">
+        Noch nicht im Hub verknüpft.
+        <%= link_to "Als Button hinzufügen", new_hub_link_path(kind: "form", form_id: form.id), class: "text-link" %>
+      </p>
+    <% end %>
+  </div>
+</div>
+
+<nav class="tabs mbe-4" aria-label="Formular">
+  <%= link_to "Fragen", form_path(form), class: "tabs__tab", aria: { current: ("page" if current == :questions) } %>
+  <%= link_to form_submissions_path(form), class: "tabs__tab", aria: { current: ("page" if current == :submissions) } do %>
+    Einsendungen
+    <% if (unread = form.submissions.unread.count).positive? %><span class="badge badge--primary"><%= unread %></span><% end %>
+  <% end %>
+  <%= link_to "Einstellungen", edit_form_path(form), class: "tabs__tab", aria: { current: ("page" if current == :settings) } %>
+</nav>

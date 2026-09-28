@@ -1,0 +1,32 @@
+request:
+  form: prayer
+  kind: long_text
+  label: Wofür dürfen wir beten?
+  required: true
+  position: 0
+
+name:
+  form: prayer
+  kind: short_text
+  label: Wie heißt du?
+  position: 1
+
+visibility:
+  form: prayer
+  kind: single_choice
+  label: Wer darf davon erfahren?
+  required: true
+  choices: [ "Nur das Gebetsteam", "Die ganze Gemeinde" ]
+  position: 2
+
+email:
+  form: prayer
+  kind: email
+  label: Deine E-Mail-Adresse
+  position: 3
+
+other:
+  form: other
+  kind: short_text
+  label: Frage der anderen Kirche
+  position: 0

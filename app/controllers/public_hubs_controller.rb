@@ -6,7 +6,8 @@ class PublicHubsController < ActionController::Base
     @hub = church.hub
     raise ActiveRecord::RecordNotFound unless @hub&.enabled?
 
-    @links = @hub.links.select(&:visible?)
+    # Forms only open inside the embedded launcher.
+    @links = @hub.links.select { |link| link.visible? && link.kind_link? }
     fresh_when @hub, public: true
   end
 end

@@ -2,9 +2,10 @@ class LinksController < ApplicationController
   before_action :require_church
   before_action :set_hub
   before_action :set_link, only: %i[ edit update destroy position ]
+  before_action :set_forms, only: %i[ new create edit update ]
 
   def new
-    @link = @hub.links.new
+    @link = @hub.links.new(kind: params[:kind].presence_in(Link.kinds.keys) || "link", form_id: @forms.find_by(id: params[:form_id])&.id)
   end
 
   def create
@@ -47,7 +48,11 @@ class LinksController < ApplicationController
       @link = @hub.links.find(params[:id])
     end
 
+    def set_forms
+      @forms = current_church.forms.order(:title)
+    end
+
     def link_params
-      params.expect(link: %i[ title url description icon visible ])
+      params.expect(link: %i[ title kind url form_id description icon visible ])
     end
 end

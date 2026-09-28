@@ -1,0 +1,41 @@
+<% content_for :title, "Einsendungen – #{@form.title}" %>
+
+<%= render "forms/header", form: @form, current: :submissions %>
+
+<div class="page-header">
+  <nav class="filter-nav flex items-center gap-half" aria-label="Filter">
+    <%= link_to "Alle", form_submissions_path(@form), class: "btn btn--sm", aria: { current: ("page" if params[:filter] != "unread") } %>
+    <%= link_to "Ungelesen", form_submissions_path(@form, filter: "unread"), class: "btn btn--sm", aria: { current: ("page" if params[:filter] == "unread") } %>
+  </nav>
+  <% if @form.submissions.any? %>
+    <div class="flex items-center gap-half">
+      <%= link_to "Als CSV exportieren", form_submissions_path(@form, format: :csv), class: "btn btn--sm", data: { turbo: false } %>
+      <%= button_to "Alle löschen", destroy_all_form_submissions_path(@form), method: :delete, class: "btn btn--sm btn--negative", form: { data: { turbo_confirm: "Wirklich alle #{@form.submissions.count} Einsendungen löschen? Das kann nicht rückgängig gemacht werden." } } %>
+    </div>
+  <% end %>
+</div>
+
+<% if @submissions.any? %>
+  <ul class="list" aria-label="Einsendungen">
+    <% @submissions.each do |submission| %>
+      <li class="list-row link-row <%= "submission-row--unread" unless submission.read? %>">
+        <div class="link-row__body">
+          <div class="flex items-center gap-half">
+            <%= link_to submission.excerpt.presence || "(keine Antworten)", form_submission_path(@form, submission), class: "submission-row__title" %>
+            <% unless submission.read? %><span class="badge badge--primary">Neu</span><% end %>
+          </div>
+          <span class="link-row__url"><%= l submission.created_at, format: :long %></span>
+        </div>
+        <div class="link-row__actions">
+          <%= button_to submission.read? ? "Als ungelesen markieren" : "Als gelesen markieren", toggle_read_form_submission_path(@form, submission), method: :patch, class: "btn btn--sm" %>
+          <%= button_to "Löschen", form_submission_path(@form, submission), method: :delete, class: "btn btn--sm btn--negative", form: { data: { turbo_confirm: "Einsendung wirklich löschen?" } } %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <div class="empty-state">
+    <p class="font-medium"><%= params[:filter] == "unread" ? "Keine ungelesenen Einsendungen" : "Noch keine Einsendungen" %></p>
+    <p class="text-sm text-subtle">Sobald jemand das Formular im Launcher abschickt, erscheint es hier.</p>
+  </div>
+<% end %>

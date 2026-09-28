@@ -38,7 +38,7 @@ class Hub < ApplicationRecord
     {
       title: title,
       theme: theme,
-      links: links.select(&:visible?).map(&:embed_payload)
+      links: links.select(&:embeddable?).map(&:embed_payload)
     }
   end
 end

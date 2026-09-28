@@ -1,0 +1,37 @@
+<% content_for :title, @form.title %>
+
+<%= render "header", form: @form, current: :questions %>
+
+<div class="page-header">
+  <p class="text-sm text-subtle">Im Launcher erscheint immer nur eine Frage. Zum Sortieren einfach ziehen.</p>
+  <%= link_to "Frage hinzufügen", new_form_question_path(@form), class: "btn btn--primary" %>
+</div>
+
+<% if @form.questions.any? %>
+  <ol class="list" data-controller="sortable" data-sortable-handle-value=".link-row__handle" aria-label="Fragen">
+    <% @form.questions.each do |question| %>
+      <li class="list-row link-row" data-url-value="<%= position_form_question_path(@form, question) %>">
+        <span class="link-row__handle" title="Ziehen zum Sortieren" aria-hidden="true">⋮⋮</span>
+        <div class="link-row__body">
+          <div class="flex items-center gap-half">
+            <span class="font-medium"><%= question.label %></span>
+            <% if question.required? %><span class="badge">Pflicht</span><% end %>
+          </div>
+          <span class="link-row__url">
+            <%= question.kind_name %><% if question.choice_kind? %>: <%= question.choices.join(" · ") %><% end %>
+          </span>
+        </div>
+        <div class="link-row__actions">
+          <%= link_to "Bearbeiten", edit_form_question_path(@form, question), class: "btn btn--sm" %>
+          <%= button_to "Löschen", form_question_path(@form, question), method: :delete, class: "btn btn--sm btn--negative", form: { data: { turbo_confirm: "Frage „#{question.label}“ wirklich löschen?" } } %>
+        </div>
+      </li>
+    <% end %>
+  </ol>
+<% else %>
+  <div class="empty-state">
+    <p class="font-medium">Noch keine Fragen</p>
+    <p class="text-sm text-subtle">Ohne Fragen kann das Formular nicht abgeschickt werden.</p>
+    <%= link_to "Erste Frage hinzufügen", new_form_question_path(@form), class: "btn btn--primary" %>
+  </div>
+<% end %>

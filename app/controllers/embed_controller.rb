@@ -8,7 +8,7 @@ class EmbedController < ActionController::Base
   def show
     expires_in 5.minutes, public: true
     response.headers["Vary"] = "Referer"
-    @hub = Hub.includes(:church, :links).find_by(public_token: params[:token], enabled: true)
+    @hub = Hub.includes(:church, links: { form: :questions }).find_by(public_token: params[:token], enabled: true)
 
     if @hub.nil?
       render js: "/* Hub nicht gefunden oder deaktiviert */"

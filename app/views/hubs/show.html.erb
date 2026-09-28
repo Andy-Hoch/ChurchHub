@@ -17,9 +17,14 @@
         <div class="link-row__body">
           <div class="flex items-center gap-half">
             <span class="font-medium"><%= link.title %></span>
+            <% if link.kind_form? %><span class="badge">Formular</span><% end %>
             <% unless link.visible? %><span class="badge badge--secondary">Ausgeblendet</span><% end %>
           </div>
-          <span class="link-row__url"><%= link.url %></span>
+          <% if link.kind_form? %>
+            <span class="link-row__url"><%= link.form ? link.form.title : "Formular wurde gelöscht – wird nicht angezeigt" %></span>
+          <% else %>
+            <span class="link-row__url"><%= link.url %></span>
+          <% end %>
         </div>
         <div class="link-row__actions">
           <%= link_to "Bearbeiten", edit_hub_link_path(link), class: "btn btn--sm" %>

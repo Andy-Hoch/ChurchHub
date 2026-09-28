@@ -1,0 +1,161 @@
+# Vorlagen für neue Formulare. Beim Anlegen wird eine Kopie erstellt,
+# die Kirche kann danach alles anpassen.
+prayer:
+  name: Gebetsanliegen
+  icon: 🙏
+  description: Anliegen teilen, auf Wunsch vertraulich und mit Rückmeldung.
+  title: Gebetsanliegen
+  intro: Wir beten gerne für dich. Teile dein Anliegen mit uns – so ausführlich, wie du möchtest.
+  thank_you_message: Danke, dass du dein Anliegen mit uns teilst. Wir beten für dich.
+  submit_label: Anliegen senden
+  questions:
+    - kind: long_text
+      label: Wofür dürfen wir beten?
+      required: true
+    - kind: short_text
+      label: Wie heißt du?
+      help_text: Optional – du kannst auch anonym bleiben.
+    - kind: single_choice
+      label: Wer darf von deinem Anliegen erfahren?
+      required: true
+      choices:
+        - Nur das Gebetsteam
+        - Gerne auch die Gemeinde im Gottesdienst
+    - kind: yes_no
+      label: Möchtest du, dass sich jemand bei dir meldet?
+      required: true
+    - kind: email
+      label: Unter welcher E-Mail-Adresse erreichen wir dich?
+      help_text: Nur nötig, wenn du eine Rückmeldung möchtest.
+
+contact:
+  name: Kontakt / Rückruf
+  icon: 📞
+  description: Nachricht oder Rückrufwunsch mit bevorzugter Zeit.
+  title: Kontakt
+  intro: Du hast eine Frage oder möchtest mit jemandem sprechen? Schreib uns, wir melden uns.
+  thank_you_message: Danke für deine Nachricht! Wir melden uns so bald wie möglich.
+  submit_label: Nachricht senden
+  questions:
+    - kind: short_text
+      label: Wie heißt du?
+      required: true
+    - kind: long_text
+      label: Worum geht es?
+      required: true
+    - kind: single_choice
+      label: Wie sollen wir uns melden?
+      required: true
+      choices:
+        - Per E-Mail
+        - Per Telefon
+    - kind: email
+      label: Deine E-Mail-Adresse
+    - kind: phone
+      label: Deine Telefonnummer
+    - kind: single_choice
+      label: Wann passt ein Rückruf am besten?
+      choices:
+        - Vormittags
+        - Nachmittags
+        - Abends
+        - Egal
+
+volunteer:
+  name: Mitarbeit
+  icon: 🤝
+  description: Interesse an Mitarbeitsbereichen sammeln.
+  title: Mitarbeiten
+  intro: Schön, dass du dich einbringen möchtest! Erzähl uns kurz, was dich interessiert.
+  thank_you_message: Danke für dein Interesse! Jemand aus dem passenden Team meldet sich bei dir.
+  submit_label: Absenden
+  questions:
+    - kind: short_text
+      label: Wie heißt du?
+      required: true
+    - kind: email
+      label: Deine E-Mail-Adresse
+      required: true
+    - kind: phone
+      label: Deine Telefonnummer
+    - kind: multiple_choice
+      label: Wo würdest du gerne mitarbeiten?
+      required: true
+      choices:
+        - Kinder
+        - Jugend
+        - Musik / Lobpreis
+        - Technik
+        - Begrüßung & Café
+        - Gebet
+        - Anderes
+    - kind: long_text
+      label: Möchtest du uns noch etwas mitteilen?
+
+baptism:
+  name: Taufe
+  icon: 💧
+  description: Anfrage für eine Taufe oder ein Taufgespräch.
+  title: Taufanfrage
+  intro: Wie schön, dass du über eine Taufe nachdenkst! Wir melden uns für ein erstes Gespräch.
+  thank_you_message: Danke für deine Anfrage! Wir melden uns bei dir, um alles Weitere zu besprechen.
+  submit_label: Anfrage senden
+  questions:
+    - kind: short_text
+      label: Wie heißt du?
+      required: true
+    - kind: single_choice
+      label: Für wen ist die Taufe?
+      required: true
+      choices:
+        - Für mich
+        - Für mein Kind
+        - Für jemand anderen
+    - kind: short_text
+      label: Name der Person, die getauft werden soll
+      help_text: Falls es nicht um dich geht.
+    - kind: email
+      label: Deine E-Mail-Adresse
+      required: true
+    - kind: phone
+      label: Deine Telefonnummer
+    - kind: date
+      label: Hast du einen Wunschtermin?
+    - kind: long_text
+      label: Was möchtest du uns noch sagen?
+
+new_here:
+  name: Neu hier
+  icon: 👋
+  description: Digitale Willkommenskarte für Gäste.
+  title: Neu hier?
+  intro: Herzlich willkommen! Wir freuen uns, dich kennenzulernen.
+  thank_you_message: Schön, dass du da bist! Wir melden uns bald bei dir.
+  submit_label: Absenden
+  questions:
+    - kind: short_text
+      label: Wie heißt du?
+      required: true
+    - kind: email
+      label: Deine E-Mail-Adresse
+    - kind: single_choice
+      label: Wie hast du von uns erfahren?
+      choices:
+        - Freunde oder Familie
+        - Internet
+        - Social Media
+        - Vorbeigekommen
+        - Anderes
+    - kind: multiple_choice
+      label: Was interessiert dich?
+      choices:
+        - Gottesdienste
+        - Kleingruppen
+        - Angebote für Kinder
+        - Angebote für Jugendliche
+        - Mitarbeit
+    - kind: yes_no
+      label: Möchtest du, dass sich jemand bei dir meldet?
+      required: true
+    - kind: long_text
+      label: Möchtest du uns noch etwas sagen?

@@ -12,6 +12,9 @@
 
   var script = document.currentScript;
   var options = (script && script.dataset) || {};
+  // Submissions go to /embed/<token>/forms/<id>/submissions next to this script.
+  // Inline copies (the admin preview) have no src and only simulate sending.
+  var endpoint = script && script.src ? script.src.replace(/\.js(\?.*)?$/, "") : null;
 
   var ICONS = {
     grid: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
@@ -19,8 +22,30 @@
     heart: '<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/>',
     cross: '<path d="M12 2v20M6 8h12"/>',
     link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
-    close: '<path d="M18 6 6 18M6 6l12 12"/>'
+    close: '<path d="M18 6 6 18M6 6l12 12"/>',
+    chevron: '<path d="m9 18 6-6-6-6"/>',
+    check: '<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>'
   };
+
+  var MESSAGES = {
+    required: "Bitte beantworte diese Frage.",
+    email: "Bitte gib eine gültige E-Mail-Adresse ein.",
+    phone: "Bitte gib eine gültige Telefonnummer ein.",
+    number: "Bitte gib eine Zahl ein.",
+    date: "Bitte gib ein gültiges Datum ein.",
+    consent: "Bitte stimme der Datenverarbeitung zu.",
+    network: "Das Absenden hat nicht geklappt. Bitte prüfe deine Verbindung und versuche es erneut.",
+    discard: "Deine Eingaben gehen verloren. Formular wirklich schließen?"
+  };
+
+  var FORMATS = {
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+    phone: /^\+?[\d\s()\/.-]{5,30}$/,
+    number: /^-?\d+([.,]\d+)?$/,
+    date: /^\d{4}-\d{2}-\d{2}$/
+  };
+
+  var INPUT_TYPES = { email: "email", phone: "tel", date: "date" };
 
   var STYLES = [
     ":host { all: initial; }",
@@ -43,18 +68,68 @@
     ".close { all: unset; cursor: pointer; display: inline-flex; padding: 4px; border-radius: 6px; }",
     ".list { list-style: none; margin: 0; padding: 8px; display: grid; gap: 4px; }",
     ".link { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: calc(var(--radius) * .66); color: inherit; text-decoration: none; }",
+    "button.link { all: unset; box-sizing: border-box; cursor: pointer; display: flex; width: 100%; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: calc(var(--radius) * .66); }",
     ".link:hover { background: light-dark(oklch(96.74% 0.0013 286.38), oklch(27.39% 0.0055 286.03)); }",
     ".emoji { font-size: 20px; line-height: 1.2; width: 24px; text-align: center; flex-shrink: 0; }",
+    ".link-text { flex: 1; min-width: 0; }",
     ".link-title { display: block; font-weight: 600; }",
     ".link-description { display: block; font-size: 13px; color: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); }",
+    ".link .chevron { width: 16px; height: 16px; margin-top: 2px; opacity: .5; }",
     ".empty { padding: 16px; margin: 0; color: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); }",
     "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
     "@media (max-width: 640px) { :host(:not([data-inline])) .panel { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; max-height: none; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; } :host(:not([data-inline])) .header { position: sticky; top: 0; padding-top: max(14px, env(safe-area-inset-top)); } :host(:not([data-inline])) .panel:not([hidden]) + .button { display: none; } :host(:not([data-inline])) .close { padding: 8px; } }",
-    "@media (prefers-reduced-motion: reduce) { .panel { animation: none; } .button { transition: none; } }"
+
+    ".form { --radius: calc(var(--ph-radius) * 1px); --border: light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); --muted: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); --negative: light-dark(oklch(57.71% 0.2152 27.33), oklch(70.4% 0.191 22.22)); color-scheme: var(--ph-scheme); font: 400 16px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; position: fixed; inset: 0; z-index: 2147483001; display: flex; flex-direction: column; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); color: light-dark(oklch(14.08% 0.0044 285.82), oklch(98.51% 0 0)); }",
+    ".form--enter { animation: ph-fade .2s ease-out; }",
+    ":host([data-inline]) .form { position: absolute; }",
+    ".form *, .form *::before, .form *::after { box-sizing: border-box; }",
+    ".form-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); background: var(--ph-primary); color: var(--ph-text); }",
+    ".form-header .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
+    ".progress { height: 4px; flex-shrink: 0; background: var(--border); }",
+    ".progress-bar { height: 100%; background: var(--ph-primary); transition: width .25s ease; }",
+    ".form-body { flex: 1; overflow: auto; overscroll-behavior: contain; display: flex; }",
+    ".step { margin: auto; width: min(560px, 100%); padding: 32px 20px; animation: ph-step .2s ease-out; }",
+    ".step-count { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--muted); }",
+    ".question { margin: 0 0 8px; font-size: clamp(20px, 4.5vw, 26px); font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }",
+    ".optional { font-size: 14px; font-weight: 400; color: var(--muted); }",
+    ".help, .intro { margin: 0 0 8px; color: var(--muted); white-space: pre-line; overflow-wrap: anywhere; }",
+    ".intro { font-size: 17px; color: inherit; }",
+    ".input { display: block; width: 100%; margin-top: 16px; font: inherit; font-size: 18px; padding: 12px 14px; color: inherit; background: transparent; border: 1px solid var(--border); border-radius: calc(var(--radius) * .66); }",
+    ".input:focus, .option:has(:focus-visible) { outline: 2px solid var(--ph-primary); outline-offset: 1px; }",
+    ".input[aria-invalid=true] { border-color: var(--negative); }",
+    "textarea.input { min-height: 160px; resize: vertical; }",
+    ".options { display: grid; gap: 10px; margin-top: 16px; }",
+    ".option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--border); border-radius: calc(var(--radius) * .66); cursor: pointer; overflow-wrap: anywhere; }",
+    ".option:has(:checked) { border-color: var(--ph-primary); box-shadow: inset 0 0 0 1px var(--ph-primary); }",
+    ".option input { flex-shrink: 0; width: 18px; height: 18px; margin: 0; accent-color: var(--ph-primary); }",
+    ".error { margin: 12px 0 0; color: var(--negative); font-size: 14px; font-weight: 500; }",
+    ".error:empty { display: none; }",
+    ".review { margin: 16px 0 0; padding: 0; }",
+    ".review-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }",
+    ".review-text { flex: 1; min-width: 0; }",
+    ".review-label { display: block; font-size: 13px; color: var(--muted); }",
+    ".review-value { display: block; margin: 2px 0 0; white-space: pre-line; overflow-wrap: anywhere; }",
+    ".review-value--empty { color: var(--muted); font-style: italic; }",
+    ".edit { all: unset; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: underline; padding: 2px 4px; border-radius: 4px; }",
+    ".consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; font-size: 14px; cursor: pointer; }",
+    ".consent input { flex-shrink: 0; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--ph-primary); }",
+    ".consent a { color: inherit; }",
+    ".done { text-align: center; }",
+    ".done .icon { width: 56px; height: 56px; color: var(--ph-primary); stroke-width: 1.5; margin-bottom: 12px; }",
+    ".form-footer { display: flex; gap: 12px; padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }",
+    ".btn { all: unset; box-sizing: border-box; cursor: pointer; padding: 12px 22px; border-radius: max(8px, calc(var(--radius) * .66)); font-weight: 600; text-align: center; }",
+    ".btn-primary { margin-inline-start: auto; background: var(--ph-primary); color: var(--ph-text); }",
+    ".btn-secondary { border: 1px solid var(--border); }",
+    ".btn[disabled] { opacity: .6; cursor: default; }",
+    ".btn:focus-visible, .edit:focus-visible { outline: 2px solid var(--ph-primary); outline-offset: 2px; }",
+    ".hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }",
+    "@keyframes ph-fade { from { opacity: 0; } }",
+    "@keyframes ph-step { from { opacity: 0; transform: translateY(8px); } }",
+    "@media (prefers-reduced-motion: reduce) { .panel, .form--enter, .step { animation: none; } .button, .progress-bar { transition: none; } }"
   ].join("\n");
 
-  function svg(name) {
-    return '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || ICONS.grid) + "</svg>";
+  function svg(name, className) {
+    return '<svg class="icon' + (className ? " " + className : "") + '" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || ICONS.grid) + "</svg>";
   }
 
   function safeUrl(url) {
@@ -66,6 +141,35 @@
     if (className) node.className = className;
     if (text) node.textContent = text;
     return node;
+  }
+
+  function button(className, text, onClick) {
+    var node = el("button", className, text);
+    node.type = "button";
+    node.addEventListener("click", onClick);
+    return node;
+  }
+
+  function isBlank(value) {
+    return Array.isArray(value) ? value.length === 0 : !String(value == null ? "" : value).trim();
+  }
+
+  // Mirrors FormQuestion#parse_answer on the server.
+  function validate(question, value) {
+    if (isBlank(value)) return question.required ? MESSAGES.required : null;
+    if (Array.isArray(value)) return null;
+
+    value = String(value).trim();
+    if (question.maxLength && value.length > question.maxLength) return "Bitte höchstens " + question.maxLength + " Zeichen.";
+    if (FORMATS[question.kind] && !FORMATS[question.kind].test(value)) return MESSAGES[question.kind];
+    return null;
+  }
+
+  function formatAnswer(question, value) {
+    if (isBlank(value)) return null;
+    if (Array.isArray(value)) return value.join(", ");
+    if (question.kind === "date" && FORMATS.date.test(value)) return value.split("-").reverse().join(".");
+    return String(value).trim();
   }
 
   function mount() {
@@ -81,11 +185,13 @@
     var root = host.attachShadow({ mode: "open" });
     var theme = Object.assign({}, data.theme);
     var open = options.open === "true";
+    var activeForm = null;
 
     var style = el("style");
     style.textContent = STYLES;
     var launcher = el("div", "launcher");
-    root.append(style, launcher);
+    var formLayer = el("div");
+    root.append(style, launcher, formLayer);
     container.appendChild(host);
 
     function render() {
@@ -116,42 +222,419 @@
       } else {
         var list = el("ul", "list");
         data.links.forEach(function (item) {
-          var href = safeUrl(item.url);
-          if (!href) return;
-          var li = el("li");
-          var a = el("a", "link");
-          a.href = href;
-          a.target = "_blank";
-          a.rel = "noopener";
-          a.appendChild(el("span", "emoji", item.icon || "🔗")).setAttribute("aria-hidden", "true");
-          var text = el("span");
+          var node;
+          if (item.type === "form" && item.form) {
+            node = button("link", null, function () { openForm(item.form, node); });
+            node.setAttribute("aria-haspopup", "dialog");
+          } else {
+            var href = safeUrl(item.url);
+            if (!href) return;
+            node = el("a", "link");
+            node.href = href;
+            node.target = "_blank";
+            node.rel = "noopener";
+          }
+          node.appendChild(el("span", "emoji", item.icon || (item.type === "form" ? "📝" : "🔗"))).setAttribute("aria-hidden", "true");
+          var text = el("span", "link-text");
           text.appendChild(el("span", "link-title", item.title));
           if (item.description) text.appendChild(el("span", "link-description", item.description));
-          a.appendChild(text);
-          li.appendChild(a);
+          node.appendChild(text);
+          if (item.type === "form") node.insertAdjacentHTML("beforeend", svg("chevron", "chevron"));
+          var li = el("li");
+          li.appendChild(node);
           list.appendChild(li);
         });
         panel.appendChild(list);
       }
 
-      var button = el("button", "button");
-      button.type = "button";
-      button.setAttribute("aria-expanded", String(open));
-      button.setAttribute("aria-controls", panelId);
-      button.innerHTML = svg(open ? "close" : theme.buttonIcon);
-      button.appendChild(el("span", null, theme.buttonLabel));
+      var toggleButton = el("button", "button");
+      toggleButton.type = "button";
+      toggleButton.setAttribute("aria-expanded", String(open));
+      toggleButton.setAttribute("aria-controls", panelId);
+      toggleButton.innerHTML = svg(open ? "close" : theme.buttonIcon);
+      toggleButton.appendChild(el("span", null, theme.buttonLabel));
 
-      launcher.append(panel, button);
+      launcher.append(panel, toggleButton);
 
-      button.addEventListener("click", function () { toggle(!open, true); });
+      toggleButton.addEventListener("click", function () { toggle(!open, true); });
       close.addEventListener("click", function () { toggle(false, true); });
     }
+
+    // Forms: a full-screen dialog that shows one step at a time
+    // (intro, one step per question, review, thank you).
+
+    function openForm(form, trigger) {
+      var steps = [];
+      if (form.intro) steps.push({ type: "intro" });
+      form.questions.forEach(function (question, index) {
+        steps.push({ type: "question", question: question, number: index + 1 });
+      });
+      steps.push({ type: "review" });
+
+      activeForm = {
+        form: form, steps: steps, index: 0, answers: {}, errors: {}, consent: false, honeypot: "",
+        returnToReview: false, submitting: false, done: false, error: "", startedAt: Date.now(), trigger: trigger, entering: true
+      };
+      lockScroll();
+      renderForm(true);
+    }
+
+    function closeForm(askFirst) {
+      var state = activeForm;
+      if (!state) return;
+      if (askFirst && !state.done && isDirty(state) && !window.confirm(MESSAGES.discard)) return;
+
+      activeForm = null;
+      formLayer.replaceChildren();
+      lockScroll();
+      var target = state.trigger && state.trigger.isConnected ? state.trigger : root.querySelector(".link, .button");
+      if (target) target.focus();
+    }
+
+    function isDirty(state) {
+      return Object.keys(state.answers).some(function (id) { return !isBlank(state.answers[id]); });
+    }
+
+    function currentStep() {
+      return activeForm.done ? { type: "done" } : activeForm.steps[activeForm.index];
+    }
+
+    function renderForm(focus) {
+      var state = activeForm;
+      var form = state.form;
+      var step = currentStep();
+
+      var dialog = el("div", "form" + (state.entering ? " form--enter" : ""));
+      state.entering = false;
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-modal", "true");
+      dialog.setAttribute("aria-label", form.title);
+
+      var header = el("div", "form-header");
+      var close = button("close", null, function () { closeForm(true); });
+      close.setAttribute("aria-label", "Formular schließen");
+      close.innerHTML = svg("close");
+      header.append(el("h2", "title", form.title), close);
+
+      var percent = state.done ? 100 : Math.round(state.index / state.steps.length * 100);
+      var progress = el("div", "progress");
+      progress.setAttribute("role", "progressbar");
+      progress.setAttribute("aria-label", "Fortschritt");
+      progress.setAttribute("aria-valuemin", "0");
+      progress.setAttribute("aria-valuemax", "100");
+      progress.setAttribute("aria-valuenow", String(percent));
+      var bar = el("div", "progress-bar");
+      bar.style.width = percent + "%";
+      progress.appendChild(bar);
+
+      var body = el("div", "form-body");
+      var content = el("div", "step");
+      var footer = el("div", "form-footer");
+      body.appendChild(content);
+
+      var focusTarget = null;
+      var hasPrevious = state.index > 0 && !state.done;
+      if (hasPrevious) footer.appendChild(button("btn btn-secondary", "Zurück", back));
+
+      if (step.type === "intro") {
+        content.append(el("h3", "question", form.title), el("p", "intro", form.intro));
+        focusTarget = footer.appendChild(button("btn btn-primary", "Los geht’s", next));
+      } else if (step.type === "question") {
+        focusTarget = renderQuestion(step, content);
+        footer.appendChild(button("btn btn-primary", state.returnToReview ? "Zur Übersicht" : "Weiter", next));
+      } else if (step.type === "review") {
+        renderReview(content);
+        var submit = footer.appendChild(button("btn btn-primary", state.submitting ? "Wird gesendet …" : (form.submitLabel || "Absenden"), next));
+        submit.disabled = state.submitting;
+        focusTarget = (state.error && content.querySelector(".consent input")) || submit;
+      } else {
+        var done = el("div", "done");
+        done.innerHTML = svg("check");
+        done.append(el("h3", "question", "Vielen Dank!"), el("p", "intro", form.thankYou || "Wir haben deine Angaben erhalten."));
+        if (state.preview) done.appendChild(el("p", "help", "Vorschau: Es wurde nichts gesendet."));
+        content.appendChild(done);
+        focusTarget = footer.appendChild(button("btn btn-primary", "Schließen", function () { closeForm(false); }));
+      }
+
+      dialog.append(header, progress, body, footer);
+      formLayer.replaceChildren(dialog);
+      if (focus && focusTarget) focusTarget.focus();
+    }
+
+    function renderQuestion(step, content) {
+      var state = activeForm;
+      var question = step.question;
+      var id = "kh-q" + question.id;
+      var describedBy = [];
+
+      content.appendChild(el("p", "step-count", "Frage " + step.number + " von " + state.form.questions.length));
+      var heading = content.appendChild(el("h3", "question", question.label));
+      heading.id = id + "-label";
+      if (!question.required) heading.appendChild(el("span", "optional", " (optional)"));
+      if (question.help) {
+        content.appendChild(el("p", "help", question.help)).id = id + "-help";
+        describedBy.push(id + "-help");
+      }
+
+      var error = el("p", "error", state.errors[question.id]);
+      error.id = id + "-error";
+      error.setAttribute("role", "alert");
+      describedBy.push(error.id);
+
+      var field = buildField(question, id);
+      field.node.setAttribute("aria-labelledby", heading.id);
+      field.node.setAttribute("aria-describedby", describedBy.join(" "));
+      if (state.errors[question.id]) field.node.setAttribute("aria-invalid", "true");
+      content.append(field.node, error);
+
+      content.addEventListener("keydown", function (event) {
+        if (event.key !== "Enter" || event.target.tagName === "BUTTON") return;
+        if (event.target.tagName === "TEXTAREA" && !(event.ctrlKey || event.metaKey)) return;
+        event.preventDefault();
+        next();
+      });
+
+      return field.focus;
+    }
+
+    function buildField(question, id) {
+      var answers = activeForm.answers;
+      var value = answers[question.id];
+
+      if (question.kind === "single_choice" || question.kind === "multiple_choice" || question.kind === "yes_no") {
+        var multiple = question.kind === "multiple_choice";
+        var group = el("div", "options");
+        group.setAttribute("role", multiple ? "group" : "radiogroup");
+        var inputs = (question.kind === "yes_no" ? ["Ja", "Nein"] : question.choices || []).map(function (choice) {
+          var option = el("label", "option");
+          var input = el("input");
+          input.type = multiple ? "checkbox" : "radio";
+          input.name = id;
+          input.value = choice;
+          input.checked = multiple ? (value || []).indexOf(choice) !== -1 : value === choice;
+          input.addEventListener("change", function () {
+            answers[question.id] = multiple
+              ? Array.prototype.map.call(group.querySelectorAll("input:checked"), function (box) { return box.value; })
+              : choice;
+          });
+          option.append(input, el("span", null, choice));
+          group.appendChild(option);
+          return input;
+        });
+        var checked = inputs.filter(function (input) { return input.checked; })[0];
+        return { node: group, focus: checked || inputs[0] };
+      }
+
+      var field;
+      if (question.kind === "long_text") {
+        field = el("textarea", "input");
+        field.rows = 5;
+      } else {
+        field = el("input", "input");
+        field.type = INPUT_TYPES[question.kind] || "text";
+        if (question.kind === "number") field.inputMode = "decimal";
+        if (question.kind === "email") field.autocomplete = "email";
+        if (question.kind === "phone") field.autocomplete = "tel";
+      }
+      field.id = id;
+      if (question.maxLength) field.maxLength = question.maxLength;
+      if (question.required) field.setAttribute("aria-required", "true");
+      field.value = value || "";
+      field.addEventListener("input", function () { answers[question.id] = field.value; });
+      return { node: field, focus: field };
+    }
+
+    function renderReview(content) {
+      var state = activeForm;
+      var form = state.form;
+
+      content.append(el("h3", "question", "Stimmt alles so?"), el("p", "help", "Prüfe deine Angaben, bevor du sie absendest."));
+
+      var list = el("dl", "review");
+      state.steps.forEach(function (step, index) {
+        if (step.type !== "question") return;
+        var question = step.question;
+        var answer = formatAnswer(question, state.answers[question.id]);
+        var item = el("div", "review-item");
+        var text = el("div", "review-text");
+        text.append(el("dt", "review-label", question.label), el("dd", "review-value" + (answer ? "" : " review-value--empty"), answer || "Keine Angabe"));
+        var edit = button("edit", "Ändern", function () {
+          state.index = index;
+          state.returnToReview = true;
+          state.error = "";
+          renderForm(true);
+        });
+        edit.setAttribute("aria-label", "Ändern: " + question.label);
+        item.append(text, edit);
+        list.appendChild(item);
+      });
+      content.appendChild(list);
+
+      if (form.consentText) {
+        var consent = el("label", "consent");
+        var box = el("input");
+        box.type = "checkbox";
+        box.checked = state.consent;
+        box.addEventListener("change", function () { state.consent = box.checked; });
+        var text = el("span", null, form.consentText);
+        var privacyUrl = safeUrl(form.privacyUrl);
+        if (privacyUrl) {
+          var link = el("a", null, "Datenschutzerklärung");
+          link.href = privacyUrl;
+          link.target = "_blank";
+          link.rel = "noopener";
+          text.append(" (", link, ")");
+        }
+        consent.append(box, text);
+        content.appendChild(consent);
+      }
+
+      // Honeypot: invisible for people, bots tend to fill it in.
+      var trap = el("div", "hp");
+      trap.setAttribute("aria-hidden", "true");
+      var trapInput = el("input");
+      trapInput.name = "website";
+      trapInput.tabIndex = -1;
+      trapInput.autocomplete = "off";
+      trapInput.value = state.honeypot;
+      trapInput.addEventListener("input", function () { state.honeypot = trapInput.value; });
+      trap.appendChild(trapInput);
+      content.appendChild(trap);
+
+      var error = el("p", "error", state.error);
+      error.setAttribute("role", "alert");
+      content.appendChild(error);
+    }
+
+    function next() {
+      var state = activeForm;
+      var step = currentStep();
+
+      if (step.type === "question") {
+        var message = validate(step.question, state.answers[step.question.id]);
+        if (message) return showFieldError(step.question, message);
+        delete state.errors[step.question.id];
+      }
+      if (step.type === "review") return submit();
+
+      if (state.returnToReview && step.type === "question") {
+        state.index = state.steps.length - 1;
+        state.returnToReview = false;
+      } else {
+        state.index++;
+      }
+      renderForm(true);
+    }
+
+    function back() {
+      activeForm.index = Math.max(0, activeForm.index - 1);
+      activeForm.returnToReview = false;
+      activeForm.error = "";
+      renderForm(true);
+    }
+
+    function showFieldError(question, message) {
+      activeForm.errors[question.id] = message;
+      var id = "kh-q" + question.id;
+      var error = formLayer.querySelector("#" + id + "-error");
+      if (error) error.textContent = message;
+      var field = formLayer.querySelector("#" + id) || formLayer.querySelector("[name='" + id + "']");
+      var described = formLayer.querySelector("[aria-describedby~='" + id + "-error']");
+      if (described) described.setAttribute("aria-invalid", "true");
+      if (field) field.focus();
+    }
+
+    function submit() {
+      var state = activeForm;
+      var form = state.form;
+      if (state.submitting) return;
+
+      if (form.consentText && !state.consent) {
+        state.error = MESSAGES.consent;
+        return renderForm(true);
+      }
+
+      if (!endpoint) {
+        state.done = true;
+        state.preview = true;
+        return renderForm(true);
+      }
+
+      var body = new FormData();
+      form.questions.forEach(function (question) {
+        var value = state.answers[question.id];
+        if (Array.isArray(value)) {
+          value.forEach(function (item) { body.append("answers[" + question.id + "][]", item); });
+        } else if (!isBlank(value)) {
+          body.append("answers[" + question.id + "]", value);
+        }
+      });
+      body.append("consent", state.consent ? "1" : "0");
+      body.append("website", state.honeypot);
+      body.append("elapsed_ms", String(Date.now() - state.startedAt));
+
+      state.submitting = true;
+      state.error = "";
+      renderForm(false);
+
+      fetch(endpoint + "/forms/" + encodeURIComponent(form.id) + "/submissions", { method: "POST", body: body, credentials: "omit" })
+        .then(function (response) {
+          return response.json().catch(function () { return {}; }).then(function (json) { return { ok: response.ok, json: json }; });
+        })
+        .then(function (result) {
+          if (activeForm !== state) return;
+          state.submitting = false;
+          var errors = result.json.errors || {};
+
+          if (result.ok) {
+            state.done = true;
+          } else if (errors.consent) {
+            state.error = errors.consent;
+          } else if (Object.keys(errors).length) {
+            // Jump to the first question the server rejected.
+            state.errors = errors;
+            state.index = state.steps.findIndex(function (step) { return step.type === "question" && errors[step.question.id]; });
+            state.returnToReview = true;
+            if (state.index === -1) {
+              state.index = state.steps.length - 1;
+              state.error = MESSAGES.network;
+            }
+          } else {
+            state.error = result.json.error || MESSAGES.network;
+          }
+          renderForm(true);
+        })
+        .catch(function () {
+          if (activeForm !== state) return;
+          state.submitting = false;
+          state.error = MESSAGES.network;
+          renderForm(true);
+        });
+    }
+
+    // Keep keyboard focus inside the form dialog.
+    formLayer.addEventListener("keydown", function (event) {
+      if (event.key !== "Tab") return;
+      var focusable = Array.prototype.filter.call(formLayer.querySelectorAll("button, input, textarea, a[href]"), function (node) {
+        return !node.disabled && node.tabIndex !== -1;
+      });
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (event.shiftKey && root.activeElement === first) {
+        last.focus();
+        event.preventDefault();
+      } else if (!event.shiftKey && root.activeElement === last) {
+        first.focus();
+        event.preventDefault();
+      }
+    });
 
     var fullscreen = window.matchMedia("(max-width: 640px)");
     var previousOverflow = null;
 
     function lockScroll() {
-      var lock = open && !options.container && fullscreen.matches;
+      var lock = !options.container && (!!activeForm || (open && fullscreen.matches));
       var html = document.documentElement;
       if (lock && previousOverflow === null) {
         previousOverflow = html.style.overflow;
@@ -175,11 +658,16 @@
     }
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape" && open && host.isConnected) toggle(false, true);
+      if (event.key !== "Escape" || !host.isConnected) return;
+      if (activeForm) {
+        closeForm(true);
+      } else if (open) {
+        toggle(false, true);
+      }
     });
 
     document.addEventListener("click", function (event) {
-      if (open && !options.container && host.isConnected && event.composedPath().indexOf(host) === -1) toggle(false, false);
+      if (open && !activeForm && !options.container && host.isConnected && event.composedPath().indexOf(host) === -1) toggle(false, false);
     });
 
     host.addEventListener("kirchen-hub:update", function (event) {

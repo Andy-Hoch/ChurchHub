@@ -6,6 +6,9 @@ de:
       hub: Hub
       link: Link
       membership: Mitgliedschaft
+      form: Formular
+      form_question: Frage
+      form_submission: Einsendung
     attributes:
       user:
         name: Name
@@ -30,3 +33,20 @@ de:
         url: Adresse
         description: Beschreibung
         icon: Symbol
+        kind: Art
+        form: Formular
+      form:
+        title: Titel
+        intro: Begrüßungstext
+        thank_you_message: Danke-Text
+        submit_label: Text des Absenden-Buttons
+        notification_emails: Benachrichtigungen an
+        consent_text: Einwilligungstext
+        privacy_url: Link zur Datenschutzerklärung
+        retention_months: Aufbewahrungsdauer
+      form_question:
+        kind: Fragetyp
+        label: Frage
+        help_text: Hinweis
+        required: Pflichtfrage
+        choices: Antwortmöglichkeiten
