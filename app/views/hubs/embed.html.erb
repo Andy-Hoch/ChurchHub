@@ -10,6 +10,12 @@
 
   <div class="card flex flex-col gap">
     <label for="embed_snippet" class="field__label">Einbettungs-Code</label>
+    <% church = @hub.church %>
+    <% if church.embed_restricted? %>
+      <p class="text-sm text-subtle">Der Launcher wird nur auf <strong><%= church.website_host %></strong> und dessen Subdomains angezeigt. <%= link_to "Webseite ändern", edit_church_path, class: "font-medium text-link" %></p>
+    <% else %>
+      <p class="text-sm text-subtle">Der Launcher kann aktuell auf jeder Webseite eingebunden werden. <%= link_to "Hinterlege eure Webseite", edit_church_path, class: "font-medium text-link" %>, um das auf eure Domain zu beschränken.</p>
+    <% end %>
     <div class="input input--actor flex items-center gap-half" data-controller="input-copyable">
       <input id="embed_snippet" type="text" readonly value="<%= embed_snippet(@hub) %>" class="code" data-input-copyable-target="input">
       <button type="button" class="btn btn--sm btn--borderless btn--icon" data-action="input-copyable#copy" aria-label="Kopieren">

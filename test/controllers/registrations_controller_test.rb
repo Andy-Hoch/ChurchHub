@@ -19,6 +19,27 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     user = User.find_by!(email_address: "clara@example.com")
     assert user.memberships.first.owner?
     assert_equal "st-paulus", user.churches.first.slug
+    assert_nil user.churches.first.website_url
+  end
+
+  test "stores the church website" do
+    post registration_path, params: {
+      church: { name: "St. Paulus", website_url: "st-paulus.example" },
+      user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123" }
+    }
+
+    assert_equal "https://st-paulus.example", Church.find_by!(slug: "st-paulus").website_url
+  end
+
+  test "rejects an invalid church website" do
+    assert_no_difference [ "User.count", "Church.count" ] do
+      post registration_path, params: {
+        church: { name: "St. Paulus", website_url: "ftp://st-paulus" },
+        user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123" }
+      }
+    end
+
+    assert_response :unprocessable_entity
   end
 
   test "renders errors without creating anything" do

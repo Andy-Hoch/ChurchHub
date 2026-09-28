@@ -2,6 +2,14 @@
   "use strict";
 
   var data = <%= json_escape(hub.embed_payload.to_json).html_safe %>;
+  var allowedHosts = <%= json_escape(local_assigns[:allowed_hosts].to_json).html_safe %>;
+  var pageHost = location.hostname.toLowerCase();
+
+  if (allowedHosts && !allowedHosts.some(function (host) { return pageHost === host || pageHost.slice(-host.length - 1) === "." + host; })) {
+    if (window.console) console.warn("Kirchen-Hub: Der Launcher ist für diese Webseite nicht freigegeben.");
+    return;
+  }
+
   var script = document.currentScript;
   var options = (script && script.dataset) || {};
   // Submissions go to /embed/<token>/forms/<id>/submissions next to this script.

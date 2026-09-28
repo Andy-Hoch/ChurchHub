@@ -1,6 +1,7 @@
 one:
   name: Gemeinde Eins
   slug: gemeinde-eins
+  website_url: https://gemeinde-eins.example
 
 two:
   name: Gemeinde Zwei

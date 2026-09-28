@@ -31,6 +31,6 @@ class RegistrationsController < ApplicationController
     end
 
     def church_params
-      params.expect(church: %i[ name ])
+      params.expect(church: %i[ name website_url ])
     end
 end
