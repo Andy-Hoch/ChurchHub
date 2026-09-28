@@ -13,6 +13,12 @@
           <%= field_error(@church, :name) %>
         </div>
         <div class="field">
+          <%= form.label :website_url, "Webseite (optional)", class: "field__label" %>
+          <%= form.text_field :website_url, inputmode: "url", autocomplete: "url", placeholder: "https://kirche-musterstadt.de", class: "input" %>
+          <p class="field__hint">Wenn angegeben, wird der Launcher nur auf dieser Webseite und ihren Subdomains angezeigt. Leer lassen = überall erlaubt.</p>
+          <%= field_error(@church, :website_url) %>
+        </div>
+        <div class="field">
           <%= form.label :slug, "Kurzname", class: "field__label" %>
           <%= form.text_field :slug, required: true, class: "input" %>
           <p class="field__hint">Nur Kleinbuchstaben, Zahlen und Bindestriche.</p>

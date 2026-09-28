@@ -10,6 +10,13 @@
   </div>
 
   <div class="field">
+    <%= label_tag "church_website_url", "Webseite eurer Gemeinde (optional)", class: "field__label" %>
+    <%= text_field_tag "church[website_url]", @church.website_url, id: "church_website_url", inputmode: "url", autocomplete: "url", placeholder: "https://kirche-musterstadt.de", class: "input" %>
+    <p class="field__hint">Wenn angegeben, wird der Launcher nur auf dieser Webseite und ihren Subdomains angezeigt. Leer lassen = überall erlaubt.</p>
+    <%= field_error(@church, :website_url) %>
+  </div>
+
+  <div class="field">
     <%= form.label :name, "Dein Name", class: "field__label" %>
     <%= form.text_field :name, required: true, autocomplete: "name", class: "input" %>
     <%= field_error(@user, :name) %>

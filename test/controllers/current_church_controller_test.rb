@@ -10,6 +10,21 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Neuer Name", churches(:one).reload.name
   end
 
+  test "owner sets and removes the church website" do
+    patch church_path, params: { church: { website_url: "https://neu.example" } }
+    assert_equal "https://neu.example", churches(:one).reload.website_url
+
+    patch church_path, params: { church: { website_url: "" } }
+    assert_nil churches(:one).reload.website_url
+  end
+
+  test "rejects an invalid church website" do
+    patch church_path, params: { church: { website_url: "keine adresse" } }
+
+    assert_response :unprocessable_entity
+    assert_equal "https://gemeinde-eins.example", churches(:one).reload.website_url
+  end
+
   test "admins cannot update the church" do
     memberships(:one).update!(role: :admin)
     patch church_path, params: { church: { name: "Neuer Name" } }
