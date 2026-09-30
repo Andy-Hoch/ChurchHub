@@ -115,7 +115,8 @@
     ".edit { all: unset; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: underline; padding: 2px 4px; border-radius: 4px; }",
     ".consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; font-size: 14px; cursor: pointer; }",
     ".consent input { flex-shrink: 0; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--ph-primary); }",
-    ".consent a { color: inherit; }",
+    ".consent a, .privacy a { color: inherit; }",
+    ".privacy { margin: 20px 0 0; font-size: 14px; color: var(--muted); }",
     ".done { text-align: center; }",
     ".done .icon { width: 56px; height: 56px; color: var(--ph-primary); stroke-width: 1.5; margin-bottom: 12px; }",
     ".form-footer { display: flex; gap: 12px; padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }",
@@ -474,6 +475,16 @@
       });
       content.appendChild(list);
 
+      // Consent checkbox and/or privacy link, shown right above the submit button.
+      var privacyUrl = safeUrl(form.privacyUrl);
+      var privacyLink = null;
+      if (privacyUrl) {
+        privacyLink = el("a", null, "Datenschutzerklärung");
+        privacyLink.href = privacyUrl;
+        privacyLink.target = "_blank";
+        privacyLink.rel = "noopener";
+      }
+
       if (form.consentText) {
         var consent = el("label", "consent");
         var box = el("input");
@@ -481,16 +492,13 @@
         box.checked = state.consent;
         box.addEventListener("change", function () { state.consent = box.checked; });
         var text = el("span", null, form.consentText);
-        var privacyUrl = safeUrl(form.privacyUrl);
-        if (privacyUrl) {
-          var link = el("a", null, "Datenschutzerklärung");
-          link.href = privacyUrl;
-          link.target = "_blank";
-          link.rel = "noopener";
-          text.append(" (", link, ")");
-        }
+        if (privacyLink) text.append(" (", privacyLink, ")");
         consent.append(box, text);
         content.appendChild(consent);
+      } else if (privacyLink) {
+        var notice = el("p", "privacy", "Informationen zum Umgang mit deinen Daten findest du in unserer ");
+        notice.append(privacyLink, ".");
+        content.appendChild(notice);
       }
 
       // Honeypot: invisible for people, bots tend to fill it in.

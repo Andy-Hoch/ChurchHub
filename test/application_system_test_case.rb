@@ -7,6 +7,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # waits that would have succeeded a moment later. Only failing waits get slower.
   Capybara.default_max_wait_time = 5
 
+  # The embed script is publicly cacheable for a few minutes; without this a
+  # test would get the launcher an earlier test loaded for the same hub.
+  setup { page.driver.browser.execute_cdp("Network.clearBrowserCache") }
+
   def sign_in_as(user, password: "password")
     visit new_session_path
     fill_in "E-Mail-Adresse", with: user.email_address
