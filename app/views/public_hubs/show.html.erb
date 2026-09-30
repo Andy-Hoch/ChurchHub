@@ -30,7 +30,7 @@
       .title { margin: 0 auto; max-width: 36rem; font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
       main { max-width: 36rem; margin: -48px auto 0; padding: 0 16px max(32px, env(safe-area-inset-bottom)); }
       .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
-      .link { display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: inherit; text-decoration: none; box-shadow: 0 1px 3px oklch(0% 0 0 / .06); transition: transform .15s ease, background-color .15s ease; }
+      .link { width: 100%; font: inherit; text-align: start; cursor: pointer; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: inherit; text-decoration: none; box-shadow: 0 1px 3px oklch(0% 0 0 / .06); transition: transform .15s ease, background-color .15s ease; }
       .link:hover { background: var(--hover); }
       .link:active { transform: scale(.98); }
       .link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
@@ -52,14 +52,15 @@
         <ul class="list">
           <% @links.each do |link| %>
             <li>
-              <a class="link" href="<%= link.url %>" target="_blank" rel="noopener">
-                <span class="emoji" aria-hidden="true"><%= link.icon.presence || "🔗" %></span>
-                <span class="text">
-                  <span class="link-title"><%= link.title %></span>
-                  <% if link.description.present? %><span class="link-description"><%= link.description %></span><% end %>
-                </span>
-                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-              </a>
+              <% if link.kind_form? %>
+                <button type="button" class="link" data-kirchen-hub-form="<%= link.form_id %>" aria-haspopup="dialog">
+                  <%= render "public_hubs/link_content", link: link, default_icon: "📝" %>
+                </button>
+              <% else %>
+                <a class="link" href="<%= link.url %>" target="_blank" rel="noopener">
+                  <%= render "public_hubs/link_content", link: link, default_icon: "🔗" %>
+                </a>
+              <% end %>
             </li>
           <% end %>
         </ul>
@@ -67,5 +68,8 @@
         <p class="empty">Noch keine Links vorhanden.</p>
       <% end %>
     </main>
+    <% if @links.any?(&:kind_form?) %>
+      <script src="<%= embed_path(@hub.public_token, format: :js) %>" data-launcher="false" defer></script>
+    <% end %>
   </body>
 </html>

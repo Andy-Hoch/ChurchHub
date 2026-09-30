@@ -81,4 +81,17 @@ class FormsTest < ApplicationSystemTestCase
     assert_text "Anna"
     assert_text "Nur das Gebetsteam"
   end
+
+  test "visitors open forms on the public hub page" do
+    hubs(:one).links.create!(title: "Gebet", kind: "form", form: forms(:prayer))
+
+    visit public_hub_path(churches(:one).slug)
+    click_on "Gebet"
+
+    launcher = find("[data-kirchen-hub]", visible: :all).shadow_root
+    launcher.assert_selector ".intro", text: "Wir beten gerne für dich."
+    launcher.assert_no_selector ".launcher .button"
+    launcher.find(".btn-primary", text: "Los geht’s").click
+    launcher.assert_selector ".step-count", text: "Frage 1 von 4"
+  end
 end

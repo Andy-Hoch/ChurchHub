@@ -115,12 +115,4 @@ class EmbedSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Wofür dürfen wir beten?", response.body
     assert_match "Nur das Gebetsteam", response.body
   end
-
-  test "form buttons are not shown on the public hub page" do
-    get public_hub_path(churches(:one).slug)
-
-    assert_response :success
-    assert_select ".link-title", text: "Gebet", count: 0
-    assert_match "Gottesdienst live", response.body
-  end
 end

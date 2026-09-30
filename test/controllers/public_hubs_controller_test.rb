@@ -11,6 +11,21 @@ class PublicHubsControllerTest < ActionDispatch::IntegrationTest
     assert_select "meta[name=viewport]"
   end
 
+  test "shows form buttons and loads the launcher script without its button" do
+    hubs(:one).links.create!(title: "Gebet", kind: "form", form: forms(:prayer))
+
+    get public_hub_path(churches(:one).slug)
+
+    assert_select "button.link[data-kirchen-hub-form=?]", forms(:prayer).id.to_s, text: /Gebet/
+    assert_select "script[data-launcher=false][src=?]", embed_path(hubs(:one).public_token, format: :js)
+  end
+
+  test "skips the launcher script without form buttons" do
+    get public_hub_path(churches(:one).slug)
+
+    assert_select "script", count: 0
+  end
+
   test "returns not found for unknown churches and disabled hubs" do
     get public_hub_path("unbekannt")
     assert_response :not_found
