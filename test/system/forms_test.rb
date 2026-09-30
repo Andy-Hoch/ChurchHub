@@ -100,5 +100,6 @@ class FormsTest < ApplicationSystemTestCase
     launcher.find(".btn-primary", text: "Absenden").click
 
     launcher.assert_selector ".question", text: "Vielen Dank!"
+    assert_equal 1, form.submissions.count
   end
 end
