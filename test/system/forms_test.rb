@@ -66,6 +66,11 @@ class FormsTest < ApplicationSystemTestCase
     launcher.assert_selector ".question", text: "Stimmt alles so?"
     launcher.assert_selector ".review-value", text: "Für unsere Gemeinde"
     launcher.assert_selector ".review-value--empty", text: "Keine Angabe"
+    launcher.assert_no_selector ".consent"
+    launcher.assert_no_selector ".btn-primary", text: "Absenden"
+    launcher.find(".btn-primary", text: "Weiter").click
+
+    launcher.assert_selector ".question", text: "Datenschutz"
     launcher.find(".btn-primary", text: "Absenden").click
     launcher.assert_selector ".error", text: "Bitte stimme der Datenverarbeitung zu."
     launcher.find(".consent input").click
@@ -95,8 +100,31 @@ class FormsTest < ApplicationSystemTestCase
     launcher.find(".btn-primary", text: "Weiter").click
 
     launcher.assert_selector ".question", text: "Stimmt alles so?"
+    launcher.assert_no_selector ".privacy"
+    launcher.find(".btn-primary", text: "Weiter").click
+
+    launcher.assert_selector ".question", text: "Datenschutz"
     launcher.assert_no_selector ".consent"
     launcher.assert_selector ".privacy a[href='https://example.com/datenschutz']", text: "Datenschutzerklärung"
+    launcher.find(".btn-primary", text: "Absenden").click
+
+    launcher.assert_selector ".question", text: "Vielen Dank!"
+    assert_equal 1, form.submissions.count
+  end
+
+  test "forms without consent text or privacy link are sent right from the review" do
+    form = churches(:one).forms.create!(title: "Feedback")
+    form.questions.create!(label: "Was möchtest du uns sagen?", kind: "short_text", required: true)
+    hubs(:one).links.create!(title: "Feedback", kind: "form", form: form)
+
+    visit "/embed-demo.html?token=#{hubs(:one).public_token}"
+    launcher = find("[data-kirchen-hub]", visible: :all).shadow_root
+    launcher.find(".button").click
+    launcher.find("button.link", text: "Feedback").click
+    launcher.find("input.input").set("Danke!")
+    launcher.find(".btn-primary", text: "Weiter").click
+
+    launcher.assert_selector ".question", text: "Stimmt alles so?"
     launcher.find(".btn-primary", text: "Absenden").click
 
     launcher.assert_selector ".question", text: "Vielen Dank!"
@@ -118,6 +146,7 @@ class FormsTest < ApplicationSystemTestCase
     launcher.find(".btn-primary", text: "Weiter").click
     launcher.find(".btn-primary", text: "Weiter").click
     launcher.find(".option", text: "Nur das Gebetsteam").click
+    launcher.find(".btn-primary", text: "Weiter").click
     launcher.find(".btn-primary", text: "Weiter").click
     launcher.find(".btn-primary", text: "Weiter").click
     launcher.find(".consent input").click

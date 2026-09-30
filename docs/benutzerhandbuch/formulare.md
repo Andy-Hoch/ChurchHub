@@ -132,9 +132,11 @@ Ein **ausgeblendeter** Link macht sein Formular ebenfalls unerreichbar.
    bemängelt (z. B. „Bitte gib eine gültige E-Mail-Adresse ein.“). Mit der **Enter-Taste** geht es weiter.
    In mehrzeiligen Feldern mit Strg/Cmd + Enter.
 4. **Übersicht** („Stimmt alles so?“): Alle Antworten stehen zur Kontrolle da. Mit **Ändern** springt man zu einer Frage
-   und danach mit „Zur Übersicht“ zurück. Nicht beantwortete optionale Fragen zeigen „Keine Angabe“. Ist ein
-   Einwilligungstext hinterlegt, muss hier das Kästchen gesetzt werden.
-5. **Absenden** (bzw. die eigene Beschriftung): Danach erscheint die **Danke-Seite** mit dem Danke-Text und „Schließen“.
+   und danach mit „Zur Übersicht“ zurück. Nicht beantwortete optionale Fragen zeigen „Keine Angabe“.
+5. **Datenschutz** (nur wenn ein Einwilligungstext oder ein Link zur Datenschutzerklärung hinterlegt ist): Ein eigener
+   letzter Schritt mit dem Einwilligungstext samt Kästchen, das gesetzt sein muss, und/oder dem Link
+   „Datenschutzerklärung“. Erst hier gibt es den Absenden-Button; die Übersicht davor führt mit **Weiter** hierher.
+6. **Absenden** (bzw. die eigene Beschriftung): Danach erscheint die **Danke-Seite** mit dem Danke-Text und „Schließen“.
 
 Weitere Details:
 
