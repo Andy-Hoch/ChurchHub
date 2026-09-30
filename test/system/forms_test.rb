@@ -82,16 +82,31 @@ class FormsTest < ApplicationSystemTestCase
     assert_text "Nur das Gebetsteam"
   end
 
-  test "visitors open forms on the public hub page" do
+  test "visitors submit forms on the public hub page, even when the launcher is limited to the church website" do
+    churches(:one).update!(website_url: "https://kirche.example")
     hubs(:one).links.create!(title: "Gebet", kind: "form", form: forms(:prayer))
 
     visit public_hub_path(churches(:one).slug)
     click_on "Gebet"
 
     launcher = find("[data-kirchen-hub]", visible: :all).shadow_root
-    launcher.assert_selector ".intro", text: "Wir beten gerne für dich."
     launcher.assert_no_selector ".launcher .button"
+    launcher.assert_selector ".intro", text: "Wir beten gerne für dich."
     launcher.find(".btn-primary", text: "Los geht’s").click
-    launcher.assert_selector ".step-count", text: "Frage 1 von 4"
+    launcher.find("textarea").set("Für die Jugendfreizeit")
+    launcher.find(".btn-primary", text: "Weiter").click
+    launcher.find(".btn-primary", text: "Weiter").click
+    launcher.find(".option", text: "Nur das Gebetsteam").click
+    launcher.find(".btn-primary", text: "Weiter").click
+    launcher.find(".btn-primary", text: "Weiter").click
+    launcher.find(".consent input").click
+
+    assert_difference -> { forms(:prayer).submissions.count } do
+      launcher.find(".btn-primary", text: "Absenden").click
+      launcher.assert_selector ".question", text: "Vielen Dank!"
+    end
+
+    launcher.find(".btn-primary", text: "Schließen").click
+    assert_selector "button.link:focus", text: "Gebet"
   end
 end
