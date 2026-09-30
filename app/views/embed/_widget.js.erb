@@ -12,6 +12,8 @@
 
   var script = document.currentScript;
   var options = (script && script.dataset) || {};
+  // data-launcher="false" skips the floating button and only opens forms from
+  // page elements with data-kirchen-hub-form="<form id>" (the public hub page).
   // Submissions go to /embed/<token>/forms/<id>/submissions next to this script.
   // Inline copies (the admin preview) have no src and only simulate sending.
   var endpoint = script && script.src ? script.src.replace(/\.js(\?.*)?$/, "") : null;
@@ -186,6 +188,7 @@
     var root = host.attachShadow({ mode: "open" });
     var theme = Object.assign({}, data.theme);
     var open = options.open === "true";
+    var headless = options.launcher === "false";
     var activeForm = null;
 
     var style = el("style");
@@ -202,6 +205,7 @@
       host.style.setProperty("--ph-scheme", theme.colorScheme === "auto" ? "light dark" : theme.colorScheme);
       launcher.className = "launcher launcher--" + (theme.position === "left" ? "left" : "right");
       launcher.replaceChildren();
+      if (headless) return;
 
       var panelId = "kirchen-hub-panel";
       var panel = el("div", "panel");
@@ -677,6 +681,19 @@
     document.addEventListener("click", function (event) {
       if (open && !activeForm && !options.container && host.isConnected && event.composedPath().indexOf(host) === -1) toggle(false, false);
     });
+
+    if (headless) {
+      document.addEventListener("click", function (event) {
+        var trigger = event.target.closest && event.target.closest("[data-kirchen-hub-form]");
+        if (!trigger || activeForm || !host.isConnected) return;
+        var item = data.links.filter(function (link) {
+          return link.form && String(link.form.id) === trigger.getAttribute("data-kirchen-hub-form");
+        })[0];
+        if (!item) return;
+        event.preventDefault();
+        openForm(item.form, trigger);
+      });
+    }
 
     host.addEventListener("kirchen-hub:update", function (event) {
       Object.assign(theme, event.detail.theme || {});
