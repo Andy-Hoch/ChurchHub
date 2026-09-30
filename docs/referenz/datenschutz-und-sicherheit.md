@@ -2,8 +2,8 @@
 
 ← [Zur Übersicht](../README.md)
 
-Diese Seite beschreibt, **welche Daten der Kirchen-Hub verarbeitet**, wie sie geschützt sind und was Betreiber und
-Kirchen beachten sollten. Sie ist eine technische Beschreibung und **keine Rechtsberatung**. Für die rechtliche
+Diese Seite beschreibt, **welche Daten der Kirchen-Hub verarbeitet**, wie sie geschützt sind und was ihr als Kirche
+beachten solltet. Sie ist eine technische Beschreibung und **keine Rechtsberatung**. Für die rechtliche
 Bewertung (DSGVO, kirchliche Datenschutzgesetze wie KDG oder DSG-EKD) wende dich an eure Datenschutzbeauftragte.
 
 ## Welche Daten werden gespeichert?
@@ -25,8 +25,7 @@ Was **nicht** gespeichert wird:
 - **Keine Cookies für Besucher eurer Webseite.** Der Launcher setzt keine Cookies und nutzt keinen lokalen Speicher.
   Formular-Einsendungen werden ohne Cookies gesendet. Cookies gibt es nur im Backend (Anmeldung).
 - Technisch unvermeidbar: Beim Laden des Skripts und beim Absenden eines Formulars übermittelt der Browser wie bei
-  jeder Anfrage die **IP-Adresse** (und das Referer-Merkmal) an den Hub-Server. Sie können dort im Server-Log stehen (siehe
-  [Empfehlungen für Betreiber](#empfehlungen-für-betreiber)). Für die Rate-Limits merkt sich der Hub IP-Adressen vorübergehend im Zwischenspeicher.
+  jeder Anfrage die **IP-Adresse** (und das Referer-Merkmal) an den Hub-Server. Sie können dort im Server-Log des Betreibers stehen. Für die Rate-Limits merkt sich der Hub IP-Adressen vorübergehend im Zwischenspeicher.
 
 ## Wer sieht was?
 
@@ -34,8 +33,9 @@ Was **nicht** gespeichert wird:
   [eigene Hub-Seite](../benutzerhandbuch/eigene-seite.md). Beides enthält die **Inhalte, die ihr selbst angelegt habt**.
 - **Einsendungen und alles im Backend** sehen nur angemeldete **Mitglieder der jeweiligen Kirche**. Andere Kirchen auf
   derselben Instanz haben keinen Zugriff. Jede Abfrage im Backend ist auf die Kirche des Kontos beschränkt.
-- **Der Betreiber** des Servers hat technisch Zugriff auf die Datenbank (siehe [Betrieb & Wartung](../setup/betrieb.md)). Regelt das
-  organisatorisch (Verpflichtung zur Vertraulichkeit, ggf. Auftragsverarbeitung, wenn jemand den Hub für andere Kirchen betreibt).
+- **Der Betreiber** des Kirchen-Hubs (die Stelle, die euch die Adresse des Hubs gegeben hat) hat technisch Zugriff auf die
+  Datenbank. Klärt mit ihm, wie das organisatorisch geregelt ist: Verschwiegenheit, gegebenenfalls ein
+  Auftragsverarbeitungsvertrag, Serverstandort, Aufbewahrung von Sicherungen und Logs.
 - **E-Mail-Benachrichtigungen** enthalten aus Datenschutzgründen **keine Antworten**, sondern nur einen Link ins Backend.
 
 ## Empfehlungen für Kirchen
@@ -52,21 +52,7 @@ Was **nicht** gespeichert wird:
 7. **Betroffenenrechte:** Auskunft und Löschung könnt ihr über das Backend erfüllen. Einzelne Einsendungen lassen sich
    lesen und löschen.
 8. **Kirche/Konto löschen** entfernt die Daten vollständig ([Konto](../benutzerhandbuch/konto-und-anmeldung.md#konto-löschen)).
-   Beachte Sicherungen des Betreibers: Dort bleiben Daten bis zum Ablauf der Sicherungs-Aufbewahrung.
-
-## Empfehlungen für Betreiber
-
-- **HTTPS ist Pflicht** (`force_ssl`, siehe [Installation](../setup/produktion.md#schritt-4-https-erzwingung-aktivieren)).
-- **Server-Logs:** Bei `RAILS_LOG_LEVEL=info` (Standard) schreibt Rails die Parameter jeder Anfrage ins Log. Der Hub
-  filtert Parameter mit Namen wie `password`, `email` oder `token` heraus, **nicht aber** die Formular-Antworten
-  (`answers`). Dadurch **können Antworten (z. B. Gebetsanliegen) in den Logs erscheinen.** Ergänze deshalb in
-  `config/initializers/filter_parameter_logging.rb` den Eintrag `:answers` in der Liste `filter_parameters` und begrenze
-  die Log-Aufbewahrung. Lass Logs nie länger als nötig liegen.
-- **Backups verschlüsseln** und nur so lange aufbewahren, wie die Löschfristen es zulassen
-  ([Backups](../setup/betrieb.md#backups)).
-- **`config/master.key` geheim halten.** Er schützt die SMTP-Zugangsdaten und weitere Rails-Geheimnisse.
-- **Registrierung ist offen** ([Hinweis](../setup/produktion.md#registrierung-ist-offen)). Sperre sie bei Bedarf am Reverse-Proxy.
-- **Updates einspielen.** Sicherheitsprüfungen sind Teil der CI (`bin/brakeman`, `bin/bundler-audit`, `bin/importmap audit`).
+   Beachte Sicherungen des Betreibers: Dort bleiben Daten bis zum Ablauf seiner Sicherungs-Aufbewahrung.
 
 ## Sicherheitsmaßnahmen im Überblick
 
@@ -84,7 +70,6 @@ Was **nicht** gespeichert wird:
 | **XSS-Schutz** | Inhalte werden im Launcher als Text eingefügt, nicht als HTML. Die Daten im Skript sind für JavaScript maskiert (`json_escape`). |
 | **Isolation** | Launcher im Shadow DOM: kein Zugriff auf und keine Beeinflussung durch die Webseite eurer Kirche über CSS |
 | **CSV-Export** | Schutz vor Formel-Injection in Tabellenkalkulationen |
-| **Container** | Docker-Image läuft als Nicht-Root-Nutzer |
 | **Einbettungs-Code** | Lässt sich jederzeit [neu erzeugen](../benutzerhandbuch/einbinden.md#code-neu-erzeugen), der Launcher lässt sich [abschalten](../benutzerhandbuch/einbinden.md#launcher-aktiv--launcher-deaktivieren) |
 
 ## Was das Token ist – und was nicht
@@ -97,6 +82,5 @@ Missbrauch.
 
 ## Sicherheitslücken melden
 
-Hast du eine Sicherheitslücke gefunden? Bitte melde sie **nicht öffentlich** in einem Issue. Ein eigener Meldeweg ist im
-Repository derzeit nicht hinterlegt. Kontaktiere die Maintainer daher direkt und vertraulich (zum Beispiel über die
-Kontaktdaten im GitHub-Profil).
+Ist dir etwas Verdächtiges aufgefallen, etwa Zugriff auf Daten, die du nicht sehen solltest? Melde das bitte direkt und
+vertraulich dem Betreiber des Hubs, nicht öffentlich.

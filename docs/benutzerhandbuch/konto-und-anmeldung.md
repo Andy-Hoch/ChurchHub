@@ -35,8 +35,7 @@ Eine E-Mail-Bestätigung gibt es nicht.
 3. Über den Link zwei Mal das neue Passwort eingeben (mindestens 8 Zeichen).
 4. Alle bestehenden Anmeldungen dieses Kontos werden beendet. Du meldest dich mit dem neuen Passwort neu an.
 
-> Das funktioniert nur, wenn der Betreiber [E-Mail-Versand eingerichtet](../setup/konfiguration.md#e-mail-versand-smtp) hat.
-> Sonst wende dich an den Betreiber, siehe [Passwort zurücksetzen ohne E-Mail](../setup/betrieb.md#passwort-zurücksetzen-ohne-e-mail).
+> Kommt keine E-Mail an (auch nicht im Spam-Ordner), wende dich an den Betreiber des Hubs. Er kann dein Passwort zurücksetzen.
 
 ## Passwort ändern
 

@@ -67,8 +67,8 @@ mehrere Adressen ein, bekommen diese bei **jeder neuen Einsendung** eine E-Mail:
 Den Link im Backend können nur angemeldete Mitglieder der Kirche öffnen. Trage daher Adressen von Personen ein, die
 ein Konto haben und [Mitglied](kirche-und-team.md#mitglieder) sind.
 
-Voraussetzung ist, dass der Betreiber [SMTP eingerichtet](../setup/konfiguration.md#e-mail-versand-smtp) hat.
-Ohne E-Mail-Versand gibt es keine Benachrichtigungen, die Einsendungen selbst gehen aber trotzdem nicht verloren.
+Voraussetzung ist, dass der Betreiber des Hubs den E-Mail-Versand eingerichtet hat. Ohne ihn gibt es keine Benachrichtigungen. Die
+Einsendungen selbst gehen aber trotzdem nicht verloren und stehen im Backend.
 
 ## Automatisches Löschen
 
@@ -80,7 +80,7 @@ In den Formular-Einstellungen wählst du unter **„Einsendungen automatisch lö
 - Das Löschen ist endgültig.
 - Die Aufbewahrungsdauer gilt pro Formular. Ändert ihr sie, greift die neue Frist beim nächsten Lauf auch für
   bereits vorhandene Einsendungen.
-- Voraussetzung ist der [Job-Runner](../setup/konfiguration.md#umgebungsvariablen) des Betreibers (`SOLID_QUEUE_IN_PUMA`).
+- Das Löschen läuft automatisch im Hintergrund. Ihr müsst nichts tun.
 
 Speichere wichtige Daten (z. B. eine Taufanfrage) rechtzeitig anderswo, bevor die Frist abläuft.
 

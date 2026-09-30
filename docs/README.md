@@ -1,38 +1,26 @@
 # Kirchen-Hub – Dokumentation
 
-Willkommen! Diese Dokumentation erklärt, wie du den Kirchen-Hub **einrichtest** und wie du alle **Funktionen** nutzt.
-
 Der Kirchen-Hub ist ein Launcher für die Webseite deiner Kirche: Ein schwebender Button öffnet ein Panel mit den
 wichtigsten Links (Livestream, Termine, Spenden, Kleingruppen …) und auf Wunsch mit Formularen
-(Gebetsanliegen, Kontakt, „Neu hier“ …). Eingebunden wird er mit einer einzigen Zeile Code.
+(Gebetsanliegen, Kontakt, „Neu hier“ …). Eingebunden wird er mit einer einzigen Zeile Code. Außerdem gibt es
+eine eigene Hub-Seite, zum Beispiel für QR-Codes.
 
-## Wo fange ich an?
+Die Dokumentation hat zwei Teile:
 
-| Ich möchte … | Dann lies … |
-| --- | --- |
-| verstehen, was der Kirchen-Hub kann und wie die Begriffe zusammenhängen | [Einstieg & Grundbegriffe](einstieg.md) |
-| den Hub **auf meinem Rechner** ausprobieren | [Lokale Installation](setup/lokale-installation.md) |
-| den Hub **auf einem eigenen Server** betreiben (mit eigener Domain) | [Installation im Internet](setup/produktion.md) |
-| E-Mail-Versand, Umgebungsvariablen und Einstellungen nachschlagen | [Konfiguration](setup/konfiguration.md) |
-| Updates, Backups und Wartung erledigen | [Betrieb & Wartung](setup/betrieb.md) |
-| den Hub **benutzen** (Links, Design, Formulare …) | [Benutzerhandbuch](benutzerhandbuch/README.md) |
-| wissen, was mit Daten passiert | [Datenschutz & Sicherheit](referenz/datenschutz-und-sicherheit.md) |
-| ein Problem lösen | [Häufige Fragen & Fehlerbehebung](referenz/faq.md) |
-| technische Details (Architektur, Schnittstellen) | [Technische Referenz](referenz/technik.md) · [Schnittstellen](referenz/schnittstellen.md) |
+| Für wen? | Worum geht es? | Start |
+| --- | --- | --- |
+| 👥 **Nutzer** (Mitarbeitende und Ehrenamtliche in Kirchen) | Den Hub benutzen: Anmelden, Links pflegen, Design, Formulare, auf der Webseite oder als eigene Seite verwenden | [Schnellstart](benutzerhandbuch/schnellstart.md) |
+| 🛠️ **Betreiber** (wer die App installiert und laufen lässt) | Installation, Konfiguration, Updates, Backups, Technik | [Installation im Internet](betreiber/produktion.md) |
 
-## Inhaltsverzeichnis
+---
 
-### Grundlagen
-- [Einstieg & Grundbegriffe](einstieg.md) – Was ist der Hub? Kirche, Hub, Link, Formular, Rollen. In 10 Minuten zum ersten Launcher.
+## 👥 Für Nutzer
 
-### Setup
-1. [Lokale Installation](setup/lokale-installation.md) – Ausprobieren und Entwickeln auf dem eigenen Rechner
-2. [Installation im Internet (Produktion)](setup/produktion.md) – Von einem leeren Server bis zum laufenden Hub unter eigener Domain
-3. [Konfiguration](setup/konfiguration.md) – Umgebungsvariablen, Zugangsdaten, E-Mail-Versand
-4. [Betrieb & Wartung](setup/betrieb.md) – Updates, Backups, Passwort-Reset ohne E-Mail, Überwachung
+**Schnell loslegen:** → **[Schnellstart: Von der Anmeldung bis zum Hub auf der Webseite](benutzerhandbuch/schnellstart.md)**
 
 ### Benutzerhandbuch
-- [Übersicht](benutzerhandbuch/README.md)
+- [Übersicht des Backends](benutzerhandbuch/README.md)
+- [Grundbegriffe](benutzerhandbuch/grundbegriffe.md) – Kirche, Hub, Link, Formular, Rollen
 - [Konto & Anmeldung](benutzerhandbuch/konto-und-anmeldung.md) – Registrieren, Anmelden, Passwort vergessen, Konto löschen
 - [Links verwalten](benutzerhandbuch/links.md) – Anlegen, sortieren, ausblenden
 - [Design anpassen](benutzerhandbuch/design.md) – Farben, Position, Symbol, Live-Vorschau
@@ -42,8 +30,24 @@ wichtigsten Links (Livestream, Termine, Spenden, Kleingruppen …) und auf Wunsc
 - [Einsendungen](benutzerhandbuch/einsendungen.md) – Ansehen, Benachrichtigungen, CSV-Export, automatisches Löschen
 - [Kirche & Team](benutzerhandbuch/kirche-und-team.md) – Rollen, Mitglieder, mehrere Kirchen
 
-### Referenz
-- [Datenschutz & Sicherheit](referenz/datenschutz-und-sicherheit.md)
+### Nachschlagen
 - [Häufige Fragen & Fehlerbehebung](referenz/faq.md)
-- [Technische Referenz](referenz/technik.md) – Architektur, Datenmodell, Routen
-- [Schnittstellen](referenz/schnittstellen.md) – Embed-Skript und Formular-Endpunkt
+- [Datenschutz & Sicherheit](referenz/datenschutz-und-sicherheit.md) – Welche Daten gespeichert werden und was Kirchen beachten sollten
+
+---
+
+## 🛠️ Für Betreiber
+
+| Ich möchte … | Dann lies … |
+| --- | --- |
+| den Hub **auf meinem Rechner** ausprobieren | [Lokale Installation](betreiber/lokale-installation.md) |
+| den Hub **auf einem Server** mit eigener Domain betreiben | [Installation im Internet](betreiber/produktion.md) |
+| E-Mail-Versand, Umgebungsvariablen und Grenzen nachschlagen | [Konfiguration](betreiber/konfiguration.md) |
+| Updates, Backups und Wartung erledigen, Passwörter zurücksetzen | [Betrieb & Wartung](betreiber/betrieb.md) |
+| Datenschutz im Betrieb und Hinweise für Nutzer | [Datenschutz & Sicherheit im Betrieb](betreiber/datenschutz-im-betrieb.md) |
+| technische Details | [Technische Referenz](betreiber/technik.md) · [Schnittstellen](betreiber/schnittstellen.md) |
+
+**Empfohlener Ablauf:** [Installation im Internet](betreiber/produktion.md) durcharbeiten → E-Mail-Versand einrichten
+([Konfiguration](betreiber/konfiguration.md#e-mail-versand-smtp)) → selbst einmal den [Schnellstart](benutzerhandbuch/schnellstart.md)
+durchspielen → Nutzern die Adresse des Hubs und einen Ansprechpartner nennen
+([Was du Nutzern mitgeben solltest](betreiber/datenschutz-im-betrieb.md#was-du-nutzern-mitgeben-solltest)).

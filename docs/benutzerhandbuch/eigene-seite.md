@@ -5,7 +5,7 @@
 Neben dem Launcher auf eurer Webseite ist der Hub auch als **eigenständige Seite** erreichbar:
 
 ```
-https://hub.eure-kirche.de/<kurzname>
+https://<adresse-des-hubs>/<kurzname>
 ```
 
 Die genaue Adresse steht unter **Hub → Einbinden** im Abschnitt **„Eigene Seite“**, mit Kopieren-Symbol und
@@ -53,7 +53,7 @@ Der Kurzname (englisch „slug“) bildet den Pfad der Adresse.
 - **Achtung:** Wird der Kurzname geändert, funktioniert die **alte Adresse nicht mehr**, auch nicht in gedruckten
   QR-Codes. Ändere ihn deshalb nur, wenn es unbedingt nötig ist.
 - **Reserviert:** Namen, die die Anwendung selbst verwendet, sind nicht erlaubt, zum Beispiel `session`, `hub`, `forms`,
-  `embed`, `admin`, `api`, `assets`, `up`. Die vollständige Liste steht in der [Technischen Referenz](../referenz/technik.md#reservierte-kurznamen).
+  `embed`, `admin`, `api`, `assets`, `up`. Das Formular meldet dann, dass der Name nicht verfügbar ist. Wähle einen anderen.
 - Jeder Kurzname existiert nur einmal im ganzen System.
 
 ## Aktualität

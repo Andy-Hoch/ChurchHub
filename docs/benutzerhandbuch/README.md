@@ -4,6 +4,9 @@
 
 Dieses Handbuch beschreibt jede Funktion des Backends – so, wie du sie nach dem Anmelden vorfindest.
 
+**Neu hier?** Starte mit dem [Schnellstart](schnellstart.md): Von der Registrierung bis zum Hub auf eurer Webseite oder als eigene
+Seite in etwa 15 Minuten. Die wichtigsten Begriffe erklären die [Grundbegriffe](grundbegriffe.md).
+
 ## Aufbau des Backends
 
 Nach der Anmeldung siehst du oben eine Kopfzeile (Name der aktuellen Kirche, dein Name als Link zu *Mein Konto*,
@@ -23,6 +26,7 @@ Gehörst du zu mehreren Kirchen, erscheint unten in der Navigation ein Auswahlfe
 
 ## Die Seiten im Überblick
 
+0. [Schnellstart](schnellstart.md) und [Grundbegriffe](grundbegriffe.md)
 1. [Konto & Anmeldung](konto-und-anmeldung.md) – Registrieren, Anmelden, Passwort vergessen, Konto löschen
 2. [Links verwalten](links.md) – die Einträge im Launcher
 3. [Design anpassen](design.md) – Aussehen des Launchers
@@ -31,14 +35,5 @@ Gehörst du zu mehreren Kirchen, erscheint unten in der Navigation ein Auswahlfe
 6. [Formulare](formulare.md) – Fragen, Vorlagen, Einstellungen
 7. [Einsendungen](einsendungen.md) – Antworten lesen, exportieren, löschen
 8. [Kirche & Team](kirche-und-team.md) – Rollen, Mitglieder, mehrere Kirchen
-
-## Empfohlene Reihenfolge beim Start
-
-1. Registrieren und dabei die **Webseite** eurer Gemeinde angeben
-2. Ein paar **Links** anlegen und sortieren
-3. **Design** anpassen
-4. Bei Bedarf ein **Formular** aus einer Vorlage anlegen und als Button in den Hub aufnehmen
-5. Den Code unter **Einbinden** auf die Webseite setzen und alles einmal durchtesten
-6. **Team** einladen (Kollegen müssen sich zuerst selbst registrieren)
 
 Probleme? → [Häufige Fragen & Fehlerbehebung](../referenz/faq.md)

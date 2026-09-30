@@ -7,7 +7,7 @@ Unter **Hub → Einbinden** findest du alles, um den Launcher auf euren Webseite
 ## Der Einbettungs-Code
 
 ```html
-<script src="https://hub.eure-kirche.de/embed/DEIN_TOKEN.js" async></script>
+<script src="https://<adresse-des-hubs>/embed/DEIN_TOKEN.js" async></script>
 ```
 
 Im Backend steht die Zeile **fertig mit deiner Adresse und deinem Token** in einem Feld. Ein Klick auf das
@@ -69,7 +69,7 @@ Auf der Seite *Einbinden* steht dann, für welche Domain der Launcher freigegebe
 - Eine **Testumgebung** unter anderer Domain (z. B. eine Staging-Seite) funktioniert bei aktiver Beschränkung nicht.
   Leert das Feld währenddessen oder nutzt die Demo-Seite.
 
-**Wie die Prüfung funktioniert:** Der Server vergleicht die Webseite, die den Code anfordert (Referer), mit der
+**Wie die Prüfung funktioniert:** Der Hub vergleicht die Webseite, die den Code anfordert (Referer), mit der
 hinterlegten Domain und liefert für fremde Seiten ein leeres Skript. Zusätzlich prüft das Skript selbst noch einmal
 die Adresse der Seite, auf der es läuft. Auch Formular-Einsendungen von fremden Seiten werden abgelehnt.
 
@@ -103,7 +103,7 @@ Unter **Code neu erzeugen** ersetzt du das Token im Einbettungs-Code durch ein n
 ## Zwischenspeicher: Warum erscheinen Änderungen nicht sofort?
 
 Das Skript wird von Browsern (und ggf. einem vorgeschalteten CDN) bis zu **5 Minuten** zwischengespeichert. Das
-macht euren Launcher schnell und schont den Server. Neue Links, ein neues Design oder ein deaktivierter Launcher
+macht euren Launcher schnell. Neue Links, ein neues Design oder ein deaktivierter Launcher
 sind deshalb nach spätestens etwa 5 Minuten bei allen Besuchern sichtbar.
 
 ## Erweiterte Optionen (optional)
@@ -117,7 +117,7 @@ lassen sich aber auch selbst nutzen:
 | `data-container="#mein-element"` | Der Launcher wird **innerhalb dieses Elements** angezeigt statt schwebend auf der Seite. Das Element braucht `position: relative` und eine Höhe. In dieser Darstellung sind Vollbild und Scroll-Sperre abgeschaltet. |
 
 ```html
-<script src="https://hub.eure-kirche.de/embed/DEIN_TOKEN.js" data-open="true" async></script>
+<script src="https://<adresse-des-hubs>/embed/DEIN_TOKEN.js" data-open="true" async></script>
 ```
 
 ## Webseiten mit strenger Content-Security-Policy

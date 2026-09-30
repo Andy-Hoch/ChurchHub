@@ -21,8 +21,7 @@ Nicht-Besitzer sehen die Einstellungen ausgegraut und ohne „Speichern“. Vers
 weist der Server ab („Nur Besitzer dürfen das.“).
 
 Wer eine Kirche **anlegt**, ist automatisch Besitzer. Neu hinzugefügte Mitglieder sind **Admins**. Eine Oberfläche
-zum Ändern der Rolle gibt es nicht. Bei Bedarf hilft der Betreiber, siehe
-[Betrieb & Wartung](../setup/betrieb.md#weitere-wartungsaufgaben-in-der-konsole). Es kann mehrere Besitzer geben.
+zum Ändern der Rolle gibt es nicht. Bei Bedarf (z. B. wenn der Besitzer nicht mehr erreichbar ist) wende dich an den Betreiber des Hubs. Es kann mehrere Besitzer geben.
 
 ## Einstellungen der Kirche
 

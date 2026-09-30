@@ -10,10 +10,8 @@ Die Einbindung auf der eigenen Webseite braucht nur eine Zeile Code.
 
 | | |
 | --- | --- |
-| 🚀 **Loslegen** | [Einstieg & Grundbegriffe](docs/einstieg.md) · [Lokale Installation](docs/setup/lokale-installation.md) · [Installation im Internet (eigene Domain)](docs/setup/produktion.md) |
-| ⚙️ **Betreiben** | [Konfiguration](docs/setup/konfiguration.md) · [Betrieb & Wartung (Updates, Backups)](docs/setup/betrieb.md) |
-| 📖 **Benutzen** | [Benutzerhandbuch](docs/benutzerhandbuch/README.md): [Links](docs/benutzerhandbuch/links.md) · [Design](docs/benutzerhandbuch/design.md) · [Einbinden](docs/benutzerhandbuch/einbinden.md) · [Eigene Hub-Seite](docs/benutzerhandbuch/eigene-seite.md) · [Formulare](docs/benutzerhandbuch/formulare.md) · [Einsendungen](docs/benutzerhandbuch/einsendungen.md) · [Kirche & Team](docs/benutzerhandbuch/kirche-und-team.md) |
-| 🔒 **Nachschlagen** | [Datenschutz & Sicherheit](docs/referenz/datenschutz-und-sicherheit.md) · [FAQ & Fehlerbehebung](docs/referenz/faq.md) · [Technische Referenz](docs/referenz/technik.md) · [Schnittstellen](docs/referenz/schnittstellen.md) |
+| 👥 **Für Nutzer** (Kirchen) | **[Schnellstart: von der Anmeldung bis zum Hub auf der Webseite](docs/benutzerhandbuch/schnellstart.md)** · [Benutzerhandbuch](docs/benutzerhandbuch/README.md) mit [Links](docs/benutzerhandbuch/links.md), [Design](docs/benutzerhandbuch/design.md), [Einbinden](docs/benutzerhandbuch/einbinden.md), [Eigener Hub-Seite](docs/benutzerhandbuch/eigene-seite.md), [Formularen](docs/benutzerhandbuch/formulare.md), [Einsendungen](docs/benutzerhandbuch/einsendungen.md) und [Team](docs/benutzerhandbuch/kirche-und-team.md) · [FAQ](docs/referenz/faq.md) · [Datenschutz](docs/referenz/datenschutz-und-sicherheit.md) |
+| 🛠️ **Für Betreiber** | [Lokale Installation](docs/betreiber/lokale-installation.md) · [Installation im Internet](docs/betreiber/produktion.md) · [Konfiguration](docs/betreiber/konfiguration.md) · [Betrieb & Wartung](docs/betreiber/betrieb.md) · [Technische Referenz](docs/betreiber/technik.md) · [Schnittstellen](docs/betreiber/schnittstellen.md) |
 
 ## Funktionen
 
@@ -36,7 +34,7 @@ Styling: CSS Zero liefert Tokens, Utilities und Komponenten. Eigene Ergänzungen
 
 ## Setup
 
-Ausführliche Anleitungen: [Lokale Installation](docs/setup/lokale-installation.md) und [Installation im Internet](docs/setup/produktion.md). Kurzfassung für die Entwicklung:
+Ausführliche Anleitungen: [Lokale Installation](docs/betreiber/lokale-installation.md) und [Installation im Internet](docs/betreiber/produktion.md). Kurzfassung für die Entwicklung:
 
 ```sh
 bin/setup          # Gems installieren, Datenbank vorbereiten, Server starten
@@ -48,7 +46,7 @@ gibt es unter `http://localhost:3000/embed-demo.html?token=<TOKEN>`. Das Token s
 
 ## Einbinden
 
-Mehr dazu: [Auf der Webseite einbinden](docs/benutzerhandbuch/einbinden.md) und [Schnittstellen](docs/referenz/schnittstellen.md).
+Mehr dazu: [Auf der Webseite einbinden](docs/benutzerhandbuch/einbinden.md) und [Schnittstellen](docs/betreiber/schnittstellen.md).
 
 ```html
 <script src="https://<host>/embed/<token>.js" async></script>
@@ -62,7 +60,7 @@ Spam-Schutz: Honeypot-Feld, Mindest-Ausfüllzeit und Rate-Limit pro IP.
 
 ## E-Mail-Benachrichtigungen
 
-Ausführlich: [Konfiguration – E-Mail-Versand](docs/setup/konfiguration.md#e-mail-versand-smtp).
+Ausführlich: [Konfiguration – E-Mail-Versand](docs/betreiber/konfiguration.md#e-mail-versand-smtp).
 
 Bei neuen Einsendungen gehen E-Mails an die im Formular hinterlegten Adressen. Sie enthalten nur einen
 Link ins Backend, keine Antworten. Für die Produktion SMTP per `bin/rails credentials:edit` hinterlegen:

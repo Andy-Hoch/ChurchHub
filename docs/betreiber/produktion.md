@@ -3,8 +3,8 @@
 ← [Zur Übersicht](../README.md) · Zurück: [Lokale Installation](lokale-installation.md) · Weiter: [Konfiguration](konfiguration.md)
 
 Diese Anleitung führt dich **von einem leeren Server bis zu einem laufenden Kirchen-Hub unter eigener Adresse**,
-zum Beispiel `https://hub.eure-kirche.de`. Danach kannst du dich registrieren und den Launcher auf eurer Webseite
-einbinden.
+zum Beispiel `https://hub.eure-kirche.de`. Danach können du und die Nutzer sich registrieren und den Launcher auf
+den Webseiten einbinden (siehe [Schnellstart](../benutzerhandbuch/schnellstart.md)).
 
 Es gibt zwei Wege:
 
@@ -270,3 +270,4 @@ es Mitglied ist. Mehr dazu unter [Datenschutz & Sicherheit](../referenz/datensch
 - [ ] `APP_HOST` gesetzt (Links in E-Mails zeigen auf die richtige Domain)
 - [ ] Beim ersten Konto: Kirche mit **Webseite** angelegt, damit der Launcher nur dort läuft
 - [ ] Launcher auf einer Testseite eingebunden und Formular-Einsendung getestet
+- [ ] Nutzern Adresse und Ansprechpartner mitgeteilt ([Was du Nutzern mitgeben solltest](datenschutz-im-betrieb.md#was-du-nutzern-mitgeben-solltest))

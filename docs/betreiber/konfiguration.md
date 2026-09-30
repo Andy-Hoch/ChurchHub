@@ -126,4 +126,4 @@ Diese Werte sind im Code verankert. Sie zu ändern erfordert eine Code-Anpassung
 | Antwortmöglichkeiten | höchstens 30 Einträge mit je höchstens 100 Zeichen |
 | Antwort „Kurzer Text“ / „Langer Text“ | 200 / 5000 Zeichen |
 
-Weitere technische Details: [Technische Referenz](../referenz/technik.md).
+Weitere technische Details: [Technische Referenz](technik.md).

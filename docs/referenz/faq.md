@@ -71,8 +71,8 @@ tatsächlich von Hand ausfüllen. Prüfe außerdem, ob der Filter *Ungelesen* ak
 
 **Ich bekomme keine E-Mail-Benachrichtigung.**
 1. Sind unter *Formular → Einstellungen → E-Mail an* gültige Adressen eingetragen?
-2. Hat der Betreiber [SMTP eingerichtet](../setup/konfiguration.md#e-mail-versand-smtp) und läuft der Job-Runner?
-3. Spam-Ordner prüfen. Absender ist die unter `smtp.from` hinterlegte Adresse.
+2. Hat der Betreiber des Hubs den E-Mail-Versand eingerichtet? Frag ihn im Zweifel.
+3. Spam-Ordner prüfen. Den Absender legt der Betreiber fest.
 
 **Warum steht die Antwort nicht in der E-Mail?** Bewusst aus Datenschutzgründen, siehe [Einsendungen](../benutzerhandbuch/einsendungen.md#benachrichtigung-per-e-mail).
 
@@ -90,7 +90,7 @@ mit UTF-8 und Trennzeichen Semikolon. In deutschen Excel-Installationen klappt d
 ## Konto & Team
 
 **Ich habe mein Passwort vergessen und bekomme keine E-Mail.** Prüfe den Spam-Ordner. Kommt weiterhin nichts an, ist
-womöglich kein E-Mail-Versand eingerichtet. Wende dich an den Betreiber ([Anleitung für Betreiber](../setup/betrieb.md#passwort-zurücksetzen-ohne-e-mail)).
+womöglich kein E-Mail-Versand eingerichtet. Wende dich an den Betreiber des Hubs, er kann dein Passwort zurücksetzen.
 
 **Der Link zum Zurücksetzen ist „ungültig oder abgelaufen“.** Er gilt nur kurz (standardmäßig 15 Minuten) und ist einmalig
 an das aktuelle Passwort gebunden. Fordere einen neuen an.
@@ -111,8 +111,8 @@ weitere Kirche an. Du musst außerdem Besitzer sein und den Namen exakt eintippe
 
 ## Sonstiges
 
-**Was kostet der Kirchen-Hub?** Ihr betreibt ihn selbst ([Installation](../setup/produktion.md)). Kosten entstehen daher
-für Server, Domain und gegebenenfalls einen E-Mail-Dienst.
+**Wer ist „der Betreiber“?** Die Stelle, die den Kirchen-Hub bereitstellt und euch die Adresse gegeben hat. Sie kümmert sich um
+Server, Sicherungen und E-Mail-Versand und ist euer Ansprechpartner bei technischen Problemen.
 
 **Auf welchem Endgerät funktioniert das Backend?** In modernen Browsern (Chrome, Edge, Safari, Firefox in aktuellen Versionen),
 Desktop wie Handy. Ältere Browser bekommen eine Hinweisseite („Nicht unterstützter Browser“). Für den **Launcher** auf
@@ -124,4 +124,4 @@ eurer Webseite gibt es keine Versionssperre. Er braucht aber Shadow-DOM-Unterst�
 ja, ein Code funktioniert auf beliebig vielen Seiten. Alle zeigen denselben Inhalt. Mit Beschränkung ist nur eine Domain (samt Subdomains) möglich.
 Für unterschiedliche Inhalte pro Webseite legt ihr je eine Kirche an.
 
-**Wo melde ich Fehler oder wünsche Funktionen?** Im GitHub-Repository als Issue: <https://github.com/andy-hoch/churchhub/issues>.
+**Wo melde ich Fehler oder wünsche Funktionen?** Beim Betreiber des Hubs.
