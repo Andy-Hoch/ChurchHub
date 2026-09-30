@@ -266,7 +266,7 @@
     }
 
     // Forms: a full-screen dialog that shows one step at a time
-    // (intro, one step per question, review, thank you).
+    // (intro, one step per question, review, privacy, thank you).
 
     function openForm(form, trigger) {
       var steps = [];
@@ -275,8 +275,12 @@
         steps.push({ type: "question", question: question, number: index + 1 });
       });
       steps.push({ type: "review" });
+      var reviewIndex = steps.length - 1;
+      // Consent text and/or privacy link get a step of their own right before sending.
+      if (form.consentText || safeUrl(form.privacyUrl)) steps.push({ type: "privacy" });
 
       activeForm = {
+        reviewIndex: reviewIndex,
         form: form, steps: steps, index: 0, answers: {}, errors: {}, consent: false, honeypot: "",
         returnToReview: false, submitting: false, done: false, error: "", startedAt: Date.now(), trigger: trigger, entering: true
       };
@@ -347,11 +351,20 @@
       } else if (step.type === "question") {
         focusTarget = renderQuestion(step, content);
         footer.appendChild(button("btn btn-primary", state.returnToReview ? "Zur Übersicht" : "Weiter", next));
-      } else if (step.type === "review") {
-        renderReview(content);
-        var submit = footer.appendChild(button("btn btn-primary", state.submitting ? "Wird gesendet …" : (form.submitLabel || "Absenden"), next));
-        submit.disabled = state.submitting;
-        focusTarget = (state.error && content.querySelector(".consent input")) || submit;
+      } else if (step.type === "review" || step.type === "privacy") {
+        if (step.type === "review") {
+          renderReview(content);
+        } else {
+          renderPrivacy(content);
+        }
+        if (isLastStep()) {
+          renderSubmitExtras(content);
+          var submit = footer.appendChild(button("btn btn-primary", state.submitting ? "Wird gesendet …" : (form.submitLabel || "Absenden"), next));
+          submit.disabled = state.submitting;
+          focusTarget = (state.error && content.querySelector(".consent input")) || submit;
+        } else {
+          focusTarget = footer.appendChild(button("btn btn-primary", "Weiter", next));
+        }
       } else {
         var done = el("div", "done");
         done.innerHTML = svg("check");
@@ -474,8 +487,14 @@
         list.appendChild(item);
       });
       content.appendChild(list);
+    }
 
-      // Consent checkbox and/or privacy link, shown right above the submit button.
+    function renderPrivacy(content) {
+      var state = activeForm;
+      var form = state.form;
+
+      content.append(el("h3", "question", "Datenschutz"), el("p", "help", "Bitte lies die folgenden Hinweise, bevor du deine Angaben absendest."));
+
       var privacyUrl = safeUrl(form.privacyUrl);
       var privacyLink = null;
       if (privacyUrl) {
@@ -500,6 +519,11 @@
         notice.append(privacyLink, ".");
         content.appendChild(notice);
       }
+    }
+
+    // Honeypot and error message, shown on the step with the submit button.
+    function renderSubmitExtras(content) {
+      var state = activeForm;
 
       // Honeypot: invisible for people, bots tend to fill it in.
       var trap = el("div", "hp");
@@ -518,6 +542,10 @@
       content.appendChild(error);
     }
 
+    function isLastStep() {
+      return activeForm.index === activeForm.steps.length - 1;
+    }
+
     function next() {
       var state = activeForm;
       var step = currentStep();
@@ -527,10 +555,10 @@
         if (message) return showFieldError(step.question, message);
         delete state.errors[step.question.id];
       }
-      if (step.type === "review") return submit();
+      if (isLastStep()) return submit();
 
       if (state.returnToReview && step.type === "question") {
-        state.index = state.steps.length - 1;
+        state.index = state.reviewIndex;
         state.returnToReview = false;
       } else {
         state.index++;
