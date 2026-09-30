@@ -81,4 +81,24 @@ class FormsTest < ApplicationSystemTestCase
     assert_text "Anna"
     assert_text "Nur das Gebetsteam"
   end
+
+  test "visitors see the privacy link before sending even without a consent text" do
+    form = churches(:one).forms.create!(title: "Feedback", privacy_url: "https://example.com/datenschutz")
+    form.questions.create!(label: "Was möchtest du uns sagen?", kind: "short_text", required: true)
+    hubs(:one).links.create!(title: "Feedback", kind: "form", form: form)
+
+    visit "/embed-demo.html?token=#{hubs(:one).public_token}"
+    launcher = find("[data-kirchen-hub]", visible: :all).shadow_root
+    launcher.find(".button").click
+    launcher.find("button.link", text: "Feedback").click
+    launcher.find("input.input").set("Danke!")
+    launcher.find(".btn-primary", text: "Weiter").click
+
+    launcher.assert_selector ".question", text: "Stimmt alles so?"
+    launcher.assert_no_selector ".consent"
+    launcher.assert_selector ".privacy a[href='https://example.com/datenschutz']", text: "Datenschutzerklärung"
+    launcher.find(".btn-primary", text: "Absenden").click
+
+    launcher.assert_selector ".question", text: "Vielen Dank!"
+  end
 end

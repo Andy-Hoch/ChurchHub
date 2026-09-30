@@ -47,6 +47,7 @@
   <div class="field">
     <%= form.label :privacy_url, "Link zur Datenschutzerklärung (optional)", class: "field__label" %>
     <%= form.url_field :privacy_url, placeholder: "https://", class: "input" %>
+    <p class="field__hint">Wird vor dem Absenden verlinkt – mit oder ohne Einwilligungstext.</p>
     <%= field_error(@form, :privacy_url) %>
   </div>
 
