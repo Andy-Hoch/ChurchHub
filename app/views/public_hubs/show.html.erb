@@ -54,11 +54,11 @@
             <li>
               <% if link.kind_form? %>
                 <button type="button" class="link" data-kirchen-hub-form="<%= link.form_id %>" aria-haspopup="dialog">
-                  <%= render "public_hubs/link_content", link: link, default_icon: "📝" %>
+                  <%= render "public_hubs/link_content", link: link %>
                 </button>
               <% else %>
                 <a class="link" href="<%= link.url %>" target="_blank" rel="noopener">
-                  <%= render "public_hubs/link_content", link: link, default_icon: "🔗" %>
+                  <%= render "public_hubs/link_content", link: link %>
                 </a>
               <% end %>
             </li>

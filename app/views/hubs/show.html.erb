@@ -13,7 +13,7 @@
     <% @hub.links.each do |link| %>
       <li class="list-row link-row <%= "list-row--muted" unless link.visible? %>" data-url-value="<%= position_hub_link_path(link) %>">
         <span class="link-row__handle" title="Ziehen zum Sortieren" aria-hidden="true">⋮⋮</span>
-        <span class="link-row__icon" aria-hidden="true"><%= link.icon.presence || "🔗" %></span>
+        <% if link.icon.present? %><span class="link-row__icon" aria-hidden="true"><%= link.icon %></span><% end %>
         <div class="link-row__body">
           <div class="flex items-center gap-half">
             <span class="font-medium"><%= link.title %></span>
