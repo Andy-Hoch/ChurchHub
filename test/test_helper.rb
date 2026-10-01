@@ -3,6 +3,11 @@ require_relative "../config/environment"
 require "rails/test_help"
 require_relative "test_helpers/session_test_helper"
 
+# Fixture users get a fresh random password on every run. A well-known one like
+# "password" makes Chrome's password manager open its leaked-password warning in
+# system tests, which then swallows clicks and keystrokes meant for the page.
+TEST_PASSWORD = SecureRandom.base58(24)
+
 module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers

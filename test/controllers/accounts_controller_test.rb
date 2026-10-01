@@ -23,7 +23,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     church = churches(:one)
 
     assert_difference [ "User.count", "Church.count" ], -1 do
-      delete account_path, params: { password: "password" }
+      delete account_path, params: { password: TEST_PASSWORD }
     end
 
     assert_redirected_to new_session_path
@@ -38,7 +38,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
     churches(:one).memberships.create!(user: users(:two), role: :admin)
 
     assert_no_difference "Church.count" do
-      delete account_path, params: { password: "password" }
+      delete account_path, params: { password: TEST_PASSWORD }
     end
 
     assert churches(:one).memberships.find_by!(user: users(:two)).owner?
