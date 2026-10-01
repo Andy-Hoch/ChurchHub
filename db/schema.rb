@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_29_100003) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_01_100000) do
   create_table "churches", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -72,6 +72,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_29_100003) do
     t.integer "corner_radius", default: 12, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "font_family", default: "sans", null: false
     t.index ["church_id"], name: "index_hubs_on_church_id", unique: true
     t.index ["public_token"], name: "index_hubs_on_public_token", unique: true
   end

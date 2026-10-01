@@ -2,6 +2,10 @@ class Hub < ApplicationRecord
   POSITIONS = %w[right left].freeze
   COLOR_SCHEMES = %w[light dark auto].freeze
   BUTTON_ICONS = %w[grid menu heart cross link].freeze
+  FONT_FAMILIES = {
+    "sans" => %("Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif),
+    "serif" => %("Source Serif 4", Georgia, "Times New Roman", serif)
+  }.freeze
 
   belongs_to :church
   has_many :links, -> { order(:position, :id) }, dependent: :destroy, inverse_of: :hub
@@ -16,6 +20,7 @@ class Hub < ApplicationRecord
   validates :position, inclusion: { in: POSITIONS }
   validates :color_scheme, inclusion: { in: COLOR_SCHEMES }
   validates :button_icon, inclusion: { in: BUTTON_ICONS }
+  validates :font_family, inclusion: { in: FONT_FAMILIES.keys }
   validates :corner_radius, numericality: { only_integer: true, in: 0..24 }
 
   def theme
@@ -26,7 +31,8 @@ class Hub < ApplicationRecord
       buttonLabel: button_label,
       buttonIcon: button_icon,
       colorScheme: color_scheme,
-      cornerRadius: corner_radius
+      cornerRadius: corner_radius,
+      fontFamily: font_family
     }
   end
 
