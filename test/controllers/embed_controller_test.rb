@@ -11,6 +11,13 @@ class EmbedControllerTest < ActionDispatch::IntegrationTest
     assert_match "public", response.headers["Cache-Control"]
   end
 
+  test "ships absolute URLs to the self-hosted hub fonts" do
+    get embed_path(hubs(:one).public_token, format: :js)
+
+    assert_match %r{url\(\\"http://www\.example\.com/assets/source-sans-3-latin-\h+\.woff2\\"\)}, response.body
+    assert_match %("serif":"\\"Source Serif 4\\", Georgia), response.body
+  end
+
   test "escapes link data inside the script" do
     links(:live).update!(title: "</script><script>alert(1)</script>")
     get embed_path(hubs(:one).public_token, format: :js)

@@ -30,6 +30,6 @@ class HubsController < ApplicationController
     end
 
     def hub_params
-      params.expect(hub: %i[ title enabled primary_color text_color position button_label button_icon color_scheme corner_radius ])
+      params.expect(hub: %i[ title enabled primary_color text_color position button_label button_icon color_scheme corner_radius font_family ])
     end
 end

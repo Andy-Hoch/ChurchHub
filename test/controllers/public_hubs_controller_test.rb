@@ -20,6 +20,17 @@ class PublicHubsControllerTest < ActionDispatch::IntegrationTest
     assert_select "script[data-launcher=false][src=?]", embed_path(hubs(:one).public_token, format: :js)
   end
 
+  test "uses the self-hosted hub font" do
+    hubs(:one).update!(font_family: "serif")
+
+    get public_hub_path(churches(:one).slug)
+
+    assert_select "link[rel=preload][as=font][href^=?]", "/assets/source-serif-4-latin-"
+    assert_select "style[data-kirchen-hub-fonts]", text: %r{font-family: "Source Serif 4".*url\("http://www\.example\.com/assets/source-serif-4-latin-}m
+    assert_match %(font: 400 16px/1.45 "Source Serif 4", Georgia), response.body
+    assert_no_match "fonts.googleapis.com", response.body
+  end
+
   test "skips the launcher script without form buttons" do
     get public_hub_path(churches(:one).slug)
 

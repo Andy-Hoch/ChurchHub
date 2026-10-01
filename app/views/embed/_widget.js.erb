@@ -49,9 +49,12 @@
 
   var INPUT_TYPES = { email: "email", phone: "tel", date: "date" };
 
+  var FONTS = <%= json_escape(Hub::FONT_FAMILIES.to_json).html_safe %>;
+  var FONT_FACES = <%= json_escape(hub_font_faces_css.to_json).html_safe %>;
+
   var STYLES = [
     ":host { all: initial; }",
-    ".launcher { --radius: calc(var(--ph-radius) * 1px); color-scheme: var(--ph-scheme); font: 400 15px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; position: fixed; inset-block-end: 20px; z-index: 2147483000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }",
+    ".launcher { --radius: calc(var(--ph-radius) * 1px); color-scheme: var(--ph-scheme); font: 400 15px/1.4 var(--ph-font); position: fixed; inset-block-end: 20px; z-index: 2147483000; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }",
     ".launcher--right { inset-inline-end: 20px; }",
     ".launcher--left { inset-inline-start: 20px; align-items: flex-start; }",
     ":host([data-inline]) .launcher { position: absolute; inset-block-end: 16px; }",
@@ -84,7 +87,7 @@
     "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
     "@media (max-width: 640px) { :host(:not([data-inline])) .panel { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; max-height: none; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; } :host(:not([data-inline])) .header { position: sticky; top: 0; padding-top: max(14px, env(safe-area-inset-top)); } :host(:not([data-inline])) .panel:not([hidden]) + .button { display: none; } :host(:not([data-inline])) .close { padding: 8px; } }",
 
-    ".form { --radius: calc(var(--ph-radius) * 1px); --border: light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); --muted: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); --negative: light-dark(oklch(57.71% 0.2152 27.33), oklch(70.4% 0.191 22.22)); color-scheme: var(--ph-scheme); font: 400 16px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; position: fixed; inset: 0; z-index: 2147483001; display: flex; flex-direction: column; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); color: light-dark(oklch(14.08% 0.0044 285.82), oklch(98.51% 0 0)); }",
+    ".form { --radius: calc(var(--ph-radius) * 1px); --border: light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); --muted: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); --negative: light-dark(oklch(57.71% 0.2152 27.33), oklch(70.4% 0.191 22.22)); color-scheme: var(--ph-scheme); font: 400 16px/1.45 var(--ph-font); position: fixed; inset: 0; z-index: 2147483001; display: flex; flex-direction: column; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); color: light-dark(oklch(14.08% 0.0044 285.82), oklch(98.51% 0 0)); }",
     ".form--enter { animation: ph-fade .2s ease-out; }",
     ":host([data-inline]) .form { position: absolute; }",
     ".form *, .form *::before, .form *::after { box-sizing: border-box; }",
@@ -178,7 +181,18 @@
     return String(value).trim();
   }
 
+  // @font-face rules are ignored inside a shadow root, so they go into the
+  // page itself (the public hub page already ships them).
+  function loadFonts() {
+    if (document.querySelector("style[data-kirchen-hub-fonts]")) return;
+    var style = document.createElement("style");
+    style.setAttribute("data-kirchen-hub-fonts", "");
+    style.textContent = FONT_FACES;
+    document.head.appendChild(style);
+  }
+
   function mount() {
+    loadFonts();
     var container = options.container ? document.querySelector(options.container) : document.body;
     if (!container) return;
 
@@ -206,6 +220,7 @@
       host.style.setProperty("--ph-text", theme.textColor);
       host.style.setProperty("--ph-radius", String(theme.cornerRadius));
       host.style.setProperty("--ph-scheme", theme.colorScheme === "auto" ? "light dark" : theme.colorScheme);
+      host.style.setProperty("--ph-font", FONTS[theme.fontFamily] || FONTS.sans);
       launcher.className = "launcher launcher--" + (theme.position === "left" ? "left" : "right");
       launcher.replaceChildren();
       if (headless) return;

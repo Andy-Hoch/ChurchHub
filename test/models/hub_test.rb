@@ -3,10 +3,10 @@ require "test_helper"
 class HubTest < ActiveSupport::TestCase
   test "validates theme values" do
     hub = hubs(:one)
-    hub.assign_attributes(primary_color: "red", position: "top", color_scheme: "neon", button_icon: "x", corner_radius: 99)
+    hub.assign_attributes(primary_color: "red", position: "top", color_scheme: "neon", button_icon: "x", corner_radius: 99, font_family: "comic")
 
     assert_not hub.valid?
-    assert_equal %i[ primary_color position color_scheme button_icon corner_radius ].sort, hub.errors.attribute_names.sort
+    assert_equal %i[ primary_color position color_scheme button_icon corner_radius font_family ].sort, hub.errors.attribute_names.sort
   end
 
   test "embed payload contains only visible links in order" do
@@ -14,6 +14,7 @@ class HubTest < ActiveSupport::TestCase
 
     assert_equal [ "Gottesdienst live", "Termine" ], payload[:links].map { |link| link[:title] }
     assert_equal "oklch(21.03% 0.0059 285.89)", payload[:theme][:primaryColor]
+    assert_equal "sans", payload[:theme][:fontFamily]
   end
 
   test "converts hex colors from the color picker to oklch" do

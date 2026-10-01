@@ -19,7 +19,8 @@ export default class extends Controller {
       buttonLabel: this.#value("button_label"),
       buttonIcon: this.#value("button_icon"),
       colorScheme: this.#value("color_scheme"),
-      cornerRadius: Number(this.#value("corner_radius"))
+      cornerRadius: Number(this.#value("corner_radius")),
+      fontFamily: this.#value("font_family")
     }
   }
 
