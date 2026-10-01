@@ -1,0 +1,32 @@
+name: Branch rules
+
+# Enforces the release flow dev → beta → main. Make "Check source branch"
+# a required status check on main and beta for this to block merges.
+on:
+  pull_request:
+    branches: [ main, beta ]
+    types: [ opened, edited, reopened, synchronize ]
+
+jobs:
+  check_source_branch:
+    name: Check source branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Allow only beta → main and dev → beta
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+        run: |
+          case "$BASE" in
+            main) allowed=beta ;;
+            beta) allowed=dev ;;
+          esac
+
+          if [ "$HEAD" != "$allowed" ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+            echo "::error::Pull requests into $BASE must come from $allowed in $GITHUB_REPOSITORY, not $HEAD_REPO:$HEAD."
+            exit 1
+          fi
+
+          echo "$HEAD → $BASE is allowed."
