@@ -10,6 +10,10 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+    <%= hub_font_preload_tag(@hub) %>
+    <style data-kirchen-hub-fonts>
+      <%= hub_font_faces_css %>
+    </style>
     <style>
       :root {
         --primary: <%= @hub.primary_color %>;
@@ -25,7 +29,7 @@
       }
       * { box-sizing: border-box; }
       html { -webkit-text-size-adjust: 100%; }
-      body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--bg); color: var(--fg); font: 400 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+      body { margin: 0; min-height: 100vh; min-height: 100dvh; background: var(--bg); color: var(--fg); font: 400 16px/1.45 <%= hub_font_stack(@hub) %>; }
       .header { background: var(--primary); color: var(--on-primary); padding: max(40px, env(safe-area-inset-top)) 16px 72px; text-align: center; }
       .title { margin: 0 auto; max-width: 36rem; font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
       main { max-width: 36rem; margin: -48px auto 0; padding: 0 16px max(32px, env(safe-area-inset-bottom)); }
