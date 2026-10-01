@@ -1,4 +1,4 @@
-<span class="emoji" aria-hidden="true"><%= link.icon.presence || default_icon %></span>
+<% if link.icon.present? %><span class="emoji" aria-hidden="true"><%= link.icon %></span><% end %>
 <span class="text">
   <span class="link-title"><%= link.title %></span>
   <% if link.description.present? %><span class="link-description"><%= link.description %></span><% end %>

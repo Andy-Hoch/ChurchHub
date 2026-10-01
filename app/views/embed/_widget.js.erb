@@ -57,7 +57,8 @@
     ":host([data-inline]) .launcher { position: absolute; inset-block-end: 16px; }",
     ":host([data-inline]) .launcher--right { inset-inline-end: 16px; }",
     ":host([data-inline]) .launcher--left { inset-inline-start: 16px; }",
-    ".button { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px; border-radius: 999px; background: var(--ph-primary); color: var(--ph-text); font-weight: 600; box-shadow: 0 10px 25px -5px oklch(0% 0 0 / .25), 0 4px 6px -4px oklch(0% 0 0 / .2); transition: transform .15s ease; }",
+    ".button { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 18px; border-radius: 999px; background: var(--ph-primary); color: var(--ph-text); font-weight: 600; box-shadow: 0 10px 25px -5px oklch(0% 0 0 / .25), 0 4px 6px -4px oklch(0% 0 0 / .2); transition: transform .15s ease; }",
+    ".button--icon-only { padding: 12px; gap: 0; }",
     ".button:hover { transform: translateY(-1px); }",
     ".button:active { transform: scale(.97); }",
     ".button:focus-visible, .link:focus-visible, .close:focus-visible { outline: 2px solid var(--ph-primary); outline-offset: 2px; }",
@@ -241,7 +242,7 @@
             node.target = "_blank";
             node.rel = "noopener";
           }
-          node.appendChild(el("span", "emoji", item.icon || (item.type === "form" ? "📝" : "🔗"))).setAttribute("aria-hidden", "true");
+          if (item.icon) node.appendChild(el("span", "emoji", item.icon)).setAttribute("aria-hidden", "true");
           var text = el("span", "link-text");
           text.appendChild(el("span", "link-title", item.title));
           if (item.description) text.appendChild(el("span", "link-description", item.description));
@@ -254,12 +255,13 @@
         panel.appendChild(list);
       }
 
-      var toggleButton = el("button", "button");
+      var toggleButton = el("button", "button" + (theme.buttonLabel ? "" : " button--icon-only"));
       toggleButton.type = "button";
       toggleButton.setAttribute("aria-expanded", String(open));
       toggleButton.setAttribute("aria-controls", panelId);
+      toggleButton.setAttribute("aria-label", open ? "Schließen" : (theme.buttonLabel || "Menü öffnen"));
       toggleButton.innerHTML = svg(open ? "close" : theme.buttonIcon);
-      toggleButton.appendChild(el("span", null, theme.buttonLabel));
+      if (theme.buttonLabel) toggleButton.appendChild(el("span", null, theme.buttonLabel));
 
       launcher.append(panel, toggleButton);
 

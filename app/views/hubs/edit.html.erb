@@ -16,8 +16,8 @@
     </div>
 
     <div class="field">
-      <%= form.label :button_label, "Button-Text", class: "field__label" %>
-      <%= form.text_field :button_label, required: true, maxlength: 30, class: "input" %>
+      <%= form.label :button_label, "Button-Text (optional)", class: "field__label" %>
+      <%= form.text_field :button_label, maxlength: 30, class: "input" %>
       <%= field_error(@hub, :button_label) %>
     </div>
 

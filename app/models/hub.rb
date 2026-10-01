@@ -11,7 +11,7 @@ class Hub < ApplicationRecord
   normalizes :primary_color, :text_color, with: ->(color) { OklchColor.normalize(color) || color.strip }
 
   validates :title, presence: true, length: { maximum: 80 }
-  validates :button_label, presence: true, length: { maximum: 30 }
+  validates :button_label, length: { maximum: 30 }
   validates :primary_color, :text_color, format: { with: OklchColor::FORMAT }
   validates :position, inclusion: { in: POSITIONS }
   validates :color_scheme, inclusion: { in: COLOR_SCHEMES }
