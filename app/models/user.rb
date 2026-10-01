@@ -9,6 +9,7 @@ class User < ApplicationRecord
   validates :name, presence: true
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, allow_nil: true
+  validates :confirms_christian_organization, acceptance: { message: "muss bestätigt werden" }
 
   # Deletes the user. Churches without other members are deleted with them;
   # in the others, the longest-standing member takes over if no owner is left.

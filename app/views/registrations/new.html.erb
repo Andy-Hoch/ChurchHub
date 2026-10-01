@@ -41,6 +41,14 @@
     <%= field_error(@user, :password_confirmation) %>
   </div>
 
+  <div class="field">
+    <label class="flex items-center gap">
+      <%= form.check_box :confirms_christian_organization, class: "input" %>
+      <span>Ich bestätige, dass ich eine Kirche oder eine andere christliche Organisation vertrete.</span>
+    </label>
+    <%= field_error(@user, :confirms_christian_organization) %>
+  </div>
+
   <%= form.submit "Registrieren", class: "btn btn--primary i-min" %>
 <% end %>
 

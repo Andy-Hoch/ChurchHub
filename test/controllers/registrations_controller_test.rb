@@ -10,7 +10,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_difference [ "User.count", "Church.count", "Membership.count", "Hub.count" ], 1 do
       post registration_path, params: {
         church: { name: "St. Paulus" },
-        user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123" }
+        user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123", confirms_christian_organization: "1" }
       }
     end
 
@@ -25,7 +25,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
   test "stores the church website" do
     post registration_path, params: {
       church: { name: "St. Paulus", website_url: "st-paulus.example" },
-      user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123" }
+      user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123", confirms_christian_organization: "1" }
     }
 
     assert_equal "https://st-paulus.example", Church.find_by!(slug: "st-paulus").website_url
@@ -35,7 +35,7 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference [ "User.count", "Church.count" ] do
       post registration_path, params: {
         church: { name: "St. Paulus", website_url: "ftp://st-paulus" },
-        user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123" }
+        user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123", confirms_christian_organization: "1" }
       }
     end
 
@@ -45,6 +45,17 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
   test "renders errors without creating anything" do
     assert_no_difference [ "User.count", "Church.count" ] do
       post registration_path, params: { church: { name: "" }, user: { name: "", email_address: "x", password: "1" } }
+    end
+
+    assert_response :unprocessable_entity
+  end
+
+  test "rejects registration when the Christian organization checkbox is unchecked" do
+    assert_no_difference [ "User.count", "Church.count" ] do
+      post registration_path, params: {
+        church: { name: "St. Paulus" },
+        user: { name: "Clara", email_address: "clara@example.com", password: "geheim123", password_confirmation: "geheim123", confirms_christian_organization: "0" }
+      }
     end
 
     assert_response :unprocessable_entity
