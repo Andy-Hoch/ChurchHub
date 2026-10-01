@@ -11,7 +11,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   # test would get the launcher an earlier test loaded for the same hub.
   setup { page.driver.browser.execute_cdp("Network.clearBrowserCache") }
 
-  def sign_in_as(user, password: "password")
+  def sign_in_as(user, password: TEST_PASSWORD)
     visit new_session_path
     fill_in "E-Mail-Adresse", with: user.email_address
     fill_in "Passwort", with: password
