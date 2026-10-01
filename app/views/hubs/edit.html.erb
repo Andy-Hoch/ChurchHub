@@ -56,6 +56,12 @@
       </div>
     </div>
 
+    <div class="field">
+      <%= form.label :font_family, "Schriftart", class: "field__label" %>
+      <%= form.select :font_family, { "Serifenlos (Source Sans)" => "sans", "Mit Serifen (Source Serif)" => "serif" }, {}, class: "input" %>
+      <%= field_error(@hub, :font_family) %>
+    </div>
+
     <div class="card__footer">
       <%= form.submit "Speichern", class: "btn btn--primary" %>
     </div>

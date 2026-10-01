@@ -32,6 +32,13 @@ class HubsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "left", hubs(:one).position
   end
 
+  test "updates the font family" do
+    patch hub_path, params: { hub: { font_family: "serif" } }
+
+    assert_redirected_to edit_hub_path
+    assert_equal "serif", hubs(:one).reload.font_family
+  end
+
   test "rejects an invalid theme" do
     patch hub_path, params: { hub: { primary_color: "rot" } }
     assert_response :unprocessable_entity
