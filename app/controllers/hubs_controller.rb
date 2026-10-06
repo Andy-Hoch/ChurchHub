@@ -9,7 +9,11 @@ class HubsController < ApplicationController
   end
 
   def update
-    if @hub.update(hub_params)
+    logo = hub_params[:logo]
+    logo_ok = logo.blank? || @hub.church.update(logo: logo)
+    @hub.church.reload unless logo_ok
+
+    if logo_ok && @hub.update(hub_params.except(:logo))
       redirect_back_or_to edit_hub_path, notice: "Änderungen gespeichert."
     else
       render :edit, status: :unprocessable_entity
@@ -30,6 +34,6 @@ class HubsController < ApplicationController
     end
 
     def hub_params
-      params.expect(hub: %i[ title enabled primary_color text_color position button_label button_icon color_scheme corner_radius font_family ])
+      params.expect(hub: %i[ title enabled primary_color text_color position button_label button_icon color_scheme corner_radius font_family logo ])
     end
 end

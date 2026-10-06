@@ -53,6 +53,11 @@
     <span class="text-sm">Im Launcher anzeigen</span>
   </label>
 
+  <label class="field field--inline">
+    <%= form.check_box :featured, class: "switch" %>
+    <span class="text-sm">Hervorheben</span>
+  </label>
+
   <div class="card__footer flex items-center gap">
     <%= form.submit "Speichern", class: "btn btn--primary" %>
     <%= link_to "Abbrechen", hub_path, class: "btn btn--borderless" %>

@@ -54,4 +54,28 @@ class ChurchTest < ActiveSupport::TestCase
     assert_not church.embed_restricted?
     assert church.embed_allowed_host?("irgendwo.example")
   end
+
+  test "accepts a valid logo image" do
+    church = churches(:one)
+    church.logo.attach(io: File.open(Rails.root.join("test/fixtures/files/logo.png")), filename: "logo.png", content_type: "image/png")
+
+    assert church.valid?
+    assert church.logo.attached?
+  end
+
+  test "rejects a logo with a disallowed content type" do
+    church = churches(:one)
+    church.logo.attach(io: StringIO.new("not an image"), filename: "logo.txt", content_type: "text/plain")
+
+    assert_not church.valid?
+    assert church.errors.include?(:logo)
+  end
+
+  test "rejects a logo that is too large" do
+    church = churches(:one)
+    church.logo.attach(io: StringIO.new("x" * (Church::LOGO_MAX_SIZE + 1)), filename: "logo.png", content_type: "image/png")
+
+    assert_not church.valid?
+    assert church.errors.include?(:logo)
+  end
 end

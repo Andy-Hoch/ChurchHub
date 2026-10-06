@@ -37,6 +37,30 @@ class PublicHubsControllerTest < ActionDispatch::IntegrationTest
     assert_select "script", count: 0
   end
 
+  test "renders links as buttons directly, without a list or arrow icon" do
+    get public_hub_path(churches(:one).slug)
+
+    assert_select "div.list > a.link, div.list > button.link", count: hubs(:one).links.visible.count
+    assert_select "ul.list", count: 0
+    assert_select "svg.chevron", count: 0
+  end
+
+  test "highlights a featured link" do
+    links(:live).update!(featured: true)
+
+    get public_hub_path(churches(:one).slug)
+
+    assert_select "a.link.link--featured", text: /Gottesdienst live/
+  end
+
+  test "shows the church logo in the header when attached" do
+    churches(:one).logo.attach(fixture_file_upload("logo.png", "image/png"))
+
+    get public_hub_path(churches(:one).slug)
+
+    assert_select "header.header img.logo"
+  end
+
   test "returns not found for unknown churches and disabled hubs" do
     get public_hub_path("unbekannt")
     assert_response :not_found

@@ -44,6 +44,20 @@ class HubsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 
+  test "uploads a logo for the current church" do
+    patch hub_path, params: { hub: { logo: fixture_file_upload("logo.png", "image/png") } }
+
+    assert_redirected_to edit_hub_path
+    assert hubs(:one).church.logo.attached?
+  end
+
+  test "rejects a logo with the wrong content type" do
+    patch hub_path, params: { hub: { logo: fixture_file_upload("logo.txt", "text/plain") } }
+
+    assert_response :unprocessable_entity
+    assert_not hubs(:one).church.logo.attached?
+  end
+
   test "regenerates the public token" do
     assert_changes -> { hubs(:one).reload.public_token } do
       post regenerate_token_hub_path

@@ -19,6 +19,18 @@ class LinkTest < ActiveSupport::TestCase
     assert_equal %w[ Intern Gottesdienst\ live Termine ], hubs(:one).links.reload.map(&:title)
     assert_equal [ 0, 1, 2 ], hubs(:one).links.map(&:position)
   end
+
+  test "is not featured by default" do
+    link = hubs(:one).links.create!(title: "Neu", url: "https://example.com/neu")
+
+    assert_not link.featured?
+  end
+
+  test "embed payload reflects the featured flag" do
+    link = hubs(:one).links.create!(title: "Neu", url: "https://example.com/neu", featured: true)
+
+    assert_equal true, link.embed_payload[:featured]
+  end
 end
 
 class LinkFormTest < ActiveSupport::TestCase

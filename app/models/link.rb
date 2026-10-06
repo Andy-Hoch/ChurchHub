@@ -26,7 +26,7 @@ class Link < ApplicationRecord
   end
 
   def embed_payload
-    payload = { title: title, description: description.presence, icon: icon.presence }
+    payload = { title: title, description: description.presence, icon: icon.presence, featured: featured? }
 
     if kind_form?
       payload.merge(type: "form", form: form.embed_payload)

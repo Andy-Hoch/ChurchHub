@@ -18,6 +18,14 @@ class EmbedControllerTest < ActionDispatch::IntegrationTest
     assert_match %("serif":"\\"Source Serif 4\\", Georgia), response.body
   end
 
+  test "includes the featured flag in the link data" do
+    links(:live).update!(featured: true)
+
+    get embed_path(hubs(:one).public_token, format: :js)
+
+    assert_match %("featured":true), response.body
+  end
+
   test "escapes link data inside the script" do
     links(:live).update!(title: "</script><script>alert(1)</script>")
     get embed_path(hubs(:one).public_token, format: :js)

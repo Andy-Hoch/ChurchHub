@@ -8,7 +8,17 @@
 </div>
 
 <div class="design-grid" data-controller="theme-preview">
-  <%= form_with model: @hub, url: hub_path, method: :patch, class: "card flex flex-col gap", data: { theme_preview_target: "form", action: "input->theme-preview#update change->theme-preview#update" } do |form| %>
+  <%= form_with model: @hub, url: hub_path, method: :patch, html: { multipart: true }, class: "card flex flex-col gap", data: { theme_preview_target: "form", action: "input->theme-preview#update change->theme-preview#update" } do |form| %>
+    <div class="field">
+      <%= form.label :logo, "Logo (optional)", class: "field__label" %>
+      <% if @hub.church.logo.attached? %>
+        <%= image_tag @hub.church.logo, class: "field__logo-preview", alt: "Aktuelles Logo" %>
+      <% end %>
+      <%= form.file_field :logo, accept: "image/png,image/jpeg,image/webp,image/svg+xml", class: "input" %>
+      <p class="field__hint">PNG, JPEG, WebP oder SVG, maximal 2 MB.</p>
+      <%= field_error(@hub.church, :logo) %>
+    </div>
+
     <div class="field">
       <%= form.label :title, "Überschrift im Panel", class: "field__label" %>
       <%= form.text_field :title, required: true, maxlength: 80, class: "input" %>

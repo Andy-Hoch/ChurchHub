@@ -7,10 +7,14 @@ class Church < ApplicationRecord
     admin api assets rails cable manifest service-worker icon robots favicon
   ].freeze
 
+  LOGO_CONTENT_TYPES = %w[ image/png image/jpeg image/webp image/svg+xml ].freeze
+  LOGO_MAX_SIZE = 2.megabytes
+
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
   has_one :hub, dependent: :destroy
   has_many :forms, dependent: :destroy
+  has_one_attached :logo
 
   normalizes :slug, with: ->(slug) { slug.to_s.parameterize }
   normalizes :website_url, with: ->(url) do
@@ -22,6 +26,7 @@ class Church < ApplicationRecord
   validates :slug, presence: true, uniqueness: true,
     format: { with: /\A#{SLUG_FORMAT}\z/ }, exclusion: { in: RESERVED_SLUGS }
   validate :website_url_must_be_valid
+  validate :logo_must_be_valid
 
   before_validation :generate_slug, on: :create
   after_create :create_default_hub
@@ -57,6 +62,13 @@ class Church < ApplicationRecord
       valid = uri.is_a?(URI::HTTP) && uri.userinfo.nil? && uri.host.present? &&
         (uri.host.include?(".") || uri.host == "localhost")
       errors.add(:website_url, "ist keine gültige Webseiten-Adresse") unless valid
+    end
+
+    def logo_must_be_valid
+      return unless logo.attached?
+
+      errors.add(:logo, "muss ein Bild sein (PNG, JPEG, WebP oder SVG)") unless logo.content_type.in?(LOGO_CONTENT_TYPES)
+      errors.add(:logo, "darf höchstens 2 MB groß sein") if logo.byte_size > LOGO_MAX_SIZE
     end
 
     def generate_slug

@@ -22,6 +22,11 @@ class LinksControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Livestream", links(:live).reload.title
   end
 
+  test "marks a link as featured" do
+    patch hub_link_path(links(:live)), params: { link: { featured: "1" } }
+    assert links(:live).reload.featured?
+  end
+
   test "destroys a link" do
     assert_difference "Link.count", -1 do
       delete hub_link_path(links(:live))

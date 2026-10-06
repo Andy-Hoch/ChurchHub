@@ -99,6 +99,16 @@
   font-weight: var(--font-medium);
 }
 
+.field__logo-preview {
+  background-color: var(--color-border-light);
+  border-radius: var(--rounded-lg);
+  border-width: var(--border);
+  max-height: var(--size-16);
+  max-width: 100%;
+  object-fit: contain;
+  padding: var(--size-2);
+}
+
 .field--inline {
   align-items: center;
   column-gap: var(--size-2);
