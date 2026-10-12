@@ -2,9 +2,7 @@
 # sharing via QR code or social media. Public, like the embed script.
 class PublicHubsController < ActionController::Base
   def show
-    church = Church.find_by!(slug: params[:slug])
-    @hub = church.hub
-    raise ActiveRecord::RecordNotFound unless @hub&.enabled?
+    @hub = Hub.enabled.joins(:church).find_by!(churches: { slug: params[:slug] })
 
     # Forms open through the launcher script, loaded without its button.
     @links = @hub.links.includes(:form).select(&:embeddable?)
