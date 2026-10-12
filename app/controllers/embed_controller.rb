@@ -7,6 +7,10 @@ class EmbedController < ActionController::Base
 
   skip_forgery_protection
 
+  # The script contains the widget, so a new version of it must not be
+  # answered with 304 Not Modified.
+  etag { helpers.embed_widget_asset.digest }
+
   def show
     expires_in 5.minutes, public: true
     response.headers["Vary"] = "Referer"
