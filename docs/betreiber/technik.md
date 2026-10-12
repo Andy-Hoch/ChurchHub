@@ -18,7 +18,10 @@ Für Betreiber und Entwickler: Aufbau der Anwendung, Datenmodell und Routen.
 | **CSS Zero** | Design-Grundlage (Tokens, Utilities, Komponenten), eigene Ergänzungen in `app/assets/stylesheets/app.css` |
 | **Docker** + **Kamal 2** | Auslieferung |
 
-Die Oberfläche ist durchgängig Deutsch (`config/locales/de.yml`, Standard-Locale `de`, Zeitzone Berlin).
+Die Oberfläche ist durchgängig Deutsch (`config/locales/de.yml`, Standard-Locale `de`, Zeitzone Berlin). Meldungen
+aus Controllern, Models und Mailern stehen dort, Views enthalten ihre Texte direkt. Fehlende Übersetzungen lösen in
+Entwicklung und Tests einen Fehler aus. Die Texte im Launcher (`app/javascript/embed/widget.js`, `MESSAGES`) sind
+eine Kopie der Antwort-Prüfungen und müssen bei Änderungen mitgepflegt werden.
 
 ## Verzeichnisstruktur
 
