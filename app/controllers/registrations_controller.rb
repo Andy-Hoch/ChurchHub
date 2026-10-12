@@ -15,8 +15,7 @@ class RegistrationsController < ApplicationController
     if [ @user.valid?, @church.valid? ].all?
       ActiveRecord::Base.transaction do
         @user.save!
-        @church.save!
-        @church.memberships.create!(user: @user, role: :owner)
+        @church.save_with_owner(@user) or raise ActiveRecord::RecordInvalid, @church
       end
       start_new_session_for @user
       redirect_to hub_path, notice: "Willkommen! Dein Hub ist bereit."

@@ -37,6 +37,19 @@ class EmbedSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal %w[ A C ], forms(:prayer).submissions.first.answers.last["value"]
   end
 
+  test "treats nested params as no answer" do
+    assert_no_difference "FormSubmission.count" do
+      submit answers: valid_answers.merge(form_questions(:request).id => { "x" => "y" })
+    end
+
+    assert_response :unprocessable_entity
+    assert_equal [ form_questions(:request).id.to_s ], response.parsed_body["errors"].keys
+
+    submit answers: valid_answers.merge(form_questions(:name).id => { "x" => "y" })
+    assert_response :created
+    assert_nil forms(:prayer).submissions.first.answers.find { |answer| answer["question_id"] == form_questions(:name).id }["value"]
+  end
+
   test "returns errors per question" do
     assert_no_difference "FormSubmission.count" do
       submit answers: { form_questions(:email).id => "kaputt" }
