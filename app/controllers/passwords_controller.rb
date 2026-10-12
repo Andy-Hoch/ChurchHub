@@ -19,7 +19,9 @@ class PasswordsController < ApplicationController
   end
 
   def update
-    if @user.update(params.permit(:password, :password_confirmation))
+    # has_secure_password silently ignores a blank password, which would
+    # report success without changing anything.
+    if params[:password].present? && @user.update(params.permit(:password, :password_confirmation))
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: "Dein Passwort wurde geändert."
     else

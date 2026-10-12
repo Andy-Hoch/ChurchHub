@@ -12,6 +12,8 @@ class Hub < ApplicationRecord
 
   has_secure_token :public_token
 
+  scope :enabled, -> { where(enabled: true) }
+
   normalizes :primary_color, :text_color, with: ->(color) { OklchColor.normalize(color) || color.strip }
 
   validates :title, presence: true, length: { maximum: 80 }

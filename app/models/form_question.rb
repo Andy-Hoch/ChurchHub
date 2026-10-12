@@ -48,8 +48,9 @@ class FormQuestion < ApplicationRecord
 
   # Checks a submitted answer and returns [value, error]. The value is what
   # gets stored: stripped strings, an array for multiple choice, nil when empty.
+  # Anything that isn't a string (e.g. nested params) counts as no answer.
   def parse_answer(raw)
-    value = kind_multiple_choice? ? Array(raw).map { |item| item.to_s.strip }.compact_blank : raw.to_s.strip.presence
+    value = kind_multiple_choice? ? Array(raw).grep(String).map(&:strip).compact_blank : (raw.strip.presence if raw.is_a?(String))
 
     if value.blank?
       [ nil, (required? ? "Bitte beantworte diese Frage." : nil) ]

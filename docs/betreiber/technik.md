@@ -111,9 +111,12 @@ Bemerkungen:
 Da `/:slug` alles unterhalb der Wurzel abfängt, sind diese Namen für Kirchen gesperrt:
 
 `session`, `sessions`, `passwords`, `registration`, `account`, `hub`, `church`, `churches`, `church_switch`, `embed`, `up`,
-`forms`, `admin`, `api`, `assets`, `rails`, `cable`, `manifest`, `service-worker`, `icon`, `robots`, `favicon`.
+`forms`, `admin`, `api`, `assets`, `rails`, `cable`, `manifest`, `service-worker`, `icon`, `robots`, `favicon`, außerdem
+automatisch die Namen aller Dateien in `public/` ohne Endung (z. B. `404`, `embed-demo`), weil der Server sie auch ohne
+Endung ausliefert.
 
-Wird ein neuer Top-Level-Pfad ergänzt, muss er in `Church::RESERVED_SLUGS` stehen.
+Wird ein neuer Top-Level-Pfad ergänzt, muss er in `Church::RESERVED_SLUGS` stehen. Ein Test in
+`test/models/church_test.rb` schlägt fehl, wenn eine Route fehlt.
 
 ## Der Launcher (Widget)
 

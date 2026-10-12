@@ -123,17 +123,14 @@ Wichtige Hinweise dazu:
   noch Einsendungen automatisch gelöscht.
 - Die Werte `plain_blog` im Original sind Überbleibsel des Projektstarts. Sie sind austauschbar.
 
-### Schritt 4: HTTPS-Erzwingung aktivieren
+### Schritt 4: HTTPS-Erzwingung prüfen
 
-Öffne `config/environments/production.rb` und entferne das Kommentarzeichen vor diesen zwei Zeilen:
+In `config/environments/production.rb` sind `assume_ssl` und `force_ssl` bereits eingeschaltet. Du musst dafür nichts
+tun. Damit gelten Cookies als „secure“, HTTP wird auf HTTPS umgeleitet und der Browser merkt sich per HSTS, dass die
+Seite nur per HTTPS erreichbar ist. Das setzt voraus, dass der Kamal-Proxy (oder dein eigener Proxy) TLS terminiert.
 
-```ruby
-config.assume_ssl = true
-config.force_ssl = true
-```
-
-Damit gelten Cookies als „secure“, HTTP wird auf HTTPS umgeleitet und der Browser merkt sich per HSTS, dass die Seite
-nur per HTTPS erreichbar ist. Das ist zwingend nötig, sobald der Kamal-Proxy TLS terminiert.
+Nur wenn du das Produktions-Image ausnahmsweise **ohne** HTTPS ausprobieren willst, kannst du beides mit der
+Umgebungsvariable `DISABLE_SSL=1` abschalten. Für den echten Betrieb ist das nicht gedacht.
 
 ### Schritt 5: Zugang zur Registry bereitstellen
 
@@ -212,7 +209,7 @@ Für Server mit eigenem Reverse-Proxy. Du brauchst Docker auf dem Server und ein
 
 1. **Credentials erzeugen** wie in [Schritt 2](#schritt-2-eigene-zugangsdaten-credentials-erzeugen) (auf deinem Rechner) und `config/credentials.yml.enc`
    sowie den Inhalt von `config/master.key` bereitstellen.
-2. **HTTPS-Erzwingung** aktivieren wie in [Schritt 4](#schritt-4-https-erzwingung-aktivieren). `assume_ssl` sorgt dafür, dass Rails hinter dem Proxy
+2. **HTTPS-Erzwingung** ist bereits aktiv, siehe [Schritt 4](#schritt-4-https-erzwingung-prüfen). `assume_ssl` sorgt dafür, dass Rails hinter dem Proxy
    HTTPS annimmt.
 3. **Image bauen und starten:**
 
@@ -263,11 +260,11 @@ es Mitglied ist. Mehr dazu unter [Datenschutz & Sicherheit](../referenz/datensch
 ## Checkliste vor dem Livegang
 
 - [ ] DNS-A-Eintrag zeigt auf den Server, `https://…/up` antwortet
-- [ ] `assume_ssl` und `force_ssl` aktiv
+- [ ] `DISABLE_SSL` ist **nicht** gesetzt (HTTPS-Erzwingung aktiv)
 - [ ] `config/master.key` im Passwortmanager gesichert
 - [ ] Volume für `/rails/storage` eingerichtet und [Backup](betrieb.md#backups) geplant
 - [ ] SMTP hinterlegt und Test-Mail („Passwort vergessen?“) angekommen
-- [ ] `APP_HOST` gesetzt (Links in E-Mails zeigen auf die richtige Domain)
+- [ ] `APP_HOST` gesetzt (Links in E-Mails zeigen auf die richtige Domain, andere Domains werden abgewiesen)
 - [ ] Beim ersten Konto: Kirche mit **Webseite** angelegt, damit der Launcher nur dort läuft
 - [ ] Launcher auf einer Testseite eingebunden und Formular-Einsendung getestet
 - [ ] Nutzern Adresse und Ansprechpartner mitgeteilt ([Was du Nutzern mitgeben solltest](datenschutz-im-betrieb.md#was-du-nutzern-mitgeben-solltest))

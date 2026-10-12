@@ -22,6 +22,36 @@ class ChurchTest < ActiveSupport::TestCase
     assert_equal "account-2", Church.create!(name: "Account").slug
   end
 
+  test "reserves every top-level path of the app" do
+    paths = Rails.application.routes.routes.map { |route| route.path.spec.to_s }
+    segments = paths.filter_map { |path| path[%r{\A/([^/(:*]+)}, 1] }.uniq
+    public_files = Dir.children(Rails.public_path).map { |file| File.basename(file, ".*") }
+
+    (segments + public_files).grep(/\A#{Church::SLUG_FORMAT}\z/).each do |segment|
+      assert_includes Church::RESERVED_SLUGS, segment, "/#{segment} would hide a church with that slug"
+    end
+  end
+
+  test "rejects slugs of static files" do
+    assert_equal "404-2", Church.create!(name: "404").slug
+    assert_equal "embed-demo-2", Church.create!(name: "Embed Demo").slug
+  end
+
+  test "save_with_owner creates the owner membership" do
+    church = Church.new(name: "Neue Gemeinde")
+
+    assert church.save_with_owner(users(:one))
+    assert church.memberships.find_by(user: users(:one)).owner?
+  end
+
+  test "save_with_owner returns false without saving for invalid churches" do
+    church = Church.new(name: "")
+
+    assert_no_difference [ "Church.count", "Membership.count" ] do
+      assert_not church.save_with_owner(users(:one))
+    end
+  end
+
   test "website is optional and normalized" do
     assert Church.new(name: "Ohne Webseite").valid?
     assert_nil Church.new(website_url: "  ").website_url
