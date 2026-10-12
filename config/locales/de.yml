@@ -50,3 +50,16 @@ de:
         help_text: Hinweis
         required: Pflichtfrage
         choices: Antwortmöglichkeiten
+      membership:
+        role: Rolle
+    errors:
+      models:
+        membership:
+          attributes:
+            role:
+              last_owner: kann nicht geändert werden, weil die Kirche sonst keinen Besitzer mehr hätte
+
+  memberships:
+    update:
+      owner: "%{name} ist jetzt Besitzer."
+      admin: "%{name} ist jetzt Admin."

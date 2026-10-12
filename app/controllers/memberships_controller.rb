@@ -15,6 +15,18 @@ class MembershipsController < ApplicationController
     end
   end
 
+  # Makes a member owner or admin. Handing the church over means making
+  # someone else owner first and then oneself admin.
+  def update
+    membership = current_church.memberships.find(params[:id])
+
+    if membership.update(role: params.expect(:role))
+      redirect_to edit_church_path, notice: t(".#{membership.role}", name: membership.user.name), status: :see_other
+    else
+      redirect_to edit_church_path, alert: membership.errors.full_messages.to_sentence, status: :see_other
+    end
+  end
+
   def destroy
     membership = current_church.memberships.find(params[:id])
 

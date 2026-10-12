@@ -56,7 +56,7 @@ users ──< memberships >── churches ──1:1── hubs ──< links >�
 | `users` | `email_address` (einmalig, klein geschrieben), `password_digest`, `name` |
 | `sessions` | `user_id`, `ip_address`, `user_agent` |
 | `churches` | `name`, `slug` (einmalig), `website_url` |
-| `memberships` | `user_id`, `church_id` (zusammen einmalig), `role` (`owner` \| `admin`, Standard `admin`) |
+| `memberships` | `user_id`, `church_id` (zusammen einmalig), `role` (`owner` \| `admin`, Standard `admin`). Jede Kirche behält mindestens einen Besitzer. |
 | `hubs` | `church_id` (einmalig), `title`, `public_token` (einmalig, Token im Embed-Code), `enabled`, `primary_color`, `text_color` (oklch), `position` (`right` \| `left`), `button_label`, `button_icon` (`grid`, `menu`, `heart`, `cross`, `link`), `color_scheme` (`light`, `dark`, `auto`), `corner_radius` (0–24) |
 | `links` | `hub_id`, `title`, `kind` (`link` \| `form`), `url`, `form_id` (bei Löschung des Formulars auf NULL), `description`, `icon`, `position`, `visible` |
 | `forms` | `church_id`, `title`, `intro`, `thank_you_message`, `submit_label`, `notification_emails`, `consent_text`, `privacy_url`, `retention_months` |
@@ -90,8 +90,8 @@ Bemerkungen:
 | Links | `GET /hub/links/new`, `POST /hub/links`, `GET /hub/links/:id/edit`, `PATCH/DELETE /hub/links/:id`, `PUT /hub/links/:id/position` |
 | Formulare | `/forms` (Index, `new`, `create`, `show` = Fragen, `edit` = Einstellungen, `update`, `destroy`) |
 | Fragen | `/forms/:form_id/questions` (`new`, `create`, `edit`, `update`, `destroy`), `PUT …/:id/position` |
-| Einsendungen | `GET /forms/:form_id/submissions` (auch `.csv`, `?filter=unread`), `GET …/:id`, `DELETE …/:id`, `PATCH …/:id/toggle_read`, `DELETE …/destroy_all` |
-| Kirche | `GET /church/edit`, `PATCH/DELETE /church`, `POST /church/memberships`, `DELETE /church/memberships/:id`, `GET/POST /churches/new`, `PATCH /church_switch` |
+| Einsendungen | `GET /forms/:form_id/submissions` (auch `.csv`, `?filter=unread`, `?page=2`), `GET …/:id`, `DELETE …/:id`, `PATCH …/:id/toggle_read`, `DELETE …/destroy_all` |
+| Kirche | `GET /church/edit`, `PATCH/DELETE /church`, `POST /church/memberships`, `PATCH /church/memberships/:id` (`role`), `DELETE /church/memberships/:id`, `GET/POST /churches/new`, `PATCH /church_switch` |
 | Konto | `GET /account/edit`, `DELETE /account` |
 
 ### Ohne Anmeldung
