@@ -5,7 +5,7 @@ class Church < ApplicationRecord
   # are also served without their extension (/404 serves public/404.html).
   RESERVED_SLUGS = (%w[
     session sessions passwords registration account hub church churches church_switch embed up forms
-    admin api assets rails cable manifest service-worker icon robots favicon
+    admin api assets rails cable manifest service-worker icon robots favicon csp-reports
   ] + Dir.children(Rails.public_path).map { |file| File.basename(file, ".*") }).uniq.freeze
 
   has_many :memberships, dependent: :destroy

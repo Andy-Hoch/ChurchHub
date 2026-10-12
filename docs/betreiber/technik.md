@@ -105,6 +105,7 @@ Bemerkungen:
 | `GET /embed/:token.js` | [Embed-Skript](schnittstellen.md#embed-skript) |
 | `POST /embed/:token/forms/:form_id/submissions` | [Formular-Einsendung](schnittstellen.md#formular-einsendung) |
 | `GET /up` | Health-Check |
+| `POST /csp-reports` | Empfängt Berichte über [CSP-Verstöße](#content-security-policy) und schreibt sie ins Log |
 | `GET /:slug` | [Öffentliche Hub-Seite](../benutzerhandbuch/eigene-seite.md). Muss die **letzte** Route sein. |
 
 ### Reservierte Kurznamen
@@ -112,7 +113,7 @@ Bemerkungen:
 Da `/:slug` alles unterhalb der Wurzel abfängt, sind diese Namen für Kirchen gesperrt:
 
 `session`, `sessions`, `passwords`, `registration`, `account`, `hub`, `church`, `churches`, `church_switch`, `embed`, `up`,
-`forms`, `admin`, `api`, `assets`, `rails`, `cable`, `manifest`, `service-worker`, `icon`, `robots`, `favicon`, außerdem
+`forms`, `admin`, `api`, `assets`, `rails`, `cable`, `manifest`, `service-worker`, `icon`, `robots`, `favicon`, `csp-reports`, außerdem
 automatisch die Namen aller Dateien in `public/` ohne Endung (z. B. `404`, `embed-demo`), weil der Server sie auch ohne
 Endung ausliefert.
 
@@ -136,6 +137,23 @@ Die CI prüft die Syntax mit `node --check`.
 - Das Widget hört auf das Ereignis `kirchen-hub:update` am Host-Element (`detail.theme`, `detail.title`). Damit aktualisiert
   die Live-Vorschau im Backend ihr Aussehen.
 - Ohne `src` am `<script>` (wie in der Vorschau) simuliert es das Absenden.
+
+## Content-Security-Policy
+
+Definiert in `config/initializers/content_security_policy.rb`: Skripte, Styles, Schriften, Bilder und Verbindungen nur
+vom Hub selbst, Inline-Skripte und -Styles nur mit Nonce, keine Einbettung in fremde Frames.
+
+- **Zurzeit nur beobachtend:** Der Header heißt `Content-Security-Policy-Report-Only`. Browser blockieren nichts, melden
+  Verstöße aber an `/csp-reports`. Sie landen als `CSP violation: …` im Log (nur Pfade, keine Query-Parameter).
+  Mit `CSP_ENFORCE=1` wird die Policy durchgesetzt. In den Tests ist sie immer durchgesetzt, und die System-Tests
+  schlagen fehl, sobald die Browser-Konsole einen CSP-Verstoß meldet.
+- **Nonce:** einmal pro Sitzung erzeugt und in der Session gespeichert. Turbo übernimmt bei Seitenwechseln den Nonce
+  der neuen Seite, die Policy des ersten Seitenaufrufs bleibt aber gültig. Deshalb muss er stabil bleiben.
+- **Nur das Backend** (`ApplicationController`) bekommt einen Nonce. Öffentliche Hub-Seite, Embed-Skript und
+  Einsendungen fassen die Session nie an und setzen keine Cookies.
+- Die **öffentliche Hub-Seite** erlaubt Inline-Styles (`'unsafe-inline'`), weil sie öffentlich gecacht wird und ohne
+  Session auskommt. Skripte bleiben auf den Hub beschränkt. Embed-Skript und Einsendungen senden keine Policy, die
+  Seite für veraltete Browser (`406`) auch nicht, weil sie Inline-Styles nutzt.
 
 ## Caching
 

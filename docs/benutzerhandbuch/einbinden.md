@@ -126,4 +126,12 @@ Setzt eure Webseite eine Content-Security-Policy ein, muss sie den Hub erlauben,
 
 - `script-src`: die Domain eures Hubs (zum Laden des Skripts)
 - `connect-src`: die Domain eures Hubs (zum Absenden von Formularen)
-- ggf. `style-src 'unsafe-inline'`, denn der Launcher fügt seine Formatierung als `<style>`-Element in sein Shadow DOM ein
+- `font-src`: die Domain eures Hubs (für die Schriftarten des Launchers)
+- `style-src`: Der Launcher fügt seine Formatierung als `<style>`-Element ein. Arbeitet eure Policy mit einer
+  **Nonce**, gebt sie einfach am Einbettungs-Code mit. Der Launcher übernimmt sie für seine Styles:
+
+  ```html
+  <script src="https://<adresse-des-hubs>/embed/DEIN_TOKEN.js" nonce="EURE-NONCE" async></script>
+  ```
+
+  Ohne Nonce braucht es `style-src 'unsafe-inline'`.

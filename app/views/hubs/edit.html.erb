@@ -70,6 +70,6 @@
   <section class="hub-preview" aria-label="Vorschau">
     <span class="hub-preview__label">Vorschau</span>
     <div id="hub-preview" class="hub-preview__stage" data-theme-preview-target="stage"></div>
-    <script data-container="#hub-preview" data-open="true"><%= render partial: "embed/launcher", formats: :js, locals: { hub: @hub } %></script>
+    <script data-container="#hub-preview" data-open="true" nonce="<%= content_security_policy_nonce %>"><%= render partial: "embed/launcher", formats: :js, locals: { hub: @hub } %></script>
   </section>
 </div>

@@ -173,10 +173,11 @@
 
   // @font-face rules are ignored inside a shadow root, so they go into the
   // page itself (the public hub page already ships them).
-  function loadFonts(fontFaces) {
+  function loadFonts(fontFaces, nonce) {
     if (document.querySelector("style[data-kirchen-hub-fonts]")) return;
     var style = document.createElement("style");
     style.setAttribute("data-kirchen-hub-fonts", "");
+    if (nonce) style.nonce = nonce;
     style.textContent = fontFaces;
     document.head.appendChild(style);
   }
@@ -189,7 +190,8 @@
   // body (the admin preview), data-open="true" starts with the panel open.
   // Submissions go to /embed/<token>/forms/<id>/submissions next to the
   // script; inline copies (the admin preview) have no src and only simulate
-  // sending.
+  // sending. A nonce on the script is passed on to the launcher's styles, for
+  // pages with a content security policy.
   function mount(config, script) {
     var allowedHosts = config.allowedHosts;
     var pageHost = location.hostname.toLowerCase();
@@ -202,6 +204,7 @@
     var data = config.hub;
     var options = (script && script.dataset) || {};
     var endpoint = script && script.src ? script.src.replace(/\.js(\?.*)?$/, "") : null;
+    var nonce = (script && script.nonce) || "";
 
     if (document.body) {
       start();
@@ -210,7 +213,7 @@
     }
 
     function start() {
-      loadFonts(config.fontFaces);
+      loadFonts(config.fontFaces, nonce);
       var container = options.container ? document.querySelector(options.container) : document.body;
       if (!container) return;
 
@@ -228,6 +231,7 @@
 
       var style = el("style");
       style.textContent = STYLES;
+      if (nonce) style.nonce = nonce;
       var launcher = el("div", "launcher");
       var formLayer = el("div");
       root.append(style, launcher, formLayer);

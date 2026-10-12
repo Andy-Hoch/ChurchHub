@@ -68,6 +68,7 @@ Was **nicht** gespeichert wird:
 | **Webseiten-Beschränkung** | Optional: Embed-Skript und Einsendungen nur von der hinterlegten Domain ([Details und Grenzen](../benutzerhandbuch/einbinden.md#beschränkung-auf-eure-webseite)) |
 | **Sichere Links** | Nur `http(s)`-Adressen für Links und Datenschutz-Link, auch im Launcher geprüft (kein `javascript:` oder `data:`) |
 | **XSS-Schutz** | Inhalte werden im Launcher als Text eingefügt, nicht als HTML. Die Daten im Skript sind für JavaScript maskiert (`json_escape`). |
+| **Content-Security-Policy** | Backend und öffentliche Seite laden Skripte nur vom Hub selbst, Inline-Skripte nur mit Nonce. Zurzeit im Beobachtungsmodus (Verstöße werden protokolliert), scharf schaltbar mit `CSP_ENFORCE=1` |
 | **Isolation** | Launcher im Shadow DOM: kein Zugriff auf und keine Beeinflussung durch die Webseite eurer Kirche über CSS |
 | **CSV-Export** | Schutz vor Formel-Injection in Tabellenkalkulationen |
 | **Einbettungs-Code** | Lässt sich jederzeit [neu erzeugen](../benutzerhandbuch/einbinden.md#code-neu-erzeugen), der Launcher lässt sich [abschalten](../benutzerhandbuch/einbinden.md#launcher-aktiv--launcher-deaktivieren) |
