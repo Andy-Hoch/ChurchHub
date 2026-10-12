@@ -33,6 +33,22 @@
       </li>
     <% end %>
   </ul>
+
+  <% if @page > 1 || @next_page %>
+    <nav class="flex items-center justify-between gap-half" aria-label="Seiten">
+      <% if @page > 1 %>
+        <%= link_to "← Neuere", form_submissions_path(@form, filter: params[:filter], page: (@page - 1 if @page > 2)), class: "btn btn--sm", rel: "prev" %>
+      <% else %>
+        <span></span>
+      <% end %>
+      <span class="text-sm text-subtle">Seite <%= @page %></span>
+      <% if @next_page %>
+        <%= link_to "Ältere →", form_submissions_path(@form, filter: params[:filter], page: @next_page), class: "btn btn--sm", rel: "next" %>
+      <% else %>
+        <span></span>
+      <% end %>
+    </nav>
+  <% end %>
 <% else %>
   <div class="empty-state">
     <p class="font-medium"><%= params[:filter] == "unread" ? "Keine ungelesenen Einsendungen" : "Noch keine Einsendungen" %></p>

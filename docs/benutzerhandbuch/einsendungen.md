@@ -24,6 +24,9 @@ Die Einsendungen stehen **neueste zuerst**. Jede Zeile zeigt:
 
 Mit den Filtern **Alle** und **Ungelesen** oberhalb der Liste blendest du Erledigtes aus.
 
+Die Liste zeigt jeweils **50 Einsendungen**, die neuesten zuerst. Gibt es mehr, blätterst du unter der Liste mit
+**Ältere →** und **← Neuere** weiter.
+
 ## Eine Einsendung lesen
 
 Ein Klick auf die Vorschau öffnet die Einsendung. Dort stehen **alle Fragen mit den Antworten**, dazu

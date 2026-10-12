@@ -1,6 +1,8 @@
 require "csv"
 
 class FormSubmissionsController < ApplicationController
+  class_attribute :per_page, default: 50
+
   before_action :require_church
   before_action :set_form
   before_action :set_submission, only: %i[ show destroy toggle_read ]
@@ -10,7 +12,7 @@ class FormSubmissionsController < ApplicationController
     @submissions = @submissions.unread if params[:filter] == "unread"
 
     respond_to do |format|
-      format.html
+      format.html { paginate }
       format.csv do
         send_data submissions_csv, filename: "#{@form.title.parameterize.presence || "formular"}-#{Date.current.iso8601}.csv", type: "text/csv; charset=utf-8"
       end
@@ -37,6 +39,16 @@ class FormSubmissionsController < ApplicationController
   end
 
   private
+    # Newest first, per_page at a time. Pages past the end lead back to the first.
+    def paginate
+      @page = [ params[:page].to_i, 1 ].max
+      submissions = @submissions.offset((@page - 1) * per_page).limit(per_page + 1).to_a
+      return redirect_to form_submissions_path(@form, filter: params[:filter]) if submissions.empty? && @page > 1
+
+      @next_page = @page + 1 if submissions.size > per_page
+      @submissions = submissions.first(per_page)
+    end
+
     def set_form
       @form = current_church.forms.find(params[:form_id])
     end

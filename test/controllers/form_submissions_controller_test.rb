@@ -14,6 +14,36 @@ class FormSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "=SUMME(A1)", response.body
   end
 
+  test "pages through submissions, newest first" do
+    FormSubmissionsController.per_page = 1
+    form_submissions(:unread).update_column(:created_at, 1.hour.ago)
+
+    get form_submissions_path(forms(:prayer))
+    assert_match "Für meine Familie", response.body
+    assert_no_match "=SUMME(A1)", response.body
+    assert_select "a[rel=next][href=?]", form_submissions_path(forms(:prayer), page: 2)
+    assert_select "a[rel=prev]", count: 0
+
+    get form_submissions_path(forms(:prayer), page: 2)
+    assert_match "=SUMME(A1)", response.body
+    assert_select "a[rel=prev][href=?]", form_submissions_path(forms(:prayer))
+    assert_select "a[rel=next]", count: 0
+
+    get form_submissions_path(forms(:prayer), page: 3, filter: "unread")
+    assert_redirected_to form_submissions_path(forms(:prayer), filter: "unread")
+  ensure
+    FormSubmissionsController.per_page = 50
+  end
+
+  test "exports all submissions to CSV regardless of pages" do
+    FormSubmissionsController.per_page = 1
+    get form_submissions_path(forms(:prayer), format: :csv)
+
+    assert_equal 3, response.body.lines.count
+  ensure
+    FormSubmissionsController.per_page = 50
+  end
+
   test "shows the unread count in the navigation" do
     get forms_path
     assert_select ".sidebar-menu__button .badge", text: "1"
