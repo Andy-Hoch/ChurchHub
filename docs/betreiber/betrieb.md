@@ -119,7 +119,8 @@ PurgeExpiredFormSubmissionsJob.perform_now
 | Symptom | Mögliche Ursache und Lösung |
 | --- | --- |
 | Seite nicht erreichbar / Zertifikatsfehler | DNS zeigt nicht auf den Server, oder Ports 80/443 sind gesperrt. Let's Encrypt braucht beides. Danach `bin/kamal proxy reboot` bzw. neu deployen. |
-| „Endlose“ Weiterleitungen (Redirect-Schleife) | `force_ssl` ist aktiv, aber `assume_ssl` fehlt oder der Proxy reicht `X-Forwarded-Proto` nicht durch. |
+| „Endlose“ Weiterleitungen (Redirect-Schleife) | Der Proxy reicht `X-Forwarded-Proto` nicht durch oder terminiert gar kein TLS. |
+| „Blocked hosts: …“ | Die Seite wird über eine andere Domain aufgerufen als in `APP_HOST` eingetragen. `APP_HOST` korrigieren oder die Domain umleiten. |
 | Nach jedem Deployment sind alle Daten weg | Das Volume für `/rails/storage` fehlt oder hat sich geändert. Prüfe den Abschnitt `volumes:` in der `deploy.yml`. |
 | `ActiveSupport::MessageEncryptor::InvalidMessage` / Fehler beim Start | `RAILS_MASTER_KEY` passt nicht zu `config/credentials.yml.enc`. Bei Kamal: Steht `config/master.key` lokal, wenn du deployst? |
 | Mails kommen nicht an | SMTP prüfen ([Konfiguration](konfiguration.md#e-mail-versand-smtp)). Läuft der Job-Runner (`SOLID_QUEUE_IN_PUMA=true`)? Fehler stehen im Log (`bin/kamal logs`). |
