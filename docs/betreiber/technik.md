@@ -27,9 +27,10 @@ app/
   controllers/     Backend-Controller. embed_*, public_hubs sind öffentlich (erben von ActionController::Base)
   models/          Church, Hub, Link, Form, FormQuestion, FormSubmission, User, Membership, Session …
                    FormTemplate (Vorlagen), OklchColor (Farbumrechnung), HttpUrl (URL-Prüfung)
-  views/embed/     _widget.js.erb = der komplette Launcher (JavaScript, CSS im Shadow DOM), show.js.erb
+  views/embed/     show.js.erb / _launcher.js.erb = Embed-Skript (Widget + Daten des Hubs)
   views/           Backend-Seiten (ERB), Mail-Vorlagen, PWA-Dateien
   javascript/controllers/   Stimulus-Controller des Backends
+  javascript/embed/widget.js   der komplette Launcher (JavaScript, CSS im Shadow DOM), statisch und ohne ERB
   jobs/            PurgeExpiredFormSubmissionsJob
   mailers/         FormSubmissionMailer, PasswordsMailer
 config/
@@ -120,8 +121,12 @@ Wird ein neuer Top-Level-Pfad ergänzt, muss er in `Church::RESERVED_SLUGS` steh
 
 ## Der Launcher (Widget)
 
-`app/views/embed/_widget.js.erb` ist eine selbstständige JavaScript-Datei ohne Abhängigkeiten. Sie wird vom Server
-mit den **Daten des Hubs fest eingebettet** (`data = {title, theme, links}`), sodass zur Laufzeit keine weitere Abfrage nötig ist.
+`app/javascript/embed/widget.js` ist eine statische JavaScript-Datei (ES5, ohne Abhängigkeiten und Build-Schritt). Sie
+definiert nur `window.KirchenHub.mount(config, script)`. Das Embed-Skript `/embed/<token>.js` liefert den Inhalt dieser
+Datei und hängt den Aufruf mit den **Daten des Hubs** an (`config = {hub, allowedHosts, fonts, fontFaces}`, siehe
+`EmbedHelper#embed_config_json`). So kommt alles in **einer** Antwort, und zur Laufzeit ist keine weitere Abfrage nötig.
+Gemessen ist das beim Erstbesuch rund eine Round-Trip-Zeit schneller, als das Widget als eigenes Asset nachzuladen.
+Die CI prüft die Syntax mit `node --check`.
 
 - Er hängt ein `<div data-kirchen-hub>` an `document.body` (oder an das Element aus `data-container`), erzeugt ein
   **Shadow DOM** (`mode: open`) und rendert Button, Panel und Formular-Dialog darin.
@@ -136,7 +141,7 @@ mit den **Daten des Hubs fest eingebettet** (`data = {title, theme, links}`), so
 
 | Was | Verhalten |
 | --- | --- |
-| Embed-Skript | `Cache-Control: public, max-age=300`, `ETag` aus Hub **und** Kirche, `Vary: Referer` |
+| Embed-Skript | `Cache-Control: public, max-age=300`, `ETag` aus Hub, Kirche **und** Version von `widget.js`, `Vary: Referer` |
 | Hub-Änderungen | Jede Änderung an Links, Formularen und Fragen aktualisiert `hubs.updated_at` (`touch`). Dadurch ändert sich der ETag. |
 | Öffentliche Hub-Seite | `ETag` aus dem Hub, `Cache-Control: public` (Browser prüfen bei jedem Aufruf nach) |
 
