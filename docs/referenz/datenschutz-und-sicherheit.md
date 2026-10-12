@@ -11,7 +11,7 @@ Bewertung (DSGVO, kirchliche Datenschutzgesetze wie KDG oder DSG-EKD) wende dich
 | Wer | Daten | Zweck |
 | --- | --- | --- |
 | **Mitglieder** (Backend-Nutzer) | Name, E-Mail-Adresse, Passwort (nur als Hash, nie im Klartext), Zeitpunkte | Anmeldung, Team-Anzeige, Passwort-Reset |
-| **Anmeldungen (Sitzungen)** | IP-Adresse, Browser-Kennung (User-Agent), Zeitpunkt, Cookie-Kennung | Angemeldet bleiben, Sitzungen beim Passwort-Reset beenden |
+| **Anmeldungen (Sitzungen)** | IP-Adresse, Browser-Kennung (User-Agent), Zeitpunkt, Cookie-Kennung | Angemeldet bleiben, Sitzungen beim Passwort-Reset beenden. Nach 30 Tagen ohne Nutzung endet eine Sitzung und wird gelöscht. |
 | **Kirche** | Name, Kurzname, Webseite | Betrieb des Hubs |
 | **Hub und Links** | Überschrift, Design, Titel, Adressen, Beschreibungen | Inhalt des Launchers. Öffentlich abrufbar. |
 | **Formulare** | Fragen, Texte, Benachrichtigungsadressen, Einwilligungstext | Betrieb der Formulare |
@@ -59,7 +59,7 @@ Was **nicht** gespeichert wird:
 | Bereich | Maßnahme |
 | --- | --- |
 | **Passwörter** | Speicherung als bcrypt-Hash (`has_secure_password`), mindestens 8 Zeichen |
-| **Sitzungen** | signiertes, `HttpOnly`-Cookie mit `SameSite=Lax`, bei aktiver HTTPS-Erzwingung zusätzlich `Secure`. Passwort-Reset beendet alle Sitzungen. |
+| **Sitzungen** | signiertes, `HttpOnly`-Cookie mit `SameSite=Lax`, bei aktiver HTTPS-Erzwingung zusätzlich `Secure`. Passwort-Reset beendet alle Sitzungen, nach 30 Tagen ohne Nutzung enden sie von selbst. |
 | **Brute-Force-Schutz** | Rate-Limits für Anmeldung, Registrierung, Passwort-Reset und Konto-Löschung (je 10 pro 3 Minuten und IP) |
 | **Passwort-Reset** | Zeitlich begrenzter, signierter Link. Antwort verrät nicht, ob eine Adresse registriert ist. |
 | **Mandantentrennung** | Backend-Zugriffe laufen immer über die Kirche der angemeldeten Person; Formulare, Links, Fragen und Einsendungen anderer Kirchen sind nicht adressierbar |

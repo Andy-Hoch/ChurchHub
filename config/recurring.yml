@@ -16,3 +16,6 @@ production:
   purge_expired_form_submissions:
     class: PurgeExpiredFormSubmissionsJob
     schedule: every day at 3am
+  purge_inactive_sessions:
+    class: PurgeInactiveSessionsJob
+    schedule: every day at 3:30am

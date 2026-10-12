@@ -31,7 +31,7 @@ app/
   views/           Backend-Seiten (ERB), Mail-Vorlagen, PWA-Dateien
   javascript/controllers/   Stimulus-Controller des Backends
   javascript/embed/widget.js   der komplette Launcher (JavaScript, CSS im Shadow DOM), statisch und ohne ERB
-  jobs/            PurgeExpiredFormSubmissionsJob
+  jobs/            PurgeExpiredFormSubmissionsJob, PurgeInactiveSessionsJob
   mailers/         FormSubmissionMailer, PasswordsMailer
 config/
   routes.rb        alle Routen
@@ -169,6 +169,7 @@ vom Hub selbst, Inline-Skripte und -Styles nur mit Nonce, keine Einbettung in fr
 | --- | --- |
 | `ActionMailer` Zustellung (`deliver_later`) | Passwort-Reset, neue Einsendung |
 | `PurgeExpiredFormSubmissionsJob` | täglich 3:00 Uhr (`config/recurring.yml`, nur Produktion) |
+| `PurgeInactiveSessionsJob` | täglich 3:30 Uhr: löscht Sitzungen, die 30 Tage nicht genutzt wurden (`Session::INACTIVITY_LIMIT`) |
 | `SolidQueue::Job.clear_finished_in_batches` | stündlich |
 
 Im Container läuft Solid Queue **im Puma-Prozess**, wenn `SOLID_QUEUE_IN_PUMA` gesetzt ist. Ein separater Job-Server
