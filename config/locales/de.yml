@@ -15,6 +15,7 @@ de:
         email_address: E-Mail-Adresse
         password: Passwort
         password_confirmation: Passwortbestätigung
+        confirms_christian_organization: Bestätigung
       church:
         name: Name
         slug: Kurzname
@@ -52,14 +53,167 @@ de:
         choices: Antwortmöglichkeiten
       membership:
         role: Rolle
+    enums:
+      form_question:
+        kind:
+          short_text: Kurzer Text
+          long_text: Langer Text
+          single_choice: Einfachauswahl
+          multiple_choice: Mehrfachauswahl
+          yes_no: Ja / Nein
+          email: E-Mail-Adresse
+          phone: Telefonnummer
+          number: Zahl
+          date: Datum
     errors:
       models:
+        church:
+          attributes:
+            website_url:
+              invalid_website: ist keine gültige Webseiten-Adresse
+        form:
+          attributes:
+            notification_emails:
+              invalid_addresses: "enthält ungültige Adressen: %{addresses}"
+        form_question:
+          attributes:
+            choices:
+              missing: brauchen mindestens eine Möglichkeit
+              too_many_or_too_long: dürfen höchstens %{max} Einträge mit je %{length} Zeichen sein
+          # Answers checked on submission, shown to visitors in the launcher.
+          # The launcher (app/javascript/embed/widget.js) has its own copy for checks in the browser.
+          answers:
+            required: Bitte beantworte diese Frage.
+            short_text: Bitte höchstens %{max} Zeichen.
+            long_text: Bitte höchstens %{max} Zeichen.
+            email: Bitte gib eine gültige E-Mail-Adresse ein.
+            phone: Bitte gib eine gültige Telefonnummer ein.
+            number: Bitte gib eine Zahl ein.
+            date: Bitte gib ein gültiges Datum ein.
+            yes_no: Bitte wähle Ja oder Nein.
+            single_choice: Bitte wähle eine der Möglichkeiten.
+            multiple_choice: Bitte wähle aus den Möglichkeiten.
         membership:
           attributes:
             role:
               last_owner: kann nicht geändert werden, weil die Kirche sonst keinen Besitzer mehr hätte
+        user:
+          attributes:
+            confirms_christian_organization:
+              accepted: fehlt
+
+  time:
+    formats:
+      csv: "%d.%m.%Y %H:%M"
+
+  rate_limited: Bitte versuche es später noch einmal.
+
+  church_scoped:
+    church_required: Lege zuerst eine Kirche an.
+    owner_required: Nur Besitzer dürfen das.
+
+  accounts:
+    destroy:
+      notice: Dein Konto wurde gelöscht.
+      wrong_password: Das Passwort ist falsch.
+
+  churches:
+    create:
+      notice: Kirche angelegt.
+
+  current_church:
+    update:
+      notice: Kirche gespeichert.
+    destroy:
+      notice: "„%{name}“ wurde gelöscht."
+      only_church: Deine einzige Kirche kannst du nicht löschen. Lösche stattdessen dein Konto.
+      name_mismatch: Der eingegebene Name stimmt nicht mit dem Namen der Kirche überein.
+
+  embed:
+    show:
+      not_found: Hub nicht gefunden oder deaktiviert
+      not_allowed: Launcher ist für diese Webseite nicht freigegeben
+
+  embed_submissions:
+    rate_limited: Zu viele Einsendungen. Bitte versuche es später noch einmal.
+    not_found: Formular nicht gefunden.
+    create:
+      forbidden: Das Formular ist für diese Webseite nicht freigegeben.
+      consent_required: Bitte stimme der Datenverarbeitung zu.
+
+  form_questions:
+    create:
+      notice: Frage hinzugefügt.
+    update:
+      notice: Frage gespeichert.
+    destroy:
+      notice: Frage gelöscht.
+
+  form_submissions:
+    destroy:
+      notice: Einsendung gelöscht.
+    destroy_all:
+      notice: Alle Einsendungen gelöscht.
+    csv:
+      received_at: Eingegangen am
+      read: Gelesen
+      "yes": ja
+      "no": nein
+
+  forms:
+    create:
+      notice: Formular angelegt.
+    update:
+      notice: Einstellungen gespeichert.
+    destroy:
+      notice: Formular gelöscht.
+
+  hubs:
+    update:
+      notice: Änderungen gespeichert.
+    regenerate_token:
+      notice: Neuer Einbettungs-Code erzeugt. Bitte das Snippet auf deiner Webseite austauschen.
+
+  links:
+    create:
+      notice: Link hinzugefügt.
+    update:
+      notice: Link gespeichert.
+    destroy:
+      notice: Link gelöscht.
 
   memberships:
+    create:
+      notice: "%{name} wurde hinzugefügt."
+      unknown_account: Kein Konto mit dieser E-Mail-Adresse gefunden. Die Person muss sich zuerst registrieren.
+      already_member: "%{name} ist bereits Mitglied."
     update:
       owner: "%{name} ist jetzt Besitzer."
       admin: "%{name} ist jetzt Admin."
+    destroy:
+      notice: Mitglied entfernt.
+      self: Du kannst dich nicht selbst entfernen.
+
+  passwords:
+    invalid_token: Der Link ist ungültig oder abgelaufen.
+    create:
+      notice: Falls ein Konto mit dieser E-Mail-Adresse existiert, haben wir dir eine Anleitung geschickt.
+    update:
+      notice: Dein Passwort wurde geändert.
+      invalid: Die Passwörter stimmen nicht überein oder sind zu kurz (mindestens 8 Zeichen).
+
+  registrations:
+    create:
+      notice: Willkommen! Dein Hub ist bereit.
+
+  sessions:
+    create:
+      invalid: E-Mail-Adresse oder Passwort ist falsch.
+
+  form_submission_mailer:
+    received:
+      subject: "Neue Einsendung: %{title}"
+
+  passwords_mailer:
+    reset:
+      subject: Passwort zurücksetzen

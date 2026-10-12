@@ -11,7 +11,7 @@ class FormQuestionsController < ApplicationController
     @question = @form.questions.new(question_params)
 
     if @question.save
-      redirect_to form_path(@form), notice: "Frage hinzugefügt."
+      redirect_to form_path(@form), notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
     end
@@ -22,7 +22,7 @@ class FormQuestionsController < ApplicationController
 
   def update
     if @question.update(question_params)
-      redirect_to form_path(@form), notice: "Frage gespeichert."
+      redirect_to form_path(@form), notice: t(".notice")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -30,7 +30,7 @@ class FormQuestionsController < ApplicationController
 
   def destroy
     @question.destroy
-    redirect_to form_path(@form), notice: "Frage gelöscht.", status: :see_other
+    redirect_to form_path(@form), notice: t(".notice"), status: :see_other
   end
 
   def position

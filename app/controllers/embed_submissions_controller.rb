@@ -13,10 +13,10 @@ class EmbedSubmissionsController < ActionController::Base
 
   before_action :allow_cross_origin
   rate_limit to: 10, within: 10.minutes, only: :create,
-    with: -> { render json: { error: "Zu viele Einsendungen. Bitte versuche es später noch einmal." }, status: :too_many_requests }
+    with: -> { render json: { error: t("embed_submissions.rate_limited") }, status: :too_many_requests }
 
   rescue_from ActiveRecord::RecordNotFound do
-    render json: { error: "Formular nicht gefunden." }, status: :not_found
+    render json: { error: t("embed_submissions.not_found") }, status: :not_found
   end
 
   def create
@@ -24,14 +24,14 @@ class EmbedSubmissionsController < ActionController::Base
     form = find_form(hub)
 
     unless embedding_allowed_for?(hub.church, host_of(request.origin.presence || request.referer))
-      return render json: { error: "Das Formular ist für diese Webseite nicht freigegeben." }, status: :forbidden
+      return render json: { error: t(".forbidden") }, status: :forbidden
     end
 
     # Bots get a normal success response so they don't retry.
     return render(json: { ok: true }, status: :created) if spam?
 
     if form.consent_required? && params[:consent] != "1"
-      return render json: { errors: { consent: "Bitte stimme der Datenverarbeitung zu." } }, status: :unprocessable_entity
+      return render json: { errors: { consent: t(".consent_required") } }, status: :unprocessable_entity
     end
 
     submission = FormSubmission.build_from(form, raw_answers(form))

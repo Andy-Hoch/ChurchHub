@@ -30,12 +30,12 @@ class FormSubmissionsController < ApplicationController
 
   def destroy
     @submission.destroy
-    redirect_to form_submissions_path(@form), notice: "Einsendung gelöscht.", status: :see_other
+    redirect_to form_submissions_path(@form), notice: t(".notice"), status: :see_other
   end
 
   def destroy_all
     @form.submissions.delete_all
-    redirect_to form_submissions_path(@form), notice: "Alle Einsendungen gelöscht.", status: :see_other
+    redirect_to form_submissions_path(@form), notice: t(".notice"), status: :see_other
   end
 
   private
@@ -66,12 +66,12 @@ class FormSubmissionsController < ApplicationController
 
       # Excel needs the BOM to read UTF-8 and prefers semicolons in German locales.
       "﻿" + CSV.generate(col_sep: ";") do |csv|
-        csv << [ "Eingegangen am", "Gelesen", *columns.values ]
+        csv << [ t("form_submissions.csv.received_at"), t("form_submissions.csv.read"), *columns.values ]
         submissions.each do |submission|
           answers = submission.answers.index_by { |answer| answer["question_id"] }
           csv << [
-            submission.created_at.strftime("%d.%m.%Y %H:%M"),
-            submission.read? ? "ja" : "nein",
+            l(submission.created_at, format: :csv),
+            t(submission.read? ? "form_submissions.csv.yes" : "form_submissions.csv.no"),
             *columns.keys.map { |id| csv_safe(answers[id] && FormSubmission.format_value(answers[id])) }
           ]
         end

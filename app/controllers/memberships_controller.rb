@@ -6,12 +6,12 @@ class MembershipsController < ApplicationController
     user = User.find_by(email_address: params[:email_address].to_s.strip.downcase)
 
     if user.nil?
-      redirect_to edit_church_path, alert: "Kein Konto mit dieser E-Mail-Adresse gefunden. Die Person muss sich zuerst registrieren.", status: :see_other
+      redirect_to edit_church_path, alert: t(".unknown_account"), status: :see_other
     elsif current_church.memberships.exists?(user: user)
-      redirect_to edit_church_path, alert: "#{user.name} ist bereits Mitglied.", status: :see_other
+      redirect_to edit_church_path, alert: t(".already_member", name: user.name), status: :see_other
     else
       current_church.memberships.create!(user: user, role: :admin)
-      redirect_to edit_church_path, notice: "#{user.name} wurde hinzugefügt.", status: :see_other
+      redirect_to edit_church_path, notice: t(".notice", name: user.name), status: :see_other
     end
   end
 
@@ -31,10 +31,10 @@ class MembershipsController < ApplicationController
     membership = current_church.memberships.find(params[:id])
 
     if membership.user == Current.user
-      redirect_to edit_church_path, alert: "Du kannst dich nicht selbst entfernen.", status: :see_other
+      redirect_to edit_church_path, alert: t(".self"), status: :see_other
     else
       membership.destroy
-      redirect_to edit_church_path, notice: "Mitglied entfernt.", status: :see_other
+      redirect_to edit_church_path, notice: t(".notice"), status: :see_other
     end
   end
 end

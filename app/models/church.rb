@@ -65,7 +65,7 @@ class Church < ApplicationRecord
       uri = website_uri
       valid = uri.is_a?(URI::HTTP) && uri.userinfo.nil? && uri.host.present? &&
         (uri.host.include?(".") || uri.host == "localhost")
-      errors.add(:website_url, "ist keine gültige Webseiten-Adresse") unless valid
+      errors.add(:website_url, :invalid_website) unless valid
     end
 
     def generate_slug

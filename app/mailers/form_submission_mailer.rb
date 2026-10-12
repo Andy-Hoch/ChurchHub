@@ -4,6 +4,6 @@ class FormSubmissionMailer < ApplicationMailer
   def received(submission)
     @submission = submission
     @form = submission.form
-    mail to: @form.notification_email_list, subject: "Neue Einsendung: #{@form.title}"
+    mail to: @form.notification_email_list, subject: default_i18n_subject(title: @form.title)
   end
 end

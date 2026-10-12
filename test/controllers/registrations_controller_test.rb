@@ -59,5 +59,6 @@ class RegistrationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :unprocessable_entity
+    assert_select ".field__error", text: "Bestätigung fehlt"
   end
 end
