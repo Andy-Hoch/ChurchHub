@@ -33,7 +33,7 @@
       .header { background: var(--primary); color: var(--on-primary); padding: max(40px, env(safe-area-inset-top)) 16px 72px; text-align: center; }
       .title { margin: 0 auto; max-width: 36rem; font-size: clamp(1.5rem, 5vw, 2rem); font-weight: 700; line-height: 1.2; overflow-wrap: anywhere; }
       main { max-width: 36rem; margin: -48px auto 0; padding: 0 16px max(32px, env(safe-area-inset-bottom)); }
-      .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+      .list { display: grid; gap: 10px; }
       .link { width: 100%; font: inherit; text-align: start; cursor: pointer; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); color: inherit; text-decoration: none; box-shadow: 0 1px 3px oklch(0% 0 0 / .06); transition: transform .15s ease, background-color .15s ease; }
       .link:hover { background: var(--hover); }
       .link:active { transform: scale(.98); }
@@ -52,21 +52,19 @@
     </header>
     <main>
       <% if @links.any? %>
-        <ul class="list">
+        <div class="list">
           <% @links.each do |link| %>
-            <li>
-              <% if link.kind_form? %>
-                <button type="button" class="link" data-kirchen-hub-form="<%= link.form_id %>" aria-haspopup="dialog">
-                  <%= render "public_hubs/link_content", link: link %>
-                </button>
-              <% else %>
-                <a class="link" href="<%= link.url %>" target="_blank" rel="noopener">
-                  <%= render "public_hubs/link_content", link: link %>
-                </a>
-              <% end %>
-            </li>
+            <% if link.kind_form? %>
+              <button type="button" class="link" data-kirchen-hub-form="<%= link.form_id %>" aria-haspopup="dialog">
+                <%= render "public_hubs/link_content", link: link %>
+              </button>
+            <% else %>
+              <a class="link" href="<%= link.url %>" target="_blank" rel="noopener">
+                <%= render "public_hubs/link_content", link: link %>
+              </a>
+            <% end %>
           <% end %>
-        </ul>
+        </div>
       <% else %>
         <p class="empty">Noch keine Links vorhanden.</p>
       <% end %>
