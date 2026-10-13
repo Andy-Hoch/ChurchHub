@@ -10,6 +10,7 @@ class PublicHubsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Intern", response.body
     assert_select ".list > a.link", text: /Gottesdienst live/
     assert_select "ul, li", count: 0
+    assert_select "svg.chevron", count: 0
     assert_select "meta[name=viewport]"
   end
 

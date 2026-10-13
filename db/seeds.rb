@@ -18,11 +18,11 @@ end
 hub = church.hub
 if hub.links.none?
   [
-    { title: "Gottesdienst live", url: "https://example.com/live", description: "Sonntags um 10 Uhr" },
-    { title: "Termine", url: "https://example.com/termine", description: "Alle Veranstaltungen im Überblick" },
+    { title: "Gottesdienst live", url: "https://example.com/live" },
+    { title: "Termine", url: "https://example.com/termine" },
     { title: "Kleingruppen", url: "https://example.com/gruppen" },
-    { title: "Gebetsanliegen", kind: "form", form: prayer, description: "Wir beten für dich" },
-    { title: "Spenden", url: "https://example.com/spenden", description: "Danke für deine Unterstützung" }
+    { title: "Gebetsanliegen", kind: "form", form: prayer },
+    { title: "Spenden", url: "https://example.com/spenden" }
   ].each { |attributes| hub.links.create!(attributes) }
 end
 

@@ -61,7 +61,7 @@ users ──< memberships >── churches ──1:1── hubs ──< links >�
 | `churches` | `name`, `slug` (einmalig), `website_url` |
 | `memberships` | `user_id`, `church_id` (zusammen einmalig), `role` (`owner` \| `admin`, Standard `admin`). Jede Kirche behält mindestens einen Besitzer. |
 | `hubs` | `church_id` (einmalig), `title`, `public_token` (einmalig, Token im Embed-Code), `enabled`, `primary_color`, `text_color` (oklch), `position` (`right` \| `left`), `button_label`, `button_icon` (`grid`, `menu`, `heart`, `cross`, `link`), `color_scheme` (`light`, `dark`, `auto`), `corner_radius` (0–24) |
-| `links` | `hub_id`, `title`, `kind` (`link` \| `form`), `url`, `form_id` (bei Löschung des Formulars auf NULL), `description`, `icon`, `position`, `visible` |
+| `links` | `hub_id`, `title`, `kind` (`link` \| `form`), `url`, `form_id` (bei Löschung des Formulars auf NULL), `position`, `visible` |
 | `forms` | `church_id`, `title`, `intro`, `thank_you_message`, `submit_label`, `notification_emails`, `consent_text`, `privacy_url`, `retention_months` |
 | `form_questions` | `form_id`, `kind`, `label`, `help_text`, `required`, `choices` (JSON-Liste), `position` |
 | `form_submissions` | `form_id`, `answers` (JSON-Liste mit `question_id`, `label`, `kind`, `value`), `read_at` |

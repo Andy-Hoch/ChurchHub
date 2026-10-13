@@ -11,7 +11,6 @@ class Link < ApplicationRecord
   normalizes :url, with: ->(url) { url.strip.presence }
 
   validates :title, presence: true, length: { maximum: 80 }
-  validates :description, length: { maximum: 160 }
   validate :url_must_be_http, if: :kind_link?
   validate :form_must_belong_to_church, if: :kind_form?
 
@@ -25,7 +24,7 @@ class Link < ApplicationRecord
   end
 
   def embed_payload
-    payload = { title: title, description: description.presence }
+    payload = { title: title }
 
     if kind_form?
       payload.merge(type: "form", form: form.embed_payload)

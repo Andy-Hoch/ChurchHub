@@ -25,7 +25,7 @@ zeigt, muss der Code nie neu gedruckt werden, solange der Kurzname gleich bleibt
 Eine schlanke, für das Handy optimierte Seite mit:
 
 - Kopfzeile in eurer **Hauptfarbe** mit der **Überschrift** des Hubs
-- einer Liste der sichtbaren Links, jeweils mit Symbol, Titel und Beschreibung. Sie öffnen in einem neuen Tab.
+- einer Liste der sichtbaren Links, jeweils mit ihrem Titel. Sie öffnen in einem neuen Tab.
 - Übernahme von **Farben, Eckenrundung und Farbschema** (hell/dunkel/automatisch) aus dem [Design](design.md)
 
 Ohne Links steht dort „Noch keine Links vorhanden.“

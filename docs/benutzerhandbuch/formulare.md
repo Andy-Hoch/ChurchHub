@@ -116,7 +116,7 @@ Ein Formular erscheint erst im Launcher, wenn ein Link darauf zeigt:
 
 1. Im Formular auf **„Als Button hinzufügen“** klicken (oder unter *Links → Link hinzufügen* die Option
    **„Formular öffnen“** wählen und das Formular auswählen).
-2. Titel vergeben (z. B. „Gebetsanliegen“), optional Beschreibung.
+2. Titel vergeben (z. B. „Gebetsanliegen“).
 3. Speichern. Der Button steht nun im Panel und ist wie jeder Link sortier- und ausblendbar.
 
 Ein Formular kann von **mehreren** Links geöffnet werden. Nicht verknüpfte Formulare können keine Einsendungen erhalten.

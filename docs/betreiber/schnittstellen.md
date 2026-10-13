@@ -53,9 +53,9 @@ Das Skript enthält dieses JSON (Auszug):
     "cornerRadius": 12
   },
   "links": [
-    { "title": "Termine", "description": "…", "icon": "📅", "type": "link", "url": "https://example.com/termine" },
+    { "title": "Termine", "type": "link", "url": "https://example.com/termine" },
     {
-      "title": "Gebetsanliegen", "icon": "🙏", "type": "form",
+      "title": "Gebetsanliegen", "type": "form",
       "form": {
         "id": 1, "title": "Gebetsanliegen", "intro": "…", "thankYou": "…", "submitLabel": "Anliegen senden",
         "consentText": "…", "privacyUrl": "https://…",
@@ -69,7 +69,7 @@ Das Skript enthält dieses JSON (Auszug):
 }
 ```
 
-Enthalten sind nur **sichtbare** Links. Formular-Buttons ohne existierendes Formular fehlen. Leere Angaben bei Links und Formularen (z. B. `description`, `icon`, `intro`) sind `null`, bei Fragen werden leere Felder weggelassen.
+Enthalten sind nur **sichtbare** Links. Formular-Buttons ohne existierendes Formular fehlen. Leere Angaben bei Formularen (z. B. `intro`) sind `null`, bei Fragen werden leere Felder weggelassen.
 
 ### Ereignis `kirchen-hub:update`
 

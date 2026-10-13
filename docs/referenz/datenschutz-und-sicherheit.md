@@ -13,7 +13,7 @@ Bewertung (DSGVO, kirchliche Datenschutzgesetze wie KDG oder DSG-EKD) wende dich
 | **Mitglieder** (Backend-Nutzer) | Name, E-Mail-Adresse, Passwort (nur als Hash, nie im Klartext), Zeitpunkte | Anmeldung, Team-Anzeige, Passwort-Reset |
 | **Anmeldungen (Sitzungen)** | IP-Adresse, Browser-Kennung (User-Agent), Zeitpunkt, Cookie-Kennung | Angemeldet bleiben, Sitzungen beim Passwort-Reset beenden. Nach 30 Tagen ohne Nutzung endet eine Sitzung und wird gelöscht. |
 | **Kirche** | Name, Kurzname, Webseite | Betrieb des Hubs |
-| **Hub und Links** | Überschrift, Design, Titel, Adressen, Beschreibungen | Inhalt des Launchers. Öffentlich abrufbar. |
+| **Hub und Links** | Überschrift, Design, Titel, Adressen | Inhalt des Launchers. Öffentlich abrufbar. |
 | **Formulare** | Fragen, Texte, Benachrichtigungsadressen, Einwilligungstext | Betrieb der Formulare |
 | **Einsendungen** | Alle Antworten der Besucher samt Fragetext, Eingangszeit, „gelesen“-Status | Rückmeldungen der Gemeinde. Nur für Mitglieder sichtbar. |
 
