@@ -65,8 +65,8 @@
     "a.link, button.link { box-sizing: border-box; min-width: min(100%, 12rem); max-width: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center; min-height: 64px; padding: 16px 28px; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); border: 1px solid light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); border-radius: var(--radius); color: inherit; text-decoration: none; text-align: center; box-shadow: 0 1px 3px oklch(0% 0 0 / .06); transition: transform .15s ease, background-color .15s ease; }",
     ".link:hover { background: light-dark(oklch(96.74% 0.0013 286.38), oklch(27.39% 0.0055 286.03)); }",
     ".link:active { transform: scale(.98); }",
-    ".link-text { min-width: 0; }",
-    ".link-title { display: block; font-weight: 600; overflow-wrap: anywhere; }",
+    ".link-text { min-width: 0; max-width: 100%; }",
+    ".link-title { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }",
     "@media (prefers-reduced-motion: reduce) { .link { transition: none; } }",
     ".empty { padding: 16px; margin: 0; color: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); }",
     "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
@@ -275,6 +275,7 @@
               node.target = "_blank";
               node.rel = "noopener";
             }
+            node.title = item.title;
             var text = el("span", "link-text");
             text.appendChild(el("span", "link-title", item.title));
             node.appendChild(text);
