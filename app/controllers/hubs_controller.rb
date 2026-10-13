@@ -10,7 +10,7 @@ class HubsController < ApplicationController
 
   def update
     if @hub.update(hub_params)
-      redirect_back_or_to edit_hub_path, notice: "Änderungen gespeichert."
+      redirect_back_or_to edit_hub_path, notice: t(".notice")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -21,7 +21,7 @@ class HubsController < ApplicationController
 
   def regenerate_token
     @hub.regenerate_public_token
-    redirect_to embed_hub_path, notice: "Neuer Einbettungs-Code erzeugt. Bitte das Snippet auf deiner Webseite austauschen."
+    redirect_to embed_hub_path, notice: t(".notice")
   end
 
   private

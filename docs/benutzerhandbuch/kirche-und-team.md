@@ -15,13 +15,14 @@ Jedes Mitglied hat in einer Kirche eine von zwei Rollen:
 | Zwischen Kirchen wechseln, neue Kirche anlegen | ✅ | ✅ |
 | Einstellungen der Kirche ändern (Name, Webseite, Kurzname) | – | ✅ |
 | Mitglieder hinzufügen und entfernen | – | ✅ |
+| Rollen ändern, Kirche an jemand anderen übergeben | – | ✅ |
 | Kirche löschen | – | ✅ |
 
 Nicht-Besitzer sehen die Einstellungen ausgegraut und ohne „Speichern“. Versuche, sie trotzdem zu ändern,
 weist der Server ab („Nur Besitzer dürfen das.“).
 
-Wer eine Kirche **anlegt**, ist automatisch Besitzer. Neu hinzugefügte Mitglieder sind **Admins**. Eine Oberfläche
-zum Ändern der Rolle gibt es nicht. Bei Bedarf (z. B. wenn der Besitzer nicht mehr erreichbar ist) wende dich an den Betreiber des Hubs. Es kann mehrere Besitzer geben.
+Wer eine Kirche **anlegt**, ist automatisch Besitzer. Neu hinzugefügte Mitglieder sind **Admins**. Es kann mehrere
+Besitzer geben, aber nie keinen. Ist kein Besitzer mehr erreichbar, hilft der Betreiber des Hubs.
 
 ## Einstellungen der Kirche
 
@@ -49,8 +50,17 @@ Meldungen: „Kein Konto mit dieser E-Mail-Adresse gefunden. Die Person muss sic
 
 Bei jedem Mitglied außer dir selbst gibt es **Entfernen** (mit Rückfrage). Das entzieht den Zugang sofort. Das
 Konto der Person bleibt bestehen. **Dich selbst kannst du nicht entfernen.** Willst du selbst gehen, muss dich ein
-anderer Besitzer entfernen. Alternativ kannst du dein Konto löschen, siehe
+anderer Besitzer entfernen (siehe [Kirche übergeben](#rolle-ändern-und-kirche-übergeben-nur-besitzer)). Alternativ kannst du dein Konto löschen, siehe
 [Konto löschen](konto-und-anmeldung.md#konto-löschen).
+
+### Rolle ändern und Kirche übergeben (nur Besitzer)
+
+- **Zum Besitzer machen** steht bei jedem Admin. Nach der Rückfrage hat die Person dieselben Rechte wie du.
+- **Zum Admin machen** steht bei Besitzern, sobald es mindestens zwei gibt, auch bei dir selbst. Der letzte
+  Besitzer kann seine Rolle nicht abgeben („… weil die Kirche sonst keinen Besitzer mehr hätte“).
+
+**Kirche übergeben**, z. B. bei einem Wechsel im Team: Mache die neue Person zum Besitzer und danach dich selbst zum
+Admin. Wenn du gar nicht mehr dabei sein willst, kann dich die neue Person anschließend entfernen.
 
 ## Mehrere Kirchen
 

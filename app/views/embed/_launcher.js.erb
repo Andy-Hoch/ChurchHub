@@ -1,0 +1,3 @@
+<%# The static widget and the hub's data in one response: measured faster than loading the widget separately, because it saves a round trip on first visits. %>
+<%= embed_widget_source %>
+KirchenHub.mount(<%= embed_config_json(hub, allowed_hosts: local_assigns[:allowed_hosts]) %>, document.currentScript);

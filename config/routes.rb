@@ -24,12 +24,14 @@ Rails.application.routes.draw do
 
   resources :churches, only: %i[ new create ]
   resource :church, only: %i[ edit update destroy ], controller: :current_church do
-    resources :memberships, only: %i[ create destroy ]
+    resources :memberships, only: %i[ create update destroy ]
   end
   resource :church_switch, only: :update
 
   get "embed/:token", to: "embed#show", as: :embed, format: true, constraints: { format: :js }
   post "embed/:token/forms/:form_id/submissions", to: "embed_submissions#create", as: :embed_form_submissions
+
+  post "csp-reports", to: "csp_reports#create", as: :csp_reports
 
   get "up" => "rails/health#show", as: :rails_health_check
 

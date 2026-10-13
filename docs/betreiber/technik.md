@@ -18,7 +18,10 @@ Für Betreiber und Entwickler: Aufbau der Anwendung, Datenmodell und Routen.
 | **CSS Zero** | Design-Grundlage (Tokens, Utilities, Komponenten), eigene Ergänzungen in `app/assets/stylesheets/app.css` |
 | **Docker** + **Kamal 2** | Auslieferung |
 
-Die Oberfläche ist durchgängig Deutsch (`config/locales/de.yml`, Standard-Locale `de`, Zeitzone Berlin).
+Die Oberfläche ist durchgängig Deutsch (`config/locales/de.yml`, Standard-Locale `de`, Zeitzone Berlin). Meldungen
+aus Controllern, Models und Mailern stehen dort, Views enthalten ihre Texte direkt. Fehlende Übersetzungen lösen in
+Entwicklung und Tests einen Fehler aus. Die Texte im Launcher (`app/javascript/embed/widget.js`, `MESSAGES`) sind
+eine Kopie der Antwort-Prüfungen und müssen bei Änderungen mitgepflegt werden.
 
 ## Verzeichnisstruktur
 
@@ -27,10 +30,11 @@ app/
   controllers/     Backend-Controller. embed_*, public_hubs sind öffentlich (erben von ActionController::Base)
   models/          Church, Hub, Link, Form, FormQuestion, FormSubmission, User, Membership, Session …
                    FormTemplate (Vorlagen), OklchColor (Farbumrechnung), HttpUrl (URL-Prüfung)
-  views/embed/     _widget.js.erb = der komplette Launcher (JavaScript, CSS im Shadow DOM), show.js.erb
+  views/embed/     show.js.erb / _launcher.js.erb = Embed-Skript (Widget + Daten des Hubs)
   views/           Backend-Seiten (ERB), Mail-Vorlagen, PWA-Dateien
   javascript/controllers/   Stimulus-Controller des Backends
-  jobs/            PurgeExpiredFormSubmissionsJob
+  javascript/embed/widget.js   der komplette Launcher (JavaScript, CSS im Shadow DOM), statisch und ohne ERB
+  jobs/            PurgeExpiredFormSubmissionsJob, PurgeInactiveSessionsJob
   mailers/         FormSubmissionMailer, PasswordsMailer
 config/
   routes.rb        alle Routen
@@ -55,7 +59,7 @@ users ──< memberships >── churches ──1:1── hubs ──< links >�
 | `users` | `email_address` (einmalig, klein geschrieben), `password_digest`, `name` |
 | `sessions` | `user_id`, `ip_address`, `user_agent` |
 | `churches` | `name`, `slug` (einmalig), `website_url` |
-| `memberships` | `user_id`, `church_id` (zusammen einmalig), `role` (`owner` \| `admin`, Standard `admin`) |
+| `memberships` | `user_id`, `church_id` (zusammen einmalig), `role` (`owner` \| `admin`, Standard `admin`). Jede Kirche behält mindestens einen Besitzer. |
 | `hubs` | `church_id` (einmalig), `title`, `public_token` (einmalig, Token im Embed-Code), `enabled`, `primary_color`, `text_color` (oklch), `position` (`right` \| `left`), `button_label`, `button_icon` (`grid`, `menu`, `heart`, `cross`, `link`), `color_scheme` (`light`, `dark`, `auto`), `corner_radius` (0–24) |
 | `links` | `hub_id`, `title`, `kind` (`link` \| `form`), `url`, `form_id` (bei Löschung des Formulars auf NULL), `description`, `icon`, `position`, `visible` |
 | `forms` | `church_id`, `title`, `intro`, `thank_you_message`, `submit_label`, `notification_emails`, `consent_text`, `privacy_url`, `retention_months` |
@@ -89,8 +93,8 @@ Bemerkungen:
 | Links | `GET /hub/links/new`, `POST /hub/links`, `GET /hub/links/:id/edit`, `PATCH/DELETE /hub/links/:id`, `PUT /hub/links/:id/position` |
 | Formulare | `/forms` (Index, `new`, `create`, `show` = Fragen, `edit` = Einstellungen, `update`, `destroy`) |
 | Fragen | `/forms/:form_id/questions` (`new`, `create`, `edit`, `update`, `destroy`), `PUT …/:id/position` |
-| Einsendungen | `GET /forms/:form_id/submissions` (auch `.csv`, `?filter=unread`), `GET …/:id`, `DELETE …/:id`, `PATCH …/:id/toggle_read`, `DELETE …/destroy_all` |
-| Kirche | `GET /church/edit`, `PATCH/DELETE /church`, `POST /church/memberships`, `DELETE /church/memberships/:id`, `GET/POST /churches/new`, `PATCH /church_switch` |
+| Einsendungen | `GET /forms/:form_id/submissions` (auch `.csv`, `?filter=unread`, `?page=2`), `GET …/:id`, `DELETE …/:id`, `PATCH …/:id/toggle_read`, `DELETE …/destroy_all` |
+| Kirche | `GET /church/edit`, `PATCH/DELETE /church`, `POST /church/memberships`, `PATCH /church/memberships/:id` (`role`), `DELETE /church/memberships/:id`, `GET/POST /churches/new`, `PATCH /church_switch` |
 | Konto | `GET /account/edit`, `DELETE /account` |
 
 ### Ohne Anmeldung
@@ -104,6 +108,7 @@ Bemerkungen:
 | `GET /embed/:token.js` | [Embed-Skript](schnittstellen.md#embed-skript) |
 | `POST /embed/:token/forms/:form_id/submissions` | [Formular-Einsendung](schnittstellen.md#formular-einsendung) |
 | `GET /up` | Health-Check |
+| `POST /csp-reports` | Empfängt Berichte über [CSP-Verstöße](#content-security-policy) und schreibt sie ins Log |
 | `GET /:slug` | [Öffentliche Hub-Seite](../benutzerhandbuch/eigene-seite.md). Muss die **letzte** Route sein. |
 
 ### Reservierte Kurznamen
@@ -111,7 +116,7 @@ Bemerkungen:
 Da `/:slug` alles unterhalb der Wurzel abfängt, sind diese Namen für Kirchen gesperrt:
 
 `session`, `sessions`, `passwords`, `registration`, `account`, `hub`, `church`, `churches`, `church_switch`, `embed`, `up`,
-`forms`, `admin`, `api`, `assets`, `rails`, `cable`, `manifest`, `service-worker`, `icon`, `robots`, `favicon`, außerdem
+`forms`, `admin`, `api`, `assets`, `rails`, `cable`, `manifest`, `service-worker`, `icon`, `robots`, `favicon`, `csp-reports`, außerdem
 automatisch die Namen aller Dateien in `public/` ohne Endung (z. B. `404`, `embed-demo`), weil der Server sie auch ohne
 Endung ausliefert.
 
@@ -120,8 +125,12 @@ Wird ein neuer Top-Level-Pfad ergänzt, muss er in `Church::RESERVED_SLUGS` steh
 
 ## Der Launcher (Widget)
 
-`app/views/embed/_widget.js.erb` ist eine selbstständige JavaScript-Datei ohne Abhängigkeiten. Sie wird vom Server
-mit den **Daten des Hubs fest eingebettet** (`data = {title, theme, links}`), sodass zur Laufzeit keine weitere Abfrage nötig ist.
+`app/javascript/embed/widget.js` ist eine statische JavaScript-Datei (ES5, ohne Abhängigkeiten und Build-Schritt). Sie
+definiert nur `window.KirchenHub.mount(config, script)`. Das Embed-Skript `/embed/<token>.js` liefert den Inhalt dieser
+Datei und hängt den Aufruf mit den **Daten des Hubs** an (`config = {hub, allowedHosts, fonts, fontFaces}`, siehe
+`EmbedHelper#embed_config_json`). So kommt alles in **einer** Antwort, und zur Laufzeit ist keine weitere Abfrage nötig.
+Gemessen ist das beim Erstbesuch rund eine Round-Trip-Zeit schneller, als das Widget als eigenes Asset nachzuladen.
+Die CI prüft die Syntax mit `node --check`.
 
 - Er hängt ein `<div data-kirchen-hub>` an `document.body` (oder an das Element aus `data-container`), erzeugt ein
   **Shadow DOM** (`mode: open`) und rendert Button, Panel und Formular-Dialog darin.
@@ -132,11 +141,28 @@ mit den **Daten des Hubs fest eingebettet** (`data = {title, theme, links}`), so
   die Live-Vorschau im Backend ihr Aussehen.
 - Ohne `src` am `<script>` (wie in der Vorschau) simuliert es das Absenden.
 
+## Content-Security-Policy
+
+Definiert in `config/initializers/content_security_policy.rb`: Skripte, Styles, Schriften, Bilder und Verbindungen nur
+vom Hub selbst, Inline-Skripte und -Styles nur mit Nonce, keine Einbettung in fremde Frames.
+
+- **Zurzeit nur beobachtend:** Der Header heißt `Content-Security-Policy-Report-Only`. Browser blockieren nichts, melden
+  Verstöße aber an `/csp-reports`. Sie landen als `CSP violation: …` im Log (nur Pfade, keine Query-Parameter).
+  Mit `CSP_ENFORCE=1` wird die Policy durchgesetzt. In den Tests ist sie immer durchgesetzt, und die System-Tests
+  schlagen fehl, sobald die Browser-Konsole einen CSP-Verstoß meldet.
+- **Nonce:** einmal pro Sitzung erzeugt und in der Session gespeichert. Turbo übernimmt bei Seitenwechseln den Nonce
+  der neuen Seite, die Policy des ersten Seitenaufrufs bleibt aber gültig. Deshalb muss er stabil bleiben.
+- **Nur das Backend** (`ApplicationController`) bekommt einen Nonce. Öffentliche Hub-Seite, Embed-Skript und
+  Einsendungen fassen die Session nie an und setzen keine Cookies.
+- Die **öffentliche Hub-Seite** erlaubt Inline-Styles (`'unsafe-inline'`), weil sie öffentlich gecacht wird und ohne
+  Session auskommt. Skripte bleiben auf den Hub beschränkt. Embed-Skript und Einsendungen senden keine Policy, die
+  Seite für veraltete Browser (`406`) auch nicht, weil sie Inline-Styles nutzt.
+
 ## Caching
 
 | Was | Verhalten |
 | --- | --- |
-| Embed-Skript | `Cache-Control: public, max-age=300`, `ETag` aus Hub **und** Kirche, `Vary: Referer` |
+| Embed-Skript | `Cache-Control: public, max-age=300`, `ETag` aus Hub, Kirche **und** Version von `widget.js`, `Vary: Referer` |
 | Hub-Änderungen | Jede Änderung an Links, Formularen und Fragen aktualisiert `hubs.updated_at` (`touch`). Dadurch ändert sich der ETag. |
 | Öffentliche Hub-Seite | `ETag` aus dem Hub, `Cache-Control: public` (Browser prüfen bei jedem Aufruf nach) |
 
@@ -146,6 +172,7 @@ mit den **Daten des Hubs fest eingebettet** (`data = {title, theme, links}`), so
 | --- | --- |
 | `ActionMailer` Zustellung (`deliver_later`) | Passwort-Reset, neue Einsendung |
 | `PurgeExpiredFormSubmissionsJob` | täglich 3:00 Uhr (`config/recurring.yml`, nur Produktion) |
+| `PurgeInactiveSessionsJob` | täglich 3:30 Uhr: löscht Sitzungen, die 30 Tage nicht genutzt wurden (`Session::INACTIVITY_LIMIT`) |
 | `SolidQueue::Job.clear_finished_in_batches` | stündlich |
 
 Im Container läuft Solid Queue **im Puma-Prozess**, wenn `SOLID_QUEUE_IN_PUMA` gesetzt ist. Ein separater Job-Server

@@ -1,7 +1,7 @@
 class SessionsController < ApplicationController
   allow_unauthenticated_access only: %i[ new create ]
   layout "auth"
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_path, alert: "Bitte versuche es später noch einmal." }
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_path, alert: t("rate_limited") }
 
   def new
   end
@@ -11,7 +11,7 @@ class SessionsController < ApplicationController
       start_new_session_for user
       redirect_to after_authentication_url
     else
-      redirect_to new_session_path, alert: "E-Mail-Adresse oder Passwort ist falsch."
+      redirect_to new_session_path, alert: t(".invalid")
     end
   end
 

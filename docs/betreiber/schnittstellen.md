@@ -34,6 +34,7 @@ das Skript selbst `location.hostname`.
 | --- | --- |
 | `data-open="true"` | Panel beim Laden geöffnet |
 | `data-container="<CSS-Selektor>"` | Launcher innerhalb dieses Elements statt schwebend anzeigen |
+| `nonce="…"` | Wird an die `<style>`-Elemente des Launchers weitergegeben, für Webseiten mit Content-Security-Policy |
 
 ### Nutzdaten im Skript
 

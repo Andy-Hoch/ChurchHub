@@ -33,6 +33,30 @@ class EmbedControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_modified
   end
 
+  test "a new widget version is not answered with not modified" do
+    get embed_path(hubs(:one).public_token, format: :js)
+    etag = response.headers["ETag"]
+
+    load_path = Rails.application.assets.load_path
+    changed = Data.define(:digest) { def content(encoding:) = "/* neu */" }.new("changed")
+    load_path.define_singleton_method(:find) { |path| path == EmbedHelper::EMBED_WIDGET ? changed : super(path) }
+    begin
+      get embed_path(hubs(:one).public_token, format: :js), headers: { "If-None-Match" => etag }
+    ensure
+      load_path.singleton_class.remove_method(:find)
+    end
+
+    assert_response :success
+    assert_match "/* neu */", response.body
+  end
+
+  test "ships the static widget together with the hub data" do
+    get embed_path(hubs(:one).public_token, format: :js)
+
+    assert response.body.start_with?(Rails.application.assets.load_path.find(EmbedHelper::EMBED_WIDGET).content(encoding: "UTF-8"))
+    assert_match "KirchenHub.mount({", response.body
+  end
+
   test "serves the script on the church website and its subdomains" do
     [ "https://gemeinde-eins.example/", "https://www.gemeinde-eins.example/kontakt", "https://jugend.gemeinde-eins.example/" ].each do |referer|
       get embed_path(hubs(:one).public_token, format: :js), headers: { "Referer" => referer }
@@ -65,7 +89,7 @@ class EmbedControllerTest < ActionDispatch::IntegrationTest
     get embed_path(hubs(:one).public_token, format: :js), headers: { "Referer" => "https://fremd.example/" }
 
     assert_match "Gottesdienst live", response.body
-    assert_match "var allowedHosts = null;", response.body
+    assert_match %("allowedHosts":null), response.body
   end
 
   test "returns harmless script for disabled or unknown hubs" do

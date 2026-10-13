@@ -1,6 +1,8 @@
 require "csv"
 
 class FormSubmissionsController < ApplicationController
+  class_attribute :per_page, default: 50
+
   before_action :require_church
   before_action :set_form
   before_action :set_submission, only: %i[ show destroy toggle_read ]
@@ -10,7 +12,7 @@ class FormSubmissionsController < ApplicationController
     @submissions = @submissions.unread if params[:filter] == "unread"
 
     respond_to do |format|
-      format.html
+      format.html { paginate }
       format.csv do
         send_data submissions_csv, filename: "#{@form.title.parameterize.presence || "formular"}-#{Date.current.iso8601}.csv", type: "text/csv; charset=utf-8"
       end
@@ -28,15 +30,25 @@ class FormSubmissionsController < ApplicationController
 
   def destroy
     @submission.destroy
-    redirect_to form_submissions_path(@form), notice: "Einsendung gelöscht.", status: :see_other
+    redirect_to form_submissions_path(@form), notice: t(".notice"), status: :see_other
   end
 
   def destroy_all
     @form.submissions.delete_all
-    redirect_to form_submissions_path(@form), notice: "Alle Einsendungen gelöscht.", status: :see_other
+    redirect_to form_submissions_path(@form), notice: t(".notice"), status: :see_other
   end
 
   private
+    # Newest first, per_page at a time. Pages past the end lead back to the first.
+    def paginate
+      @page = [ params[:page].to_i, 1 ].max
+      submissions = @submissions.offset((@page - 1) * per_page).limit(per_page + 1).to_a
+      return redirect_to form_submissions_path(@form, filter: params[:filter]) if submissions.empty? && @page > 1
+
+      @next_page = @page + 1 if submissions.size > per_page
+      @submissions = submissions.first(per_page)
+    end
+
     def set_form
       @form = current_church.forms.find(params[:form_id])
     end
@@ -54,12 +66,12 @@ class FormSubmissionsController < ApplicationController
 
       # Excel needs the BOM to read UTF-8 and prefers semicolons in German locales.
       "﻿" + CSV.generate(col_sep: ";") do |csv|
-        csv << [ "Eingegangen am", "Gelesen", *columns.values ]
+        csv << [ t("form_submissions.csv.received_at"), t("form_submissions.csv.read"), *columns.values ]
         submissions.each do |submission|
           answers = submission.answers.index_by { |answer| answer["question_id"] }
           csv << [
-            submission.created_at.strftime("%d.%m.%Y %H:%M"),
-            submission.read? ? "ja" : "nein",
+            l(submission.created_at, format: :csv),
+            t(submission.read? ? "form_submissions.csv.yes" : "form_submissions.csv.no"),
             *columns.keys.map { |id| csv_safe(answers[id] && FormSubmission.format_value(answers[id])) }
           ]
         end

@@ -35,7 +35,7 @@ class MembershipsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "admins cannot manage members" do
-    memberships(:one).update!(role: :admin)
+    memberships(:one).update_column(:role, "admin")
     other = churches(:one).memberships.create!(user: users(:two))
 
     assert_no_difference "Membership.count" do
