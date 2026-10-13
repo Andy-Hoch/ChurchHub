@@ -38,8 +38,8 @@
       .link:hover { background: var(--hover); }
       .link:active { transform: scale(.98); }
       .link:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-      .text { min-width: 0; }
-      .link-title { display: block; font-weight: 600; overflow-wrap: anywhere; }
+      .text { min-width: 0; max-width: 100%; }
+      .link-title { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .empty { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px 16px; margin: 0; text-align: center; color: var(--muted); }
       @media (prefers-reduced-motion: reduce) { .link { transition: none; } }
     </style>
@@ -53,11 +53,11 @@
         <div class="list">
           <% @links.each do |link| %>
             <% if link.kind_form? %>
-              <button type="button" class="link" data-kirchen-hub-form="<%= link.form_id %>" aria-haspopup="dialog">
+              <button type="button" class="link" title="<%= link.title %>" data-kirchen-hub-form="<%= link.form_id %>" aria-haspopup="dialog">
                 <%= render "public_hubs/link_content", link: link %>
               </button>
             <% else %>
-              <a class="link" href="<%= link.url %>" target="_blank" rel="noopener">
+              <a class="link" href="<%= link.url %>" title="<%= link.title %>" target="_blank" rel="noopener">
                 <%= render "public_hubs/link_content", link: link %>
               </a>
             <% end %>
