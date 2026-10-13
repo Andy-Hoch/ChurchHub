@@ -57,7 +57,6 @@ Links siehst du die Navigation, oben rechts „Abmelden“. Die Menüpunkte:
 2. Trage ein:
    - **Titel**, z. B. „Gottesdienst live“
    - **Adresse (URL)**, beginnend mit `https://`
-   - optional eine **Beschreibung** („Sonntags um 10 Uhr“)
 3. **Speichern**. Wiederhole das für jeden Link.
 4. **Sortiere** die Links per Drag & Drop am Griff (⋮⋮) links in der Zeile. Das Wichtigste nach oben.
 

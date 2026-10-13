@@ -32,7 +32,6 @@ de:
       link:
         title: Titel
         url: Adresse
-        description: Beschreibung
         kind: Art
         form: Formular
       form:
