@@ -9,6 +9,7 @@ class EmbedSubmissionsController < ActionController::Base
   class_attribute :minimum_fill_time, default: 3.seconds
 
   skip_forgery_protection
+  content_security_policy false
 
   before_action :allow_cross_origin
   rate_limit to: 10, within: 10.minutes, only: :create,

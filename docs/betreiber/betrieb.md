@@ -13,6 +13,9 @@ Die Befehle nutzen Kamal (`bin/kamal …`). Wenn du Docker von Hand betreibst, e
 - **Embed-Skript prüfen:** `https://<euer-hub>/embed/<TOKEN>.js` sollte JavaScript liefern. Kommt nur
   `/* Hub nicht gefunden oder deaktiviert */`, ist das Token falsch oder der Launcher ist ausgeschaltet.
 - **Logs:** `bin/kamal logs` (live mitlesen) bzw. `docker logs -f kirchen-hub`. Sie werden auf STDOUT geschrieben.
+- **Content-Security-Policy:** Zeilen mit `CSP violation` zeigen, was die Policy blockieren würde. Tauchen über
+  längere Zeit keine auf, kann sie mit `CSP_ENFORCE=1` scharf geschaltet werden. Einzelne Meldungen mit fremden
+  Adressen stammen oft von Browser-Erweiterungen der Nutzer und sind harmlos.
 
 ## Updates einspielen
 

@@ -31,6 +31,8 @@ Rails.application.routes.draw do
   get "embed/:token", to: "embed#show", as: :embed, format: true, constraints: { format: :js }
   post "embed/:token/forms/:form_id/submissions", to: "embed_submissions#create", as: :embed_form_submissions
 
+  post "csp-reports", to: "csp_reports#create", as: :csp_reports
+
   get "up" => "rails/health#show", as: :rails_health_check
 
   root "pages#home"

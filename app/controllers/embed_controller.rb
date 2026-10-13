@@ -6,6 +6,7 @@ class EmbedController < ActionController::Base
   include EmbedOrigin
 
   skip_forgery_protection
+  content_security_policy false
 
   # The script contains the widget, so a new version of it must not be
   # answered with 304 Not Modified.
