@@ -13,6 +13,9 @@ Die Befehle nutzen Kamal (`bin/kamal …`). Wenn du Docker von Hand betreibst, e
 - **Embed-Skript prüfen:** `https://<euer-hub>/embed/<TOKEN>.js` sollte JavaScript liefern. Kommt nur
   `/* Hub nicht gefunden oder deaktiviert */`, ist das Token falsch oder der Launcher ist ausgeschaltet.
 - **Logs:** `bin/kamal logs` (live mitlesen) bzw. `docker logs -f kirchen-hub`. Sie werden auf STDOUT geschrieben.
+- **Content-Security-Policy:** Zeilen mit `CSP violation` zeigen, was die Policy blockieren würde. Tauchen über
+  längere Zeit keine auf, kann sie mit `CSP_ENFORCE=1` scharf geschaltet werden. Einzelne Meldungen mit fremden
+  Adressen stammen oft von Browser-Erweiterungen der Nutzer und sind harmlos.
 
 ## Updates einspielen
 
@@ -26,6 +29,10 @@ bin/kamal deploy         # Image bauen, neuen Container starten, umschalten
 - Lies vor größeren Updates die Änderungen (`git log`), besonders wenn `config/deploy.yml` oder
   `config/environments/production.rb` betroffen sind: Deine angepassten Werte dürfen beim Mergen nicht verloren gehen.
 - **Sichere die Datenbank vor jedem Update** ([Backups](#backups)).
+- **Ältere Installationen mit `plain_blog`:** Früher hießen Dienst und Volume in der mitgelieferten `deploy.yml`
+  `plain_blog` bzw. `plain_blog_storage`, heute `kirchen_hub`. Hast du die alten Namen übernommen, **behalte sie**
+  beim Mergen. Ein neuer Volume-Name bedeutet eine leere Datenbank. Nach diesem Update startet jede Person einmal
+  wieder bei ihrer ersten Kirche, weil das Session-Cookie jetzt `_kirchen_hub_session` heißt. Angemeldet bleiben alle.
 
 Sicherheits-Updates der Bibliotheken prüft das Projekt in CI mit `bin/bundler-audit`, `bin/importmap audit` und
 `bin/brakeman`. Du kannst sie lokal ebenfalls ausführen.
@@ -119,7 +126,8 @@ PurgeExpiredFormSubmissionsJob.perform_now
 | Symptom | Mögliche Ursache und Lösung |
 | --- | --- |
 | Seite nicht erreichbar / Zertifikatsfehler | DNS zeigt nicht auf den Server, oder Ports 80/443 sind gesperrt. Let's Encrypt braucht beides. Danach `bin/kamal proxy reboot` bzw. neu deployen. |
-| „Endlose“ Weiterleitungen (Redirect-Schleife) | `force_ssl` ist aktiv, aber `assume_ssl` fehlt oder der Proxy reicht `X-Forwarded-Proto` nicht durch. |
+| „Endlose“ Weiterleitungen (Redirect-Schleife) | Der Proxy reicht `X-Forwarded-Proto` nicht durch oder terminiert gar kein TLS. |
+| „Blocked hosts: …“ | Die Seite wird über eine andere Domain aufgerufen als in `APP_HOST` eingetragen. `APP_HOST` korrigieren oder die Domain umleiten. |
 | Nach jedem Deployment sind alle Daten weg | Das Volume für `/rails/storage` fehlt oder hat sich geändert. Prüfe den Abschnitt `volumes:` in der `deploy.yml`. |
 | `ActiveSupport::MessageEncryptor::InvalidMessage` / Fehler beim Start | `RAILS_MASTER_KEY` passt nicht zu `config/credentials.yml.enc`. Bei Kamal: Steht `config/master.key` lokal, wenn du deployst? |
 | Mails kommen nicht an | SMTP prüfen ([Konfiguration](konfiguration.md#e-mail-versand-smtp)). Läuft der Job-Runner (`SOLID_QUEUE_IN_PUMA=true`)? Fehler stehen im Log (`bin/kamal logs`). |

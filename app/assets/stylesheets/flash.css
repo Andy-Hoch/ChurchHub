@@ -8,7 +8,7 @@
   color: var(--color-text);
   font-size: var(--text-sm);
   inline-size: var(--size-full);
-  margin: var(--flash-position, var(--size-6)) auto auto;
+  margin: var(--flash-position, 1rem) auto auto;
   max-inline-size: calc(100% - 2rem);
 
   &:is(:hover, :focus-within) {

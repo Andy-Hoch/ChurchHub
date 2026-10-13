@@ -65,6 +65,9 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+      - name: Check syntax of the embedded launcher
+        run: node --check app/javascript/embed/widget.js
+
   test:
     runs-on: ubuntu-latest
 

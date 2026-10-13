@@ -14,7 +14,7 @@ gesamte Datenbank, auch auf Einsendungen im Klartext.
 
 ## Checkliste
 
-- **HTTPS ist Pflicht** (`force_ssl`, siehe [Installation](produktion.md#schritt-4-https-erzwingung-aktivieren)).
+- **HTTPS ist Pflicht** (`force_ssl`, siehe [Installation](produktion.md#schritt-4-https-erzwingung-prüfen)).
 - **Server-Logs:** Bei `RAILS_LOG_LEVEL=info` (Standard) schreibt Rails die Parameter jeder Anfrage ins Log. Der Hub
   filtert Parameter mit Namen wie `password`, `email` oder `token` heraus, **nicht aber** die Formular-Antworten
   (`answers`). Dadurch **können Antworten (z. B. Gebetsanliegen) in den Logs erscheinen.** Ergänze deshalb in

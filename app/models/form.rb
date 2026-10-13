@@ -51,7 +51,7 @@ class Form < ApplicationRecord
   private
     def notification_emails_must_be_valid
       invalid = notification_email_list.grep_v(URI::MailTo::EMAIL_REGEXP)
-      errors.add(:notification_emails, "enthält ungültige Adressen: #{invalid.join(", ")}") if invalid.any?
+      errors.add(:notification_emails, :invalid_addresses, addresses: invalid.join(", ")) if invalid.any?
     end
 
     def privacy_url_must_be_http

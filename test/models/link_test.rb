@@ -19,6 +19,23 @@ class LinkTest < ActiveSupport::TestCase
     assert_equal %w[ Intern Gottesdienst\ live Termine ], hubs(:one).links.reload.map(&:title)
     assert_equal [ 0, 1, 2 ], hubs(:one).links.map(&:position)
   end
+
+  test "move_to moves down and clamps out-of-range positions" do
+    links(:live).move_to(99)
+    assert_equal %w[ Termine Intern Gottesdienst\ live ], hubs(:one).links.reload.map(&:title)
+
+    links(:live).move_to(-5)
+    assert_equal %w[ Gottesdienst\ live Termine Intern ], hubs(:one).links.reload.map(&:title)
+  end
+
+  test "move_to touches the hub so cached embeds pick up the new order" do
+    hub = hubs(:one)
+    hub.update_column(:updated_at, 1.day.ago)
+
+    assert_changes -> { hub.reload.updated_at } do
+      links(:hidden).move_to(0)
+    end
+  end
 end
 
 class LinkFormTest < ActiveSupport::TestCase

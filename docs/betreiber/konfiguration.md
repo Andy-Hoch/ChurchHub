@@ -12,7 +12,9 @@ Sie werden beim Start des Containers gesetzt (bei Kamal unter `env:` in `config/
 | Variable | Standard | Bedeutung |
 | --- | --- | --- |
 | `RAILS_MASTER_KEY` | – | Schlüssel zum Entschlüsseln von `config/credentials.yml.enc` (Inhalt von `config/master.key`). **Pflicht in Produktion**, sofern du SMTP über die Credentials konfigurierst. Geheim halten! |
-| `APP_HOST` | `example.com` | Domain deines Hubs **ohne** `https://`, z. B. `hub.eure-kirche.de`. Sie wird für Links in E-Mails verwendet (Passwort-Reset, Einsendungs-Benachrichtigung). Ist sie falsch, zeigen die Links auf `example.com`. |
+| `APP_HOST` | `example.com` | Domain deines Hubs **ohne** `https://`, z. B. `hub.eure-kirche.de`. Sie wird für Links in E-Mails verwendet (Passwort-Reset, Einsendungs-Benachrichtigung). Ist sie falsch, zeigen die Links auf `example.com`. Ist sie gesetzt, beantwortet der Hub außerdem nur Anfragen an genau diese Domain (Schutz vor DNS-Rebinding; `/up` ist ausgenommen). Andere Domains, auch `www.`-Varianten, bekommen „Blocked hosts“. |
+| `CSP_ENFORCE` | nicht gesetzt | Auf `1` setzen, um die Content-Security-Policy durchzusetzen. Ohne die Variable werden Verstöße nur gemeldet und ins Log geschrieben (`CSP violation`). Siehe [Technik](technik.md#content-security-policy). |
+| `DISABLE_SSL` | nicht gesetzt | Auf `1` setzen, um `assume_ssl` und `force_ssl` abzuschalten, etwa zum Ausprobieren des Produktions-Images ohne HTTPS. **Im echten Betrieb nie setzen.** |
 | `SOLID_QUEUE_IN_PUMA` | nicht gesetzt | Auf `true` setzen, damit der Job-Runner im Web-Prozess mitläuft. **Nötig** für E-Mail-Versand und das tägliche automatische Löschen von Einsendungen. In der mitgelieferten `deploy.yml` bereits aktiviert. |
 | `PORT` | `3000` | Port des Rails-Servers (Puma). Im Container leitet Thruster von Port 80 dorthin weiter, du musst ihn dort nicht ändern. |
 | `RAILS_MAX_THREADS` | `3` (Puma) / `5` (DB-Pool) | Threads pro Prozess. Für kleine Installationen unverändert lassen. |

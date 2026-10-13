@@ -12,7 +12,7 @@ class LinksController < ApplicationController
     @link = @hub.links.new(link_params)
 
     if @link.save
-      redirect_to hub_path, notice: "Link hinzugefügt."
+      redirect_to hub_path, notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
     end
@@ -23,7 +23,7 @@ class LinksController < ApplicationController
 
   def update
     if @link.update(link_params)
-      redirect_to hub_path, notice: "Link gespeichert."
+      redirect_to hub_path, notice: t(".notice")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -31,7 +31,7 @@ class LinksController < ApplicationController
 
   def destroy
     @link.destroy
-    redirect_to hub_path, notice: "Link gelöscht.", status: :see_other
+    redirect_to hub_path, notice: t(".notice"), status: :see_other
   end
 
   def position

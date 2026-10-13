@@ -60,6 +60,17 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_notice "stimmen nicht überein"
   end
 
+  test "update with a blank password changes nothing" do
+    token = @user.password_reset_token
+    session = @user.sessions.create!
+
+    assert_no_changes -> { @user.reload.password_digest } do
+      put password_path(token), params: { password: "", password_confirmation: "" }
+      assert_redirected_to edit_password_path(token)
+    end
+    assert Session.exists?(session.id)
+  end
+
   private
     def assert_notice(text)
       assert_select "div", /#{text}/

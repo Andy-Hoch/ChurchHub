@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus"
+import { Turbo } from "@hotwired/turbo-rails"
 import { put } from "@rails/request.js"
 import Sortable from "sortablejs"
 
@@ -13,8 +14,11 @@ export default class extends Controller {
     this.sortable.destroy()
   }
 
-  #submit({ item, newIndex, to }) {
-    put(item.dataset.urlValue, { query: { position: newIndex, parent_id: to.dataset.parentId } })
+  // A failed save (or a redirect to the login after the session expired)
+  // reloads the page, so it shows the order that was actually stored.
+  async #submit({ item, newIndex }) {
+    const response = await put(item.dataset.urlValue, { query: { position: newIndex } })
+    if (!response.ok || response.redirected) Turbo.visit(location.href, { action: "replace" })
   }
 
   get #options() {

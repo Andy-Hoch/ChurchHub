@@ -3,32 +3,35 @@
 # (a "simple" CORS request, so no preflight) and never sends cookies, which
 # is why there is no CSRF token.
 class EmbedSubmissionsController < ActionController::Base
+  include EmbedOrigin
+
   # People need a few seconds for even the shortest form; bots don't.
   class_attribute :minimum_fill_time, default: 3.seconds
 
   skip_forgery_protection
+  content_security_policy false
 
   before_action :allow_cross_origin
   rate_limit to: 10, within: 10.minutes, only: :create,
-    with: -> { render json: { error: "Zu viele Einsendungen. Bitte versuche es später noch einmal." }, status: :too_many_requests }
+    with: -> { render json: { error: t("embed_submissions.rate_limited") }, status: :too_many_requests }
 
   rescue_from ActiveRecord::RecordNotFound do
-    render json: { error: "Formular nicht gefunden." }, status: :not_found
+    render json: { error: t("embed_submissions.not_found") }, status: :not_found
   end
 
   def create
-    hub = Hub.includes(:church).find_by!(public_token: params[:token], enabled: true)
+    hub = Hub.enabled.includes(:church).find_by!(public_token: params[:token])
     form = find_form(hub)
 
-    unless submission_allowed?(hub.church)
-      return render json: { error: "Das Formular ist für diese Webseite nicht freigegeben." }, status: :forbidden
+    unless embedding_allowed_for?(hub.church, host_of(request.origin.presence || request.referer))
+      return render json: { error: t(".forbidden") }, status: :forbidden
     end
 
     # Bots get a normal success response so they don't retry.
     return render(json: { ok: true }, status: :created) if spam?
 
     if form.consent_required? && params[:consent] != "1"
-      return render json: { errors: { consent: "Bitte stimme der Datenverarbeitung zu." } }, status: :unprocessable_entity
+      return render json: { errors: { consent: t(".consent_required") } }, status: :unprocessable_entity
     end
 
     submission = FormSubmission.build_from(form, raw_answers(form))
@@ -49,23 +52,6 @@ class EmbedSubmissionsController < ActionController::Base
     # Only forms that the hub actually offers can receive submissions.
     def find_form(hub)
       hub.links.kind_form.visible.where.not(form_id: nil).find_by!(form_id: params[:form_id]).form
-    end
-
-    # When the church limits the launcher to its website, submissions must
-    # come from there too. Like EmbedController, requests without Origin and
-    # Referer are let through; the launcher itself only runs on allowed pages.
-    def submission_allowed?(church)
-      return true unless church.embed_restricted?
-
-      host = request_origin_host
-      host.nil? || host == request.host || church.embed_allowed_host?(host)
-    end
-
-    def request_origin_host
-      origin = request.origin.presence || request.referer.presence
-      URI.parse(origin).host.presence if origin
-    rescue URI::InvalidURIError
-      nil
     end
 
     def spam?

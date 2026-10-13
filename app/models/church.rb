@@ -1,11 +1,12 @@
 class Church < ApplicationRecord
   SLUG_FORMAT = /[a-z0-9]+(?:-[a-z0-9]+)*/
   # Top-level paths used by the app itself; a church with such a slug could
-  # never be reached under /<slug>.
-  RESERVED_SLUGS = %w[
+  # never be reached under /<slug>. Files in public/ count too, because they
+  # are also served without their extension (/404 serves public/404.html).
+  RESERVED_SLUGS = (%w[
     session sessions passwords registration account hub church churches church_switch embed up forms
-    admin api assets rails cable manifest service-worker icon robots favicon
-  ].freeze
+    admin api assets rails cable manifest service-worker icon robots favicon csp-reports
+  ] + Dir.children(Rails.public_path).map { |file| File.basename(file, ".*") }).uniq.freeze
 
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
@@ -25,6 +26,14 @@ class Church < ApplicationRecord
 
   before_validation :generate_slug, on: :create
   after_create :create_default_hub
+
+  # Saves the church together with the user's owner membership, so a church
+  # is never left without anyone who can manage it.
+  def save_with_owner(user)
+    transaction do
+      save && memberships.create!(user: user, role: :owner)
+    end.present?
+  end
 
   # Host the launcher is restricted to, without a leading "www." so that
   # the bare domain, www and every other subdomain are allowed alike.
@@ -56,7 +65,7 @@ class Church < ApplicationRecord
       uri = website_uri
       valid = uri.is_a?(URI::HTTP) && uri.userinfo.nil? && uri.host.present? &&
         (uri.host.include?(".") || uri.host == "localhost")
-      errors.add(:website_url, "ist keine gültige Webseiten-Adresse") unless valid
+      errors.add(:website_url, :invalid_website) unless valid
     end
 
     def generate_slug
