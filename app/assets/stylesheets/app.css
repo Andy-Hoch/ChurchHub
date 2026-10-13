@@ -161,12 +161,6 @@
   }
 }
 
-.link-row__icon {
-  font-size: var(--text-xl);
-  inline-size: var(--size-6);
-  text-align: center;
-}
-
 .link-row__body {
   display: flex;
   flex: 1;
