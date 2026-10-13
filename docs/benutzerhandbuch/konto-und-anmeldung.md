@@ -24,6 +24,7 @@ Eine E-Mail-Bestätigung gibt es nicht.
   sonst zu *Links*.
 - **Abmelden:** Schaltfläche „Abmelden“ oben rechts.
 - Die Anmeldung bleibt auf diesem Gerät bestehen, bis du dich abmeldest (Cookie, nur für die Verwaltungsseiten).
+  Nutzt du den Hub auf einem Gerät **30 Tage lang nicht**, endet die Anmeldung dort und du meldest dich neu an.
 - Bei zu vielen fehlgeschlagenen Versuchen (mehr als 10 in 3 Minuten) sperrt der Hub kurz. Bitte etwas warten.
 - Aus Sicherheitsgründen sagt die Fehlermeldung nur „E-Mail-Adresse oder Passwort ist falsch“ – nie, welcher Teil falsch war.
 

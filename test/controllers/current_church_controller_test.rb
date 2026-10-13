@@ -26,7 +26,7 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "admins cannot update the church" do
-    memberships(:one).update!(role: :admin)
+    memberships(:one).update_column(:role, "admin")
     patch church_path, params: { church: { name: "Neuer Name" } }
 
     assert_equal "Gemeinde Eins", churches(:one).reload.name
@@ -82,7 +82,7 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "admins cannot delete the church" do
-    memberships(:one).update!(role: :admin)
+    memberships(:one).update_column(:role, "admin")
     add_second_church_and_switch_to(churches(:one))
 
     assert_no_difference "Church.count" do

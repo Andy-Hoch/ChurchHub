@@ -24,7 +24,7 @@ Rails.application.routes.draw do
 
   resources :churches, only: %i[ new create ]
   resource :church, only: %i[ edit update destroy ], controller: :current_church do
-    resources :memberships, only: %i[ create destroy ]
+    resources :memberships, only: %i[ create update destroy ]
   end
   resource :church_switch, only: :update
 

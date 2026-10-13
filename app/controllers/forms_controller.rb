@@ -20,7 +20,7 @@ class FormsController < ApplicationController
     @form = template ? template.build_for(current_church) : current_church.forms.new(form_params)
 
     if @form.save
-      redirect_to form_path(@form), notice: "Formular angelegt."
+      redirect_to form_path(@form), notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
     end
@@ -31,7 +31,7 @@ class FormsController < ApplicationController
 
   def update
     if @form.update(form_params)
-      redirect_to form_path(@form), notice: "Einstellungen gespeichert."
+      redirect_to form_path(@form), notice: t(".notice")
     else
       render :edit, status: :unprocessable_entity
     end
@@ -39,7 +39,7 @@ class FormsController < ApplicationController
 
   def destroy
     @form.destroy
-    redirect_to forms_path, notice: "Formular gelöscht.", status: :see_other
+    redirect_to forms_path, notice: t(".notice"), status: :see_other
   end
 
   private

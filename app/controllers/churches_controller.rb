@@ -8,7 +8,7 @@ class ChurchesController < ApplicationController
 
     if @church.save_with_owner(Current.user)
       session[:church_id] = @church.id
-      redirect_to hub_path, notice: "Kirche angelegt."
+      redirect_to hub_path, notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
     end

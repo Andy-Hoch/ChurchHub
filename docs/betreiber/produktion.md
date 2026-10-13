@@ -121,7 +121,6 @@ Wichtige Hinweise dazu:
 - **`volumes`**: Ohne Volume gehen alle Daten beim nächsten Deployment verloren. Der Volume-Name sollte zu `service` passen.
 - **`SOLID_QUEUE_IN_PUMA: true`** ist bereits gesetzt. Lass es so. Ohne Job-Runner werden weder E-Mails verschickt
   noch Einsendungen automatisch gelöscht.
-- Die Werte `plain_blog` im Original sind Überbleibsel des Projektstarts. Sie sind austauschbar.
 
 ### Schritt 4: HTTPS-Erzwingung prüfen
 

@@ -29,6 +29,10 @@ bin/kamal deploy         # Image bauen, neuen Container starten, umschalten
 - Lies vor größeren Updates die Änderungen (`git log`), besonders wenn `config/deploy.yml` oder
   `config/environments/production.rb` betroffen sind: Deine angepassten Werte dürfen beim Mergen nicht verloren gehen.
 - **Sichere die Datenbank vor jedem Update** ([Backups](#backups)).
+- **Ältere Installationen mit `plain_blog`:** Früher hießen Dienst und Volume in der mitgelieferten `deploy.yml`
+  `plain_blog` bzw. `plain_blog_storage`, heute `kirchen_hub`. Hast du die alten Namen übernommen, **behalte sie**
+  beim Mergen. Ein neuer Volume-Name bedeutet eine leere Datenbank. Nach diesem Update startet jede Person einmal
+  wieder bei ihrer ersten Kirche, weil das Session-Cookie jetzt `_kirchen_hub_session` heißt. Angemeldet bleiben alle.
 
 Sicherheits-Updates der Bibliotheken prüft das Projekt in CI mit `bin/bundler-audit`, `bin/importmap audit` und
 `bin/brakeman`. Du kannst sie lokal ebenfalls ausführen.

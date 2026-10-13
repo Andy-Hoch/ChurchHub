@@ -7,7 +7,7 @@
 
   <div class="field">
     <%= f.label :kind, "Fragetyp", class: "field__label" %>
-    <%= f.select :kind, FormQuestion::KINDS.invert, {}, class: "input", data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
+    <%= f.select :kind, FormQuestion.kind_options, {}, class: "input", data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
     <%= field_error(question, :kind) %>
   </div>
 

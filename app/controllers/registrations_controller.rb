@@ -1,6 +1,6 @@
 class RegistrationsController < ApplicationController
   allow_unauthenticated_access
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_registration_path, alert: "Bitte versuche es später noch einmal." }
+  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_registration_path, alert: t("rate_limited") }
   layout "auth"
 
   def new
@@ -18,7 +18,7 @@ class RegistrationsController < ApplicationController
         @church.save_with_owner(@user) or raise ActiveRecord::RecordInvalid, @church
       end
       start_new_session_for @user
-      redirect_to hub_path, notice: "Willkommen! Dein Hub ist bereit."
+      redirect_to hub_path, notice: t(".notice")
     else
       render :new, status: :unprocessable_entity
     end

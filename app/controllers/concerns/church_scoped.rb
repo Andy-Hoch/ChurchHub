@@ -21,11 +21,11 @@ module ChurchScoped
     end
 
     def require_church
-      redirect_to new_church_path, alert: "Lege zuerst eine Kirche an." unless current_church
+      redirect_to new_church_path, alert: t("church_scoped.church_required") unless current_church
     end
 
     def require_owner
-      redirect_to edit_church_path, alert: "Nur Besitzer dürfen das." unless current_membership&.owner?
+      redirect_to edit_church_path, alert: t("church_scoped.owner_required") unless current_membership&.owner?
     end
 
     # Falls back to the user's first church when the chosen one is gone (deleted
