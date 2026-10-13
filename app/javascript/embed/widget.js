@@ -61,7 +61,7 @@
     ".header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; background: var(--ph-primary); color: var(--ph-text); }",
     ".title { margin: 0; font-size: 16px; font-weight: 600; }",
     ".close { all: unset; cursor: pointer; display: inline-flex; padding: 4px; border-radius: 6px; }",
-    ".list { list-style: none; margin: 0; padding: 12px; display: grid; gap: 10px; }",
+    ".list { padding: 12px; display: grid; gap: 10px; }",
     "button.link { all: unset; }",
     "a.link, button.link { box-sizing: border-box; width: 100%; cursor: pointer; display: flex; align-items: center; gap: 14px; min-height: 64px; padding: 14px 16px; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); border: 1px solid light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); border-radius: var(--radius); color: inherit; text-decoration: none; text-align: start; box-shadow: 0 1px 3px oklch(0% 0 0 / .06); transition: transform .15s ease, background-color .15s ease; }",
     ".link:hover { background: light-dark(oklch(96.74% 0.0013 286.38), oklch(27.39% 0.0055 286.03)); }",
@@ -264,7 +264,7 @@
         if (data.links.length === 0) {
           panel.appendChild(el("p", "empty", "Noch keine Links vorhanden."));
         } else {
-          var list = el("ul", "list");
+          var list = el("div", "list");
           data.links.forEach(function (item) {
             var node;
             if (item.type === "form" && item.form) {
@@ -283,9 +283,7 @@
             if (item.description) text.appendChild(el("span", "link-description", item.description));
             node.appendChild(text);
             node.insertAdjacentHTML("beforeend", svg("chevron", "chevron"));
-            var li = el("li");
-            li.appendChild(node);
-            list.appendChild(li);
+            list.appendChild(node);
           });
           panel.appendChild(list);
         }
