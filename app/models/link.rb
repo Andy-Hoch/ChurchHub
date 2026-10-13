@@ -12,7 +12,6 @@ class Link < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 80 }
   validates :description, length: { maximum: 160 }
-  validates :icon, length: { maximum: 8 }
   validate :url_must_be_http, if: :kind_link?
   validate :form_must_belong_to_church, if: :kind_form?
 
@@ -26,7 +25,7 @@ class Link < ApplicationRecord
   end
 
   def embed_payload
-    payload = { title: title, description: description.presence, icon: icon.presence }
+    payload = { title: title, description: description.presence }
 
     if kind_form?
       payload.merge(type: "form", form: form.embed_payload)

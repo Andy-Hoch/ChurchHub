@@ -2,7 +2,6 @@ live:
   hub: one
   title: Gottesdienst live
   url: https://example.com/live
-  icon: 📺
   position: 0
 
 events:

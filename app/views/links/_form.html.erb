@@ -42,12 +42,6 @@
     <%= field_error(link, :description) %>
   </div>
 
-  <div class="field">
-    <%= form.label :icon, "Symbol (optional, z. B. ein Emoji)", class: "field__label" %>
-    <%= form.text_field :icon, maxlength: 8, placeholder: "🙏", class: "input input--short" %>
-    <%= field_error(link, :icon) %>
-  </div>
-
   <label class="field field--inline">
     <%= form.check_box :visible, class: "switch" %>
     <span class="text-sm">Im Launcher anzeigen</span>

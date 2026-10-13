@@ -33,7 +33,6 @@ de:
         title: Titel
         url: Adresse
         description: Beschreibung
-        icon: Symbol
         kind: Art
         form: Formular
       form:
