@@ -67,4 +67,14 @@ class FormsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal "Anderes Formular", forms(:other).reload.title
   end
+
+  test "updates availability settings" do
+    patch form_path(forms(:prayer)), params: { form: { opens_at: "2026-11-01T08:00", closes_at: "2026-11-08T08:00", submission_limit: "20", when_full: "notice", full_message: "Ausgebucht" } }
+
+    form = forms(:prayer).reload
+    assert_equal Time.zone.parse("2026-11-01 08:00"), form.opens_at
+    assert_equal 20, form.submission_limit
+    assert form.when_full_notice?
+    assert_equal "Ausgebucht", form.full_message
+  end
 end

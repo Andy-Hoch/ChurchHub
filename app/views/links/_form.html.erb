@@ -36,6 +36,67 @@
     <%= field_error(link, :form) %>
   </div>
 
+  <div class="flex flex-col gap" data-controller="toggle-fields">
+    <fieldset class="field">
+      <legend class="field__label">Wann anzeigen?</legend>
+      <div class="choice-group">
+        <% Link.schedules.each_key do |schedule| %>
+          <label class="choice">
+            <%= form.radio_button :schedule, schedule, data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
+            <span><%= schedule_name(schedule) %></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <div class="flex flex-col gap" data-toggle-fields-target="section" data-show-for="weekly biweekly">
+      <fieldset class="field">
+        <legend class="field__label">Wochentage</legend>
+        <div class="choice-group">
+          <%= form.collection_check_boxes :weekdays, weekday_options, :last, :first do |box| %>
+            <label class="choice">
+              <%= box.check_box %>
+              <span><%= box.text %></span>
+            </label>
+          <% end %>
+        </div>
+        <%= field_error(link, :weekdays) %>
+      </fieldset>
+
+      <div class="field-row">
+        <div class="field">
+          <%= form.label :start_time, "Von (Uhrzeit)", class: "field__label" %>
+          <%= form.time_field :start_time, required: true, class: "input" %>
+          <%= field_error(link, :start_time) %>
+        </div>
+        <div class="field">
+          <%= form.label :end_time, "Bis (Uhrzeit)", class: "field__label" %>
+          <%= form.time_field :end_time, required: true, class: "input" %>
+          <%= field_error(link, :end_time) %>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap" data-toggle-fields-target="section" data-show-for="period weekly biweekly">
+      <div class="field-row">
+        <div class="field">
+          <%= form.label :visible_from, "Ab", class: "field__label" %>
+          <%= form.datetime_local_field :visible_from, class: "input" %>
+          <%= field_error(link, :visible_from) %>
+        </div>
+        <div class="field">
+          <%= form.label :visible_until, "Bis", class: "field__label" %>
+          <%= form.datetime_local_field :visible_until, class: "input" %>
+          <%= field_error(link, :visible_until) %>
+        </div>
+      </div>
+      <p class="field__hint">
+        Bei „Jede Woche“ optional. Bei „Alle 2 Wochen“ zählt die Woche des Startdatums als erste.
+        Änderungen erscheinen auf eurer Webseite nach spätestens 5 Minuten.
+      </p>
+    </div>
+  </div>
+
   <label class="field field--inline">
     <%= form.check_box :visible, class: "switch" %>
     <span class="text-sm">Im Launcher anzeigen</span>

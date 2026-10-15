@@ -18,8 +18,11 @@
             <% if (unread = @unread_counts[form.id].to_i).positive? %>
               <span class="badge badge--primary"><%= unread %> neu</span>
             <% end %>
+            <%= form_status_badge(form) %>
           </div>
-          <span class="link-row__url"><%= pluralize(@submission_counts[form.id].to_i, "Einsendung", plural: "Einsendungen") %></span>
+          <span class="link-row__url">
+            <%= pluralize(form.submissions_count, "Einsendung", plural: "Einsendungen") %><% if form.submission_limit %> von höchstens <%= form.submission_limit %><% end %>
+          </span>
         </div>
         <div class="link-row__actions">
           <%= link_to "Einsendungen", form_submissions_path(form), class: "btn btn--sm" %>

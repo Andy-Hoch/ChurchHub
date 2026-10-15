@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_13_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_15_100001) do
   create_table "churches", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -55,6 +55,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_110000) do
     t.integer "retention_months"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "opens_at"
+    t.datetime "closes_at"
+    t.integer "submission_limit"
+    t.string "when_full", default: "hide", null: false
+    t.text "full_message"
     t.index ["church_id"], name: "index_forms_on_church_id"
   end
 
@@ -87,6 +92,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_110000) do
     t.datetime "updated_at", null: false
     t.string "kind", default: "link", null: false
     t.integer "form_id"
+    t.string "schedule", default: "always", null: false
+    t.datetime "visible_from"
+    t.datetime "visible_until"
+    t.json "weekdays", default: [], null: false
+    t.string "start_time"
+    t.string "end_time"
     t.index ["form_id"], name: "index_links_on_form_id"
     t.index ["hub_id", "position"], name: "index_links_on_hub_id_and_position"
     t.index ["hub_id"], name: "index_links_on_hub_id"

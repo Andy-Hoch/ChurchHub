@@ -1,7 +1,10 @@
 <div class="page-header">
   <div>
     <p class="text-sm"><%= link_to "← Alle Formulare", forms_path, class: "text-subtle" %></p>
-    <h1 class="font-bold text-2xl"><%= form.title %></h1>
+    <div class="flex items-center gap-half">
+      <h1 class="font-bold text-2xl"><%= form.title %></h1>
+      <%= form_status_badge(form) %>
+    </div>
     <% if form.links.any? %>
       <p class="text-sm text-subtle">Im Hub als Button „<%= form.links.map(&:title).to_sentence %>“ verknüpft.</p>
     <% else %>
@@ -17,6 +20,7 @@
   <%= link_to "Fragen", form_path(form), class: "tabs__tab", aria: { current: ("page" if current == :questions) } %>
   <%= link_to form_submissions_path(form), class: "tabs__tab", aria: { current: ("page" if current == :submissions) } do %>
     Einsendungen
+    <% if form.submission_limit %><span class="text-xs text-subtle"><%= form.submissions_count %> / <%= form.submission_limit %></span><% end %>
     <% if (unread = form.submissions.unread.count).positive? %><span class="badge badge--primary"><%= unread %></span><% end %>
   <% end %>
   <%= link_to "Einstellungen", edit_form_path(form), class: "tabs__tab", aria: { current: ("page" if current == :settings) } %>

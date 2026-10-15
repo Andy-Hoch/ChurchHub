@@ -58,3 +58,60 @@ class FormTest < ActiveSupport::TestCase
     assert_not link.embeddable?
   end
 end
+
+class FormAvailabilityTest < ActiveSupport::TestCase
+  setup do
+    @form = forms(:prayer)
+    @link = hubs(:one).links.create!(title: "Gebet", kind: "form", form: @form)
+  end
+
+  test "is only open within its availability" do
+    @form.update!(opens_at: Time.zone.parse("2026-11-01 00:00"), closes_at: Time.zone.parse("2026-11-08 00:00"))
+
+    assert_not @form.open?(Time.zone.parse("2026-10-31 23:59"))
+    assert @form.open?(Time.zone.parse("2026-11-01 00:00"))
+    assert_not @form.open?(Time.zone.parse("2026-11-08 00:00"))
+    assert_not @link.embeddable?(Time.zone.parse("2026-11-08 00:00"))
+    assert @form.availability_ended?(Time.zone.parse("2026-11-08 00:00"))
+  end
+
+  test "closes when the submission limit is reached" do
+    @form.update!(submission_limit: 3)
+    assert_not @form.full?
+
+    @form.update!(submission_limit: 2)
+    assert @form.full?
+    assert_not @form.open?
+  end
+
+  test "full forms are hidden or show a notice" do
+    @form.update!(submission_limit: 2)
+    assert_not @link.reload.embeddable?
+
+    @form.update!(when_full: "notice")
+    assert @link.reload.embeddable?
+    assert_equal "Leider sind alle Plätze vergeben.", @link.embed_payload[:form][:closedMessage]
+
+    @form.update!(full_message: "Ausgebucht!")
+    assert_equal "Ausgebucht!", @link.reload.embed_payload[:form][:closedMessage]
+
+    @form.update!(submission_limit: nil)
+    assert_nil @link.reload.embed_payload[:form][:closedMessage]
+  end
+
+  test "validates availability and limit" do
+    @form.assign_attributes(opens_at: 1.day.from_now, closes_at: 1.day.ago, submission_limit: 0)
+
+    assert_not @form.valid?
+    assert @form.errors.added?(:closes_at, :not_after_start)
+    assert @form.errors.include?(:submission_limit)
+  end
+
+  test "hubs count submissions of all limited forms at once" do
+    @form.update!(submission_limit: 2, when_full: "notice")
+    hub = Hub.includes(links: :form).find(hubs(:one).id)
+
+    assert_queries_count(1) { hub.shown_links }
+    assert_includes hub.availability_key, "#{@link.id}-full"
+  end
+end

@@ -303,14 +303,20 @@
 
       function openForm(form, trigger) {
         var steps = [];
-        if (form.intro) steps.push({ type: "intro" });
-        form.questions.forEach(function (question, index) {
-          steps.push({ type: "question", question: question, number: index + 1 });
-        });
-        steps.push({ type: "review" });
-        var reviewIndex = steps.length - 1;
-        // Consent text and/or privacy link get a step of their own right before sending.
-        if (form.consentText || safeUrl(form.privacyUrl)) steps.push({ type: "privacy" });
+        var reviewIndex = -1;
+        if (form.closedMessage) {
+          // A full form whose button stays visible only shows a notice.
+          steps.push({ type: "closed" });
+        } else {
+          if (form.intro) steps.push({ type: "intro" });
+          form.questions.forEach(function (question, index) {
+            steps.push({ type: "question", question: question, number: index + 1 });
+          });
+          steps.push({ type: "review" });
+          reviewIndex = steps.length - 1;
+          // Consent text and/or privacy link get a step of their own right before sending.
+          if (form.consentText || safeUrl(form.privacyUrl)) steps.push({ type: "privacy" });
+        }
 
         activeForm = {
           reviewIndex: reviewIndex,
@@ -398,6 +404,9 @@
           } else {
             focusTarget = footer.appendChild(button("btn btn-primary", "Weiter", next));
           }
+        } else if (step.type === "closed") {
+          content.append(el("h3", "question", form.title), el("p", "intro", form.closedMessage));
+          focusTarget = footer.appendChild(button("btn btn-primary", "Schließen", function () { closeForm(false); }));
         } else {
           var done = el("div", "done");
           done.innerHTML = svg("check");
@@ -407,7 +416,9 @@
           focusTarget = footer.appendChild(button("btn btn-primary", "Schließen", function () { closeForm(false); }));
         }
 
-        dialog.append(header, progress, body, footer);
+        dialog.append(header);
+        if (step.type !== "closed") dialog.appendChild(progress);
+        dialog.append(body, footer);
         formLayer.replaceChildren(dialog);
         if (focus && focusTarget) focusTarget.focus();
       }

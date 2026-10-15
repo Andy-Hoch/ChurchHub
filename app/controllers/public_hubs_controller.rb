@@ -8,10 +8,10 @@ class PublicHubsController < ActionController::Base
   end
 
   def show
-    @hub = Hub.enabled.joins(:church).find_by!(churches: { slug: params[:slug] })
+    @hub = Hub.enabled.joins(:church).includes(links: :form).find_by!(churches: { slug: params[:slug] })
 
     # Forms open through the launcher script, loaded without its button.
-    @links = @hub.links.includes(:form).select(&:embeddable?)
-    fresh_when @hub, public: true
+    @links = @hub.shown_links
+    fresh_when etag: [ @hub, @hub.availability_key ], last_modified: @hub.updated_at, public: true
   end
 end

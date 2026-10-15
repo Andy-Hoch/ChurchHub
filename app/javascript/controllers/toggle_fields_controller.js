@@ -20,8 +20,10 @@ export default class extends Controller {
     })
   }
 
+  // Sources of nested toggle-fields controllers (e.g. the schedule inside
+  // the link form) belong to those, not to this one.
   get #value() {
-    const source = this.element.querySelector("input[data-toggle-fields-source]:checked, select[data-toggle-fields-source]")
-    return source?.value
+    const sources = this.element.querySelectorAll("input[data-toggle-fields-source]:checked, select[data-toggle-fields-source]")
+    return Array.from(sources).find(source => source.closest("[data-controller~='toggle-fields']") === this.element)?.value
   }
 }
