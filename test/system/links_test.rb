@@ -39,8 +39,10 @@ class LinksTest < ApplicationSystemTestCase
 
     choose "Jede Woche"
     check "So"
-    fill_in "Von (Uhrzeit)", with: "08:00"
-    fill_in "Bis (Uhrzeit)", with: "12:00"
+    # Times instead of strings: Capybara then sets the value directly, so the
+    # test doesn't depend on the browser's 12/24-hour time input format.
+    fill_in "Von (Uhrzeit)", with: Time.zone.parse("08:00")
+    fill_in "Bis (Uhrzeit)", with: Time.zone.parse("12:00")
     click_on "Speichern"
 
     assert_text "Link hinzugefügt."
