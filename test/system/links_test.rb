@@ -24,4 +24,28 @@ class LinksTest < ApplicationSystemTestCase
     assert_text "Gottesdienst live"
     assert_no_text "Intern"
   end
+
+  test "adding a weekly link for the livestream" do
+    sign_in_as users(:one)
+    assert_selector "h1", text: "Links"
+
+    click_on "Link hinzufügen"
+    assert_selector "h1", text: "Neuer Link"
+    wait_for_turbo
+
+    fill_in "Titel", with: "Livestream"
+    fill_in "Adresse (URL)", with: "https://example.com/livestream"
+    assert_no_field "Von (Uhrzeit)"
+
+    choose "Jede Woche"
+    check "So"
+    # Times instead of strings: Capybara then sets the value directly, so the
+    # test doesn't depend on the browser's 12/24-hour time input format.
+    fill_in "Von (Uhrzeit)", with: Time.zone.parse("08:00")
+    fill_in "Bis (Uhrzeit)", with: Time.zone.parse("12:00")
+    click_on "Speichern"
+
+    assert_text "Link hinzugefügt."
+    assert_text "Jede Woche So 08:00–12:00"
+  end
 end

@@ -29,18 +29,24 @@ class EmbedSubmissionsController < ActionController::Base
 
     # Bots get a normal success response so they don't retry.
     return render(json: { ok: true }, status: :created) if spam?
+    return render_closed unless form.open?
 
     if form.consent_required? && params[:consent] != "1"
       return render json: { errors: { consent: t(".consent_required") } }, status: :unprocessable_entity
     end
 
     submission = FormSubmission.build_from(form, raw_answers(form))
+    # Counting and saving in one (immediate) transaction keeps parallel
+    # submissions from overshooting the limit.
+    saved = form.transaction { !form.full? && submission.save }
 
-    if submission.save
+    if saved
       FormSubmissionMailer.received(submission).deliver_later if form.notification_email_list.any?
       render json: { ok: true }, status: :created
-    else
+    elsif submission.answer_errors.any?
       render json: { errors: submission.answer_errors }, status: :unprocessable_entity
+    else
+      render_closed
     end
   end
 
@@ -52,6 +58,10 @@ class EmbedSubmissionsController < ActionController::Base
     # Only forms that the hub actually offers can receive submissions.
     def find_form(hub)
       hub.links.kind_form.visible.where.not(form_id: nil).find_by!(form_id: params[:form_id]).form
+    end
+
+    def render_closed
+      render json: { error: t("embed_submissions.create.closed") }, status: :unprocessable_entity
     end
 
     def spam?

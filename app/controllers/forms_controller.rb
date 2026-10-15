@@ -4,7 +4,8 @@ class FormsController < ApplicationController
 
   def index
     @forms = current_church.forms.order(:title)
-    @submission_counts = FormSubmission.where(form: @forms).group(:form_id).count
+    submission_counts = FormSubmission.where(form: @forms).group(:form_id).count
+    @forms.each { |form| form.submissions_count = submission_counts[form.id].to_i }
     @unread_counts = FormSubmission.unread.where(form: @forms).group(:form_id).count
   end
 
@@ -48,6 +49,6 @@ class FormsController < ApplicationController
     end
 
     def form_params
-      params.expect(form: %i[ title intro thank_you_message submit_label notification_emails consent_text privacy_url retention_months ])
+      params.expect(form: %i[ title intro thank_you_message submit_label notification_emails consent_text privacy_url retention_months opens_at closes_at submission_limit when_full full_message ])
     end
 end

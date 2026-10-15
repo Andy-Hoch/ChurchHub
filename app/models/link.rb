@@ -1,5 +1,5 @@
 class Link < ApplicationRecord
-  include Positionable
+  include Positionable, Schedulable
 
   belongs_to :hub, touch: true
   belongs_to :form, optional: true
@@ -19,8 +19,8 @@ class Link < ApplicationRecord
   scope :visible, -> { where(visible: true) }
 
   # Form buttons whose form was deleted stay in the list but are not shown.
-  def embeddable?
-    visible? && (kind_link? || form.present?)
+  def embeddable?(time = Time.current)
+    visible? && scheduled_at?(time) && (kind_link? || form&.shown_in_hub?(time))
   end
 
   def embed_payload

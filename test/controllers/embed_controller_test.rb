@@ -102,4 +102,30 @@ class EmbedControllerTest < ActionDispatch::IntegrationTest
     get embed_path("unbekannt", format: :js)
     assert_response :success
   end
+
+  test "scheduled links appear in their time window, even for cached scripts" do
+    hubs(:one).links.create!(title: "Livestream", url: "https://example.com/stream", schedule: "weekly", weekdays: %w[ 0 ], start_time: "08:00", end_time: "12:00")
+
+    travel_to Time.zone.parse("2026-10-18 07:55") do
+      get embed_path(hubs(:one).public_token, format: :js)
+      assert_no_match "Livestream", response.body
+    end
+    etag = response.headers["ETag"]
+
+    travel_to Time.zone.parse("2026-10-18 08:05") do
+      get embed_path(hubs(:one).public_token, format: :js), headers: { "If-None-Match" => etag }
+      assert_response :success
+      assert_match "Livestream", response.body
+    end
+  end
+
+  test "full forms with a notice ship the notice instead of being dropped" do
+    hubs(:one).links.create!(title: "Anmeldung", kind: "form", form: forms(:prayer))
+    forms(:prayer).update!(submission_limit: 2, when_full: "notice", full_message: "Alle Plätze sind weg.")
+
+    get embed_path(hubs(:one).public_token, format: :js)
+
+    assert_match "Anmeldung", response.body
+    assert_match "Alle Plätze sind weg.", response.body
+  end
 end
