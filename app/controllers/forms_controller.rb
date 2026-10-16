@@ -49,6 +49,6 @@ class FormsController < ApplicationController
     end
 
     def form_params
-      params.expect(form: %i[ title intro thank_you_message submit_label notification_emails consent_text privacy_url retention_months opens_at closes_at submission_limit when_full full_message ])
+      params.expect(form: %i[ title intro thank_you_message submit_label notification_emails consent_text privacy_url retention_months ])
     end
 end

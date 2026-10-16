@@ -37,7 +37,9 @@ class LinksTest < ApplicationSystemTestCase
     fill_in "Adresse (URL)", with: "https://example.com/livestream"
     assert_no_field "Von (Uhrzeit)"
 
+    find("summary", text: "Button anzeigen (immer)").click
     choose "Jede Woche"
+    assert_selector "summary", text: "Button anzeigen (jede Woche)"
     check "So"
     # Times instead of strings: Capybara then sets the value directly, so the
     # test doesn't depend on the browser's 12/24-hour time input format.
@@ -47,5 +49,9 @@ class LinksTest < ApplicationSystemTestCase
 
     assert_text "Link hinzugefügt."
     assert_text "Jede Woche So 08:00–12:00"
+
+    visit edit_hub_link_path(Link.find_by!(title: "Livestream"))
+    assert_selector "summary", text: "Button anzeigen (Jede Woche So 08:00–12:00)"
+    assert_no_field "Von (Uhrzeit)"
   end
 end

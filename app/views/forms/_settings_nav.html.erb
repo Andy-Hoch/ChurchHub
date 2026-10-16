@@ -1,0 +1,4 @@
+<nav class="filter-nav flex items-center gap-half mbe-4" aria-label="Einstellungen">
+  <%= link_to "Allgemein", edit_form_path(form), class: "btn btn--sm", aria: { current: ("page" if current == :general) } %>
+  <%= link_to "Verfügbarkeit", edit_form_availability_path(form), class: "btn btn--sm", aria: { current: ("page" if current == :availability) } %>
+</nav>

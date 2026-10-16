@@ -1,0 +1,54 @@
+<% content_for :title, "Verfügbarkeit – #{@form.title}" %>
+
+<%= render "forms/header", form: @form, current: :settings %>
+<%= render "forms/settings_nav", form: @form, current: :availability %>
+
+<%= form_with model: @form, url: form_availability_path(@form), method: :patch, class: "card flex flex-col gap" do |form| %>
+  <div class="field-row">
+    <div class="field">
+      <%= form.label :opens_at, "Verfügbar ab (optional)", class: "field__label" %>
+      <%= form.datetime_local_field :opens_at, class: "input" %>
+      <%= field_error(@form, :opens_at) %>
+    </div>
+    <div class="field">
+      <%= form.label :closes_at, "Verfügbar bis (optional)", class: "field__label" %>
+      <%= form.datetime_local_field :closes_at, class: "input" %>
+      <%= field_error(@form, :closes_at) %>
+    </div>
+  </div>
+  <p class="field__hint">Außerhalb dieses Zeitraums erscheint der Button nicht im Hub und das Formular nimmt nichts an. Änderungen erscheinen auf eurer Webseite nach spätestens 5 Minuten.</p>
+
+  <div class="field">
+    <%= form.label :submission_limit, "Höchstzahl an Einsendungen (optional)", class: "field__label" %>
+    <%= form.number_field :submission_limit, min: 1, step: 1, class: "input" %>
+    <p class="field__hint">Gezählt werden die gespeicherten Einsendungen. Werden Einsendungen gelöscht, ist wieder Platz frei.</p>
+    <%= field_error(@form, :submission_limit) %>
+  </div>
+
+  <div class="flex flex-col gap" data-controller="toggle-fields">
+    <fieldset class="field">
+      <legend class="field__label">Wenn die Höchstzahl erreicht ist</legend>
+      <div class="choice-group">
+        <label class="choice">
+          <%= form.radio_button :when_full, "hide", data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
+          <span>Button ausblenden</span>
+        </label>
+        <label class="choice">
+          <%= form.radio_button :when_full, "notice", data: { toggle_fields_source: true, action: "toggle-fields#update" } %>
+          <span>Button zeigen, mit Hinweis</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="field" data-toggle-fields-target="section" data-show-for="notice">
+      <%= form.label :full_message, "Hinweistext (optional)", class: "field__label" %>
+      <%= form.text_area :full_message, rows: 2, maxlength: 1000, placeholder: t("forms.full_message"), class: "input" %>
+      <%= field_error(@form, :full_message) %>
+    </div>
+  </div>
+
+  <div class="card__footer flex items-center gap">
+    <%= form.submit "Speichern", class: "btn btn--primary" %>
+    <%= link_to "Abbrechen", form_path(@form), class: "btn btn--borderless" %>
+  </div>
+<% end %>

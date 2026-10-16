@@ -13,6 +13,7 @@ Rails.application.routes.draw do
   end
 
   resources :forms do
+    resource :availability, only: %i[ edit update ], controller: :form_availabilities
     resources :questions, controller: :form_questions, except: %i[ index show ] do
       put :position, on: :member
     end

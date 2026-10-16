@@ -4,6 +4,7 @@
 module Link::Schedulable
   extend ActiveSupport::Concern
 
+  ATTRIBUTES = %i[ schedule weekdays start_time end_time visible_from visible_until ].freeze
   RECURRING = %w[ weekly biweekly ].freeze
   # Monday first, as in German calendars.
   WEEKDAYS = [ 1, 2, 3, 4, 5, 6, 0 ].freeze

@@ -10,6 +10,20 @@ module LinksHelper
     t(schedule, scope: "activerecord.enums.link.schedule")
   end
 
+  # Accordion title for one schedule option, e.g. "Button anzeigen (jede Woche)".
+  def schedule_title(schedule)
+    "Button anzeigen (#{t(schedule, scope: "links.schedule_titles")})"
+  end
+
+  # Accordion title for the saved schedule, with its details if it has any.
+  def link_schedule_title(link)
+    if (summary = link_schedule_summary(link).presence)
+      "Button anzeigen (#{summary})"
+    else
+      schedule_title(link.schedule)
+    end
+  end
+
   # E.g. "Jede Woche So 08:00–12:00 · bis 31.12.2026 00:00".
   def link_schedule_summary(link)
     return if link.schedule_always?
