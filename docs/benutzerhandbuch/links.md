@@ -30,8 +30,6 @@ gespeichert. Ein Klick auf „Speichern“ ist nicht nötig. Neue Links landen a
 | **Was passiert beim Klick?** | ja | *Webseite öffnen* oder *Formular öffnen* |
 | **Adresse (URL)** | bei „Webseite“ | Muss mit `http://` oder `https://` beginnen und eine Domain enthalten |
 | **Formular** | bei „Formular“ | Auswahl aus euren Formularen (siehe [Formulare](formulare.md)). Gibt es noch keins, führt ein Link zum Anlegen. |
-| **Beschreibung** | nein | Kleine Zeile unter dem Titel, bis zu 160 Zeichen |
-| **Symbol** | nein | Meist ein Emoji, bis zu 8 Zeichen. Ohne Angabe erscheint 🔗 (Webseite) bzw. 📝 (Formular). |
 | **Im Launcher anzeigen** | – | Schalter. Ausgeschaltet bleibt der Link gespeichert, erscheint aber nirgends. |
 
 Beim Wechsel zwischen „Webseite“ und „Formular“ blendet die Seite das jeweils passende Feld ein.
@@ -53,6 +51,5 @@ Das jeweils **nicht** gewählte Ziel wird beim Speichern verworfen (ein Formular
 ## Tipps für gute Links
 
 - 4 bis 7 Einträge sind übersichtlich. Das Wichtigste (z. B. „Gottesdienst live“) gehört nach oben.
-- Kurze Titel, Details in die Beschreibung („Sonntags um 10 Uhr“).
-- Jeder Eintrag bekommt ein eigenes Emoji. Das macht die Liste auf dem Handy schneller lesbar.
+- Kurze, eindeutige Titel (z. B. „Gottesdienst live“ statt „Hier geht’s zum Livestream“).
 - Saisonale Links (Weihnachten, Freizeit-Anmeldung) einfach **ausblenden**, statt sie zu löschen.

@@ -119,7 +119,7 @@ Diese Werte sind im Code verankert. Sie zu ändern erfordert eine Code-Anpassung
 | Hub-Überschrift | 80 Zeichen |
 | Button-Text | 30 Zeichen |
 | Eckenrundung | 0 bis 24 Pixel |
-| Link: Titel / Beschreibung / Symbol | 80 / 160 / 8 Zeichen |
+| Link: Titel | 80 Zeichen |
 | Formular: Titel | 80 Zeichen |
 | Formular: Begrüßung, Danke-Text, Einwilligungstext | je 1000 Zeichen |
 | Formular: Text des Absenden-Buttons | 30 Zeichen |

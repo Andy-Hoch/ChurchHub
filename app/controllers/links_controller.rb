@@ -53,6 +53,6 @@ class LinksController < ApplicationController
     end
 
     def link_params
-      params.expect(link: %i[ title kind url form_id description icon visible ])
+      params.expect(link: %i[ title kind url form_id visible ])
     end
 end

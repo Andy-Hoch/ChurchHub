@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_01_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_13_110000) do
   create_table "churches", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
@@ -81,8 +81,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_01_100000) do
     t.integer "hub_id", null: false
     t.string "title", null: false
     t.string "url"
-    t.string "description"
-    t.string "icon"
     t.integer "position", default: 0, null: false
     t.boolean "visible", default: true, null: false
     t.datetime "created_at", null: false
