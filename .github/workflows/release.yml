@@ -1,9 +1,18 @@
 name: Release
 
+# beta builds the image to test on the server. A merge into main promotes
+# that same tested image to latest instead of rebuilding it, and falls back
+# to a fresh build when no matching beta image exists.
 on:
+  push:
+    branches: [ beta, main ]
   release:
     types: [published]
   workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
@@ -18,6 +27,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 2
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v4
@@ -30,20 +41,61 @@ jobs:
         id: image
         run: echo "name=${REGISTRY}/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Find tested beta image
+        id: promote_source
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+        run: |
+          if ! beta=$(git rev-parse -q --verify HEAD^2); then
+            echo "HEAD is not a merge commit, building from main."
+            exit 0
+          fi
+
+          if [ "$(git rev-parse HEAD^{tree})" != "$(git rev-parse "$beta^{tree}")" ]; then
+            echo "main differs from the merged beta commit, building from main."
+            exit 0
+          fi
+
+          source="$IMAGE:sha-$(git rev-parse --short=7 "$beta")"
+          if ! docker buildx imagetools inspect "$source" > /dev/null 2>&1; then
+            echo "No image $source found, building from main."
+            exit 0
+          fi
+
+          echo "source=$source" >> "$GITHUB_OUTPUT"
+
+      - name: Promote tested beta image
+        if: steps.promote_source.outputs.source != ''
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          SOURCE: ${{ steps.promote_source.outputs.source }}
+        run: |
+          docker buildx imagetools create \
+            --tag "$IMAGE:latest" \
+            --tag "$IMAGE:main" \
+            --tag "$IMAGE:sha-$(git rev-parse --short=7 HEAD)" \
+            "$SOURCE"
+          echo "Promoted $SOURCE to latest."
+
       - name: Extract image metadata
         id: meta
+        if: steps.promote_source.outputs.source == ''
         uses: docker/metadata-action@v6
         with:
           images: ${{ steps.image.outputs.name }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+            type=ref,event=branch
+            type=sha
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || (github.event_name == 'release' && !github.event.release.prerelease) }}
 
       - name: Build and push image
+        if: steps.promote_source.outputs.source == ''
         uses: docker/build-push-action@v6
         with:
           context: .
