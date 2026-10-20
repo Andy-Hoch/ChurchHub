@@ -1,0 +1,13 @@
+#!/bin/sh -e
+
+# ONCE runs this after it restored /storage from a backup and before the app boots.
+# Replace each database with the snapshot pre-backup took, dropping the WAL files
+# that belong to the possibly inconsistent copy of the live database.
+cd /rails/storage
+
+for snapshot in *.sqlite3.backup; do
+  [ -e "$snapshot" ] || continue
+  db="${snapshot%.backup}"
+  rm -f "$db-wal" "$db-shm"
+  mv "$snapshot" "$db"
+done

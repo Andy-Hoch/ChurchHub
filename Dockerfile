@@ -60,14 +60,22 @@ RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 # Final stage for app image
 FROM base
 
-# Run and own only the runtime files as a non-root user for security
+# Run and own only the runtime files as a non-root user for security.
+# ONCE mounts its data volume at /storage and /rails/storage, so both belong to that user.
 RUN groupadd --system --gid 1000 rails && \
-    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash
+    useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
+    mkdir /storage && chown rails:rails /storage
 USER 1000:1000
 
 # Copy built artifacts: gems, application
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
+
+# Backup hooks that ONCE calls to take consistent SQLite snapshots
+COPY --chmod=755 script/once/ /hooks/
+
+# Run jobs (emails, cleanups) inside Puma, since ONCE starts a single container
+ENV SOLID_QUEUE_IN_PUMA="true"
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

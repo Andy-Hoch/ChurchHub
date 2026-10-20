@@ -59,22 +59,42 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
-  # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "example.com"), protocol: "https" }
+  # Public address of the hub, used for links in emails and host authorization.
+  # ONCE passes BASE_URL (e.g. https://hub.example.com), other setups can set APP_HOST (e.g. hub.example.com).
+  public_url = URI(ENV["BASE_URL"]) if ENV["BASE_URL"].present?
+  public_url ||= URI("https://#{ENV["APP_HOST"]}") if ENV["APP_HOST"].present?
 
-  # Outgoing SMTP server, e.g. for form notifications. Add it with bin/rails credentials:edit:
+  # Set host to be used by links generated in mailer templates.
+  config.action_mailer.default_url_options =
+    if public_url
+      { host: public_url.host, protocol: public_url.scheme, port: (public_url.port unless public_url.port == public_url.default_port) }.compact
+    else
+      { host: "example.com", protocol: "https" }
+    end
+
+  # Outgoing SMTP server, e.g. for form notifications. ONCE passes SMTP_ADDRESS, SMTP_PORT, SMTP_USERNAME,
+  # SMTP_PASSWORD and MAILER_FROM_ADDRESS from its email settings. Otherwise add it with bin/rails credentials:edit:
   #   smtp:
   #     address: smtp.example.com
   #     user_name: ...
   #     password: ...
   #     from: hub@example.com
-  if (smtp = Rails.application.credentials.smtp)
+  smtp = if ENV["SMTP_ADDRESS"].present?
+    { address: ENV["SMTP_ADDRESS"], port: ENV["SMTP_PORT"], user_name: ENV["SMTP_USERNAME"], password: ENV["SMTP_PASSWORD"] }
+  else
+    Rails.application.credentials.smtp
+  end
+
+  if smtp
+    port = smtp[:port].presence&.to_i || 587
+
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {
-      user_name: smtp[:user_name],
-      password: smtp[:password],
+      user_name: smtp[:user_name].presence,
+      password: smtp[:password].presence,
       address: smtp[:address],
-      port: smtp.fetch(:port, 587),
+      port: port,
+      tls: port == 465,
       authentication: :plain
     }
   end
@@ -89,10 +109,10 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks: with APP_HOST
-  # set, only requests for that domain are answered.
-  if ENV["APP_HOST"].present?
-    config.hosts << ENV["APP_HOST"]
+  # Enable DNS rebinding protection and other `Host` header attacks: with BASE_URL
+  # or APP_HOST set, only requests for that domain are answered.
+  if public_url
+    config.hosts << public_url.host
 
     # Skip DNS rebinding protection for the default health check endpoint.
     config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
