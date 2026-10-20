@@ -3,6 +3,9 @@ name: Release
 # beta builds the image to test on the server. A merge into main promotes
 # that same tested image to latest instead of rebuilding it, and falls back
 # to a fresh build when no matching beta image exists.
+#
+# Every image is built for linux/amd64 and linux/arm64 on native runners and
+# published as one multi-arch tag, so ONCE can run it on x86 and ARM servers.
 on:
   push:
     branches: [ beta, main ]
@@ -18,11 +21,14 @@ env:
   REGISTRY: ghcr.io
 
 jobs:
-  build-and-push:
+  promote:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    outputs:
+      image: ${{ steps.image.outputs.name }}
+      promoted: ${{ steps.promote_source.outputs.source != '' }}
 
     steps:
       - name: Checkout code
@@ -61,8 +67,13 @@ jobs:
           fi
 
           source="$IMAGE:sha-$(git rev-parse --short=7 "$beta")"
-          if ! docker buildx imagetools inspect "$source" > /dev/null 2>&1; then
+          if ! manifest=$(docker buildx imagetools inspect --raw "$source" 2> /dev/null); then
             echo "No image $source found, building from main."
+            exit 0
+          fi
+
+          if ! grep -q '"architecture": *"arm64"' <<< "$manifest"; then
+            echo "$source has no arm64 image, building from main."
             exit 0
           fi
 
@@ -81,12 +92,99 @@ jobs:
             "$SOURCE"
           echo "Promoted $SOURCE to latest."
 
-      - name: Extract image metadata
+  build:
+    needs: promote
+    if: needs.promote.outputs.promoted != 'true'
+    runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Extract image labels
         id: meta
-        if: steps.promote_source.outputs.source == ''
         uses: docker/metadata-action@v6
         with:
-          images: ${{ steps.image.outputs.name }}
+          images: ${{ needs.promote.outputs.image }}
+
+      - name: Build and push image by digest
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ needs.promote.outputs.image }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.platform }}
+          cache-to: type=gha,scope=${{ matrix.platform }},mode=max
+
+      - name: Export digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+
+      - name: Upload digest
+        uses: actions/upload-artifact@v7
+        with:
+          name: digest-${{ strategy.job-index }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  publish:
+    needs: [ promote, build ]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@v8
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ needs.promote.outputs.image }}
           tags: |
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
@@ -94,13 +192,17 @@ jobs:
             type=sha
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' || (github.event_name == 'release' && !github.event.release.prerelease) }}
 
-      - name: Build and push image
-        if: steps.promote_source.outputs.source == ''
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Publish multi-arch image
+        working-directory: ${{ runner.temp }}/digests
+        env:
+          IMAGE: ${{ needs.promote.outputs.image }}
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("--tag " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf "$IMAGE@sha256:%s " *)
+
+      - name: Inspect image
+        env:
+          IMAGE: ${{ needs.promote.outputs.image }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: docker buildx imagetools inspect "$IMAGE:$VERSION"

@@ -6,13 +6,15 @@ Diese Anleitung führt dich **von einem leeren Server bis zu einem laufenden Kir
 zum Beispiel `https://hub.eure-kirche.de`. Danach können du und die Nutzer sich registrieren und den Launcher auf
 den Webseiten einbinden (siehe [Schnellstart](../benutzerhandbuch/schnellstart.md)).
 
-Es gibt zwei Wege:
+Es gibt drei Wege:
 
 - **[Weg A: Kamal](#weg-a-deployment-mit-kamal-empfohlen)** – empfohlen. Das Projekt bringt Kamal fertig mit. Es installiert Docker auf dem Server, baut das
   Image, holt automatisch ein HTTPS-Zertifikat (Let's Encrypt) und ermöglicht Updates mit einem Befehl.
 - **[Weg B: Docker von Hand](#weg-b-docker-von-hand)** – wenn du schon einen Server mit eigenem Reverse-Proxy (Caddy, nginx, Traefik …) hast.
+- **[Weg C: ONCE](#weg-c-once)** – ohne eigenes Bauen: [ONCE](https://github.com/basecamp/once) von 37signals installiert das
+  fertige Image, holt das Zertifikat und kümmert sich um Updates und Backups. Läuft auf x86- und ARM-Servern.
 
-Beide Wege nutzen dasselbe `Dockerfile`. Die Anwendung besteht aus **einem einzigen Container** (Rails + eingebetteter
+Alle Wege nutzen dasselbe `Dockerfile`. Die Anwendung besteht aus **einem einzigen Container** (Rails + eingebetteter
 Job-Runner) und speichert alles in **SQLite-Dateien** im Verzeichnis `/rails/storage`. Es ist keine separate
 Datenbank, kein Redis und kein Node.js nötig.
 
@@ -245,6 +247,45 @@ Updates: Code aktualisieren, `docker build` wiederholen, Container stoppen, entf
 
 ---
 
+## Weg C: ONCE
+
+[ONCE](https://github.com/basecamp/once) installiert fertige Docker-Images und übernimmt HTTPS, automatische Updates
+und Backups. Der Hub erfüllt alles, was ONCE von einer App erwartet. Das Image wird bei jedem Merge nach `main` für
+**amd64 und arm64** gebaut, du kannst also auch einen ARM-Server (z. B. Hetzner CAX, Raspberry Pi) nutzen.
+
+1. **DNS-Eintrag** für deine Domain auf den Server setzen (siehe [Was du vorab brauchst](#was-du-vorab-brauchst)).
+2. **ONCE installieren** (installiert bei Bedarf auch Docker):
+
+   ```sh
+   curl https://get.once.com | sh
+   ```
+
+3. Als App **„eigenes Image“** wählen und eintragen:
+
+   ```
+   ghcr.io/andy-hoch/churchhub:latest
+   ```
+
+   Bei einem Fork entsprechend `ghcr.io/<dein-konto>/<repo>:latest`. Das Paket muss auf GitHub öffentlich sein,
+   sonst brauchst du in ONCE Registry-Zugangsdaten.
+4. **Domain** eingeben, z. B. `hub.eure-kirche.de`. ONCE holt das Zertifikat und startet den Hub.
+5. In den App-Einstellungen von ONCE (`s`) die **E-Mail-Einstellungen** ausfüllen. Ohne sie gibt es keine
+   Passwort-Reset- und Benachrichtigungs-Mails.
+6. **Prüfen** wie in [Schritt 8](#schritt-8-prüfen).
+
+Was ONCE automatisch erledigt:
+
+| Thema | Wie |
+| --- | --- |
+| Zugangsdaten | ONCE erzeugt `SECRET_KEY_BASE`. Credentials und `RAILS_MASTER_KEY` sind **nicht nötig**. |
+| Adresse | ONCE setzt `BASE_URL`. Daraus nimmt der Hub die Domain für Links in E-Mails und für den Host-Schutz, `APP_HOST` entfällt. |
+| E-Mail | Die SMTP-Daten aus den ONCE-Einstellungen kommen als `SMTP_ADDRESS`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` und `MAILER_FROM_ADDRESS` an. |
+| Daten | Ein Volume unter `/storage` und `/rails/storage`, dort liegen die SQLite-Datenbanken. |
+| Backups | Vor jedem Backup legt der Hub über `/hooks/pre-backup` eine konsistente Kopie jeder Datenbank an (`*.sqlite3.backup`), nach einer Wiederherstellung setzt `/hooks/post-restore` sie wieder ein. Der Hub läuft während des Backups weiter. |
+| Job-Runner | `SOLID_QUEUE_IN_PUMA` ist im Image bereits gesetzt. |
+
+---
+
 ## Registrierung ist offen
 
 Jede Person, die die Adresse deines Hubs kennt, kann sich registrieren und **eine eigene Kirche anlegen**. Es gibt
@@ -263,7 +304,7 @@ es Mitglied ist. Mehr dazu unter [Datenschutz & Sicherheit](../referenz/datensch
 - [ ] `config/master.key` im Passwortmanager gesichert
 - [ ] Volume für `/rails/storage` eingerichtet und [Backup](betrieb.md#backups) geplant
 - [ ] SMTP hinterlegt und Test-Mail („Passwort vergessen?“) angekommen
-- [ ] `APP_HOST` gesetzt (Links in E-Mails zeigen auf die richtige Domain, andere Domains werden abgewiesen)
+- [ ] `APP_HOST` gesetzt (Links in E-Mails zeigen auf die richtige Domain, andere Domains werden abgewiesen). Bei ONCE übernimmt das `BASE_URL`.
 - [ ] Beim ersten Konto: Kirche mit **Webseite** angelegt, damit der Launcher nur dort läuft
 - [ ] Launcher auf einer Testseite eingebunden und Formular-Einsendung getestet
 - [ ] Nutzern Adresse und Ansprechpartner mitgeteilt ([Was du Nutzern mitgeben solltest](datenschutz-im-betrieb.md#was-du-nutzern-mitgeben-solltest))
