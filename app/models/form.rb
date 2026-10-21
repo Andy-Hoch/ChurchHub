@@ -7,14 +7,13 @@ class Form < ApplicationRecord
   has_many :links, dependent: :nullify
 
   normalizes :notification_emails, with: ->(emails) { emails.split(/[\s,;]+/).compact_blank.map(&:downcase).uniq.join(", ").presence }
-  normalizes :privacy_url, :submit_label, with: ->(value) { value.strip.presence }
+  normalizes :submit_label, with: ->(value) { value.strip.presence }
 
   validates :title, presence: true, length: { maximum: 80 }
-  validates :intro, :thank_you_message, :consent_text, length: { maximum: 1000 }
+  validates :intro, :thank_you_message, length: { maximum: 1000 }
   validates :submit_label, length: { maximum: 30 }
   validates :retention_months, numericality: { only_integer: true, in: 1..120 }, allow_nil: true
   validate :notification_emails_must_be_valid
-  validate :privacy_url_must_be_http
 
   # The embed script is cached by the hub's timestamp.
   after_save :touch_hub
@@ -25,9 +24,7 @@ class Form < ApplicationRecord
     notification_emails.to_s.split(", ")
   end
 
-  def consent_required?
-    consent_text.present?
-  end
+  delegate :consent_required?, to: :church
 
   def expired_submissions
     return FormSubmission.none unless retention_months
@@ -42,8 +39,6 @@ class Form < ApplicationRecord
       intro: intro.presence,
       thankYou: thank_you_message.presence,
       submitLabel: submit_label.presence,
-      consentText: consent_text.presence,
-      privacyUrl: privacy_url.presence,
       questions: questions.map(&:embed_payload)
     }
   end
@@ -52,10 +47,6 @@ class Form < ApplicationRecord
     def notification_emails_must_be_valid
       invalid = notification_email_list.grep_v(URI::MailTo::EMAIL_REGEXP)
       errors.add(:notification_emails, :invalid_addresses, addresses: invalid.join(", ")) if invalid.any?
-    end
-
-    def privacy_url_must_be_http
-      errors.add(:privacy_url, :invalid) if privacy_url.present? && !HttpUrl.valid?(privacy_url)
     end
 
     def touch_hub
