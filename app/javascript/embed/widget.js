@@ -1,5 +1,5 @@
 // The launcher that churches embed on their websites: a floating button with
-// a panel of links, and full-screen dialogs for forms. Plain ES5 in one file,
+// a panel of links, in which forms open one step after another. Plain ES5 in one file,
 // without modules or a build step, because it runs on all kinds of church
 // websites in all kinds of browsers.
 //
@@ -17,6 +17,8 @@
     cross: '<path d="M12 2v20M6 8h12"/>',
     link: '<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>',
     close: '<path d="M18 6 6 18M6 6l12 12"/>',
+    arrowLeft: '<path d="M19 12H5M12 19l-7-7 7-7"/>',
+    arrowRight: '<path d="M5 12h14M12 5l7 7-7 7"/>',
     check: '<circle cx="12" cy="12" r="10"/><path d="m8 12 3 3 5-6"/>'
   };
 
@@ -72,54 +74,62 @@
     "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
     "@media (max-width: 640px) { :host(:not([data-inline])) .panel { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; max-height: none; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; } :host(:not([data-inline])) .header { position: sticky; top: 0; padding-top: max(14px, env(safe-area-inset-top)); } :host(:not([data-inline])) .panel:not([hidden]) + .button { display: none; } :host(:not([data-inline])) .close { padding: 8px; } }",
 
-    ".form { --radius: calc(var(--ph-radius) * 1px); --border: light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); --muted: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); --negative: light-dark(oklch(57.71% 0.2152 27.33), oklch(70.4% 0.191 22.22)); color-scheme: var(--ph-scheme); font: 400 16px/1.45 var(--ph-font); position: fixed; inset: 0; z-index: 2147483001; display: flex; flex-direction: column; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); color: light-dark(oklch(14.08% 0.0044 285.82), oklch(98.51% 0 0)); }",
-    ".form--enter { animation: ph-fade .2s ease-out; }",
-    ":host([data-inline]) .form { position: absolute; }",
+    ".panel--form { display: flex; flex-direction: column; height: min(560px, calc(100vh - 110px)); overflow: hidden; }",
+    ".backdrop { --radius: calc(var(--ph-radius) * 1px); color-scheme: var(--ph-scheme); font: 400 15px/1.4 var(--ph-font); position: fixed; inset: 0; z-index: 2147483001; display: flex; align-items: center; justify-content: center; padding: 20px; background: oklch(0% 0 0 / .45); animation: ph-fade .2s ease-out; }",
+    ":host([data-inline]) .backdrop { position: absolute; }",
+    ".backdrop .panel { height: min(560px, calc(100vh - 40px)); max-height: none; transform-origin: center; }",
+    "@media (max-width: 640px) { .backdrop { padding: 0; } .backdrop .panel { width: 100%; height: 100%; height: 100dvh; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); } .backdrop .header { padding-top: max(14px, env(safe-area-inset-top)); } }",
+
+    ".form { --border: light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); --muted: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); --negative: light-dark(oklch(57.71% 0.2152 27.33), oklch(70.4% 0.191 22.22)); flex: 1; min-height: 0; display: flex; flex-direction: column; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); }",
     ".form *, .form *::before, .form *::after { box-sizing: border-box; }",
-    ".form-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); background: var(--ph-primary); color: var(--ph-text); }",
-    ".form-header .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
+    ".form .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
     ".progress { height: 4px; flex-shrink: 0; background: var(--border); }",
     ".progress-bar { height: 100%; background: var(--ph-primary); transition: width .25s ease; }",
-    ".form-body { flex: 1; overflow: auto; overscroll-behavior: contain; display: flex; }",
-    ".step { margin: auto; width: min(560px, 100%); padding: 32px 20px; animation: ph-step .2s ease-out; }",
-    ".step-count { margin: 0 0 8px; font-size: 13px; font-weight: 600; color: var(--muted); }",
-    ".question { margin: 0 0 8px; font-size: clamp(20px, 4.5vw, 26px); font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }",
+    // One step per slide, side by side: swiping snaps from step to step.
+    ".slides { flex: 1; min-height: 0; display: grid; grid-auto-flow: column; grid-auto-columns: 100%; grid-template-rows: 100%; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; }",
+    ".slides::-webkit-scrollbar { display: none; }",
+    ".slide { min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; overflow-y: auto; overscroll-behavior-y: contain; padding: 20px 16px; }",
+    ".step-count { margin: 0 0 6px; font-size: 13px; font-weight: 600; color: var(--muted); }",
+    ".question { margin: 0 0 8px; font-size: 20px; font-weight: 650; line-height: 1.25; overflow-wrap: anywhere; }",
     ".optional { font-size: 14px; font-weight: 400; color: var(--muted); }",
     ".help, .intro { margin: 0 0 8px; color: var(--muted); white-space: pre-line; overflow-wrap: anywhere; }",
-    ".intro { font-size: 17px; color: inherit; }",
-    ".input { display: block; width: 100%; margin-top: 16px; font: inherit; font-size: 18px; padding: 12px 14px; color: inherit; background: transparent; border: 1px solid var(--border); border-radius: calc(var(--radius) * .66); }",
+    ".intro { font-size: 16px; color: inherit; }",
+    ".input { display: block; width: 100%; margin-top: 14px; font: inherit; font-size: 16px; padding: 10px 12px; color: inherit; background: transparent; border: 1px solid var(--border); border-radius: calc(var(--radius) * .66); }",
     ".input:focus, .option:has(:focus-visible) { outline: 2px solid var(--ph-primary); outline-offset: 1px; }",
     ".input[aria-invalid=true] { border-color: var(--negative); }",
-    "textarea.input { min-height: 160px; resize: vertical; }",
-    ".options { display: grid; gap: 10px; margin-top: 16px; }",
-    ".option { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--border); border-radius: calc(var(--radius) * .66); cursor: pointer; overflow-wrap: anywhere; }",
+    "textarea.input { min-height: 120px; resize: vertical; }",
+    ".options { display: grid; gap: 8px; margin-top: 14px; }",
+    ".option { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: calc(var(--radius) * .66); cursor: pointer; overflow-wrap: anywhere; }",
     ".option:has(:checked) { border-color: var(--ph-primary); box-shadow: inset 0 0 0 1px var(--ph-primary); }",
     ".option input { flex-shrink: 0; width: 18px; height: 18px; margin: 0; accent-color: var(--ph-primary); }",
     ".error { margin: 12px 0 0; color: var(--negative); font-size: 14px; font-weight: 500; }",
     ".error:empty { display: none; }",
-    ".review { margin: 16px 0 0; padding: 0; }",
-    ".review-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }",
+    ".review { margin: 12px 0 0; padding: 0; }",
+    ".review-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }",
     ".review-text { flex: 1; min-width: 0; }",
     ".review-label { display: block; font-size: 13px; color: var(--muted); }",
     ".review-value { display: block; margin: 2px 0 0; white-space: pre-line; overflow-wrap: anywhere; }",
     ".review-value--empty { color: var(--muted); font-style: italic; }",
+    ".review .error { margin: 4px 0 0; }",
     ".edit { all: unset; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: underline; padding: 2px 4px; border-radius: 4px; }",
-    ".consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 20px; font-size: 14px; cursor: pointer; }",
+    ".consent { display: flex; align-items: flex-start; gap: 10px; margin-top: 16px; font-size: 14px; cursor: pointer; }",
     ".consent input { flex-shrink: 0; width: 18px; height: 18px; margin: 1px 0 0; accent-color: var(--ph-primary); }",
     ".consent a, .privacy a { color: inherit; }",
-    ".privacy { margin: 20px 0 0; font-size: 14px; color: var(--muted); }",
-    ".done { text-align: center; }",
+    ".privacy { margin: 16px 0 0; font-size: 14px; color: var(--muted); }",
+    ".done { flex: 1; overflow-y: auto; padding: 32px 16px; text-align: center; }",
     ".done .icon { width: 56px; height: 56px; color: var(--ph-primary); stroke-width: 1.5; margin-bottom: 12px; }",
-    ".form-footer { display: flex; gap: 12px; padding: 12px 16px; padding-bottom: max(12px, env(safe-area-inset-bottom)); border-top: 1px solid var(--border); }",
-    ".btn { all: unset; box-sizing: border-box; cursor: pointer; padding: 12px 22px; border-radius: max(8px, calc(var(--radius) * .66)); font-weight: 600; text-align: center; }",
+    ".form-footer { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--border); }",
+    ".btn { all: unset; box-sizing: border-box; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 10px 20px; border-radius: max(8px, calc(var(--radius) * .66)); font-weight: 600; text-align: center; }",
+    ".btn .icon { width: 18px; height: 18px; }",
+    ".btn[hidden] { display: none; }",
+    ".btn-icon { padding: 10px 12px; }",
     ".btn-primary { margin-inline-start: auto; background: var(--ph-primary); color: var(--ph-text); }",
     ".btn-secondary { border: 1px solid var(--border); }",
     ".btn[disabled] { opacity: .6; cursor: default; }",
     ".btn:focus-visible, .edit:focus-visible { outline: 2px solid var(--ph-primary); outline-offset: 2px; }",
     ".hp { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }",
     "@keyframes ph-fade { from { opacity: 0; } }",
-    "@keyframes ph-step { from { opacity: 0; transform: translateY(8px); } }",
-    "@media (prefers-reduced-motion: reduce) { .panel, .form--enter, .step { animation: none; } .button, .progress-bar { transition: none; } }"
+    "@media (prefers-reduced-motion: reduce) { .panel, .backdrop { animation: none; } .button, .progress-bar { transition: none; } }"
   ].join("\n");
 
   function svg(name, className) {
@@ -224,6 +234,9 @@
       var open = options.open === "true";
       var headless = options.launcher === "false";
       var activeForm = null;
+      var panel = null;
+      var privacy = data.privacy || {};
+      var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       var style = el("style");
       style.textContent = STYLES;
@@ -244,45 +257,10 @@
         if (headless) return;
 
         var panelId = "kirchen-hub-panel";
-        var panel = el("div", "panel");
+        panel = el("div", "panel");
         panel.id = panelId;
         panel.setAttribute("role", "dialog");
-        panel.setAttribute("aria-label", data.title);
         panel.hidden = !open;
-
-        var header = el("div", "header");
-        var close = el("button", "close");
-        close.type = "button";
-        close.setAttribute("aria-label", "Schließen");
-        close.innerHTML = svg("close");
-        header.append(el("h2", "title", data.title), close);
-        panel.appendChild(header);
-
-        if (data.links.length === 0) {
-          panel.appendChild(el("p", "empty", "Noch keine Links vorhanden."));
-        } else {
-          var list = el("div", "list");
-          data.links.forEach(function (item) {
-            var node;
-            if (item.type === "form" && item.form) {
-              node = button("link", null, function () { openForm(item.form, node); });
-              node.setAttribute("aria-haspopup", "dialog");
-            } else {
-              var href = safeUrl(item.url);
-              if (!href) return;
-              node = el("a", "link");
-              node.href = href;
-              node.target = "_blank";
-              node.rel = "noopener";
-            }
-            node.title = item.title;
-            var text = el("span", "link-text");
-            text.appendChild(el("span", "link-title", item.title));
-            node.appendChild(text);
-            list.appendChild(node);
-          });
-          panel.appendChild(list);
-        }
 
         var toggleButton = el("button", "button" + (theme.buttonLabel ? "" : " button--icon-only"));
         toggleButton.type = "button";
@@ -293,13 +271,64 @@
         if (theme.buttonLabel) toggleButton.appendChild(el("span", null, theme.buttonLabel));
 
         launcher.append(panel, toggleButton);
+        fillPanel();
 
         toggleButton.addEventListener("click", function () { toggle(!open, true); });
-        close.addEventListener("click", function () { toggle(false, true); });
       }
 
-      // Forms: a full-screen dialog that shows one step at a time
-      // (intro, one step per question, review, privacy, thank you).
+      // The panel shows either the links or the open form.
+      function fillPanel() {
+        if (activeForm) {
+          panel.className = "panel panel--form";
+          panel.setAttribute("aria-label", activeForm.form.title);
+          panel.replaceChildren(activeForm.node);
+          restoreScroll();
+          return;
+        }
+
+        panel.className = "panel";
+        panel.setAttribute("aria-label", data.title);
+
+        var header = el("div", "header");
+        var close = button("close", null, function () { toggle(false, true); });
+        close.setAttribute("aria-label", "Schließen");
+        close.innerHTML = svg("close");
+        header.append(el("h2", "title", data.title), close);
+        panel.replaceChildren(header);
+
+        if (data.links.length === 0) {
+          panel.appendChild(el("p", "empty", "Noch keine Links vorhanden."));
+          return;
+        }
+
+        var list = el("div", "list");
+        data.links.forEach(function (item) {
+          var node;
+          if (item.type === "form" && item.form) {
+            node = button("link", null, function () { openForm(item.form, node); });
+            node.setAttribute("aria-haspopup", "dialog");
+            node.setAttribute("data-form-id", item.form.id);
+          } else {
+            var href = safeUrl(item.url);
+            if (!href) return;
+            node = el("a", "link");
+            node.href = href;
+            node.target = "_blank";
+            node.rel = "noopener";
+          }
+          node.title = item.title;
+          var text = el("span", "link-text");
+          text.appendChild(el("span", "link-title", item.title));
+          node.appendChild(text);
+          list.appendChild(node);
+        });
+        panel.appendChild(list);
+      }
+
+      // Forms open inside the launcher panel (on the public hub page, where
+      // there is no launcher, in a card of the same size). Every step (intro,
+      // one per question, review, privacy) is a slide of its own; they sit side
+      // by side and are reached by swiping or with the buttons below.
 
       function openForm(form, trigger) {
         var steps = [];
@@ -310,15 +339,33 @@
         steps.push({ type: "review" });
         var reviewIndex = steps.length - 1;
         // Consent text and/or privacy link get a step of their own right before sending.
-        if (form.consentText || safeUrl(form.privacyUrl)) steps.push({ type: "privacy" });
+        if (privacy.consentText || safeUrl(privacy.privacyUrl)) steps.push({ type: "privacy" });
 
         activeForm = {
           reviewIndex: reviewIndex,
           form: form, steps: steps, index: 0, answers: {}, errors: {}, consent: false, honeypot: "",
-          returnToReview: false, submitting: false, done: false, error: "", startedAt: Date.now(), trigger: trigger, entering: true
+          returnToReview: false, submitting: false, done: false, error: "", startedAt: Date.now(), trigger: trigger,
+          scrollTarget: null, scrollUntil: 0
         };
+        buildForm();
+
+        if (headless) {
+          var dialog = el("div", "panel panel--form");
+          dialog.setAttribute("role", "dialog");
+          dialog.setAttribute("aria-modal", "true");
+          dialog.setAttribute("aria-label", form.title);
+          dialog.appendChild(activeForm.node);
+          var backdrop = el("div", "backdrop");
+          backdrop.appendChild(dialog);
+          backdrop.addEventListener("click", function (event) {
+            if (event.target === backdrop) closeForm(true);
+          });
+          formLayer.replaceChildren(backdrop);
+        } else {
+          fillPanel();
+        }
         lockScroll();
-        renderForm(true);
+        focusStep();
       }
 
       function closeForm(askFirst) {
@@ -327,9 +374,15 @@
         if (askFirst && !state.done && isDirty(state) && !window.confirm(MESSAGES.discard)) return;
 
         activeForm = null;
-        formLayer.replaceChildren();
+        if (headless) {
+          formLayer.replaceChildren();
+        } else if (panel) {
+          fillPanel();
+        }
         lockScroll();
-        var target = state.trigger && state.trigger.isConnected ? state.trigger : root.querySelector(".link, .button");
+        var target = state.trigger && state.trigger.isConnected
+          ? state.trigger
+          : root.querySelector("[data-form-id='" + state.form.id + "']") || root.querySelector(".link, .button");
         if (target) target.focus();
       }
 
@@ -337,113 +390,190 @@
         return Object.keys(state.answers).some(function (id) { return !isBlank(state.answers[id]); });
       }
 
-      function currentStep() {
-        return activeForm.done ? { type: "done" } : activeForm.steps[activeForm.index];
-      }
-
-      function renderForm(focus) {
+      function buildForm() {
         var state = activeForm;
         var form = state.form;
-        var step = currentStep();
+        var ui = state.ui = {};
 
-        var dialog = el("div", "form" + (state.entering ? " form--enter" : ""));
-        state.entering = false;
-        dialog.setAttribute("role", "dialog");
-        dialog.setAttribute("aria-modal", "true");
-        dialog.setAttribute("aria-label", form.title);
-
-        var header = el("div", "form-header");
+        var header = el("div", "header");
         var close = button("close", null, function () { closeForm(true); });
         close.setAttribute("aria-label", "Formular schließen");
         close.innerHTML = svg("close");
         header.append(el("h2", "title", form.title), close);
 
-        var percent = state.done ? 100 : Math.round(state.index / state.steps.length * 100);
-        var progress = el("div", "progress");
-        progress.setAttribute("role", "progressbar");
-        progress.setAttribute("aria-label", "Fortschritt");
-        progress.setAttribute("aria-valuemin", "0");
-        progress.setAttribute("aria-valuemax", "100");
-        progress.setAttribute("aria-valuenow", String(percent));
-        var bar = el("div", "progress-bar");
-        bar.style.width = percent + "%";
-        progress.appendChild(bar);
+        ui.progress = el("div", "progress");
+        ui.progress.setAttribute("role", "progressbar");
+        ui.progress.setAttribute("aria-label", "Fortschritt");
+        ui.progress.setAttribute("aria-valuemin", "0");
+        ui.progress.setAttribute("aria-valuemax", "100");
+        ui.bar = ui.progress.appendChild(el("div", "progress-bar"));
 
-        var body = el("div", "form-body");
-        var content = el("div", "step");
-        var footer = el("div", "form-footer");
-        body.appendChild(content);
+        ui.slides = el("div", "slides");
+        state.steps.forEach(function (step, index) {
+          var slide = el("div", "slide");
+          slide.setAttribute("role", "group");
+          slide.setAttribute("aria-roledescription", "Schritt");
+          slide.setAttribute("aria-label", (index + 1) + " von " + state.steps.length);
 
-        var focusTarget = null;
-        var hasPrevious = state.index > 0 && !state.done;
-        if (hasPrevious) footer.appendChild(button("btn btn-secondary", "Zurück", back));
-
-        if (step.type === "intro") {
-          content.append(el("h3", "question", form.title), el("p", "intro", form.intro));
-          focusTarget = footer.appendChild(button("btn btn-primary", "Los geht’s", next));
-        } else if (step.type === "question") {
-          focusTarget = renderQuestion(step, content);
-          footer.appendChild(button("btn btn-primary", state.returnToReview ? "Zur Übersicht" : "Weiter", next));
-        } else if (step.type === "review" || step.type === "privacy") {
-          if (step.type === "review") {
-            renderReview(content);
+          if (step.type === "intro") {
+            slide.append(el("h3", "question", form.title), el("p", "intro", form.intro));
+          } else if (step.type === "question") {
+            step.focus = renderQuestion(step, slide);
+          } else if (step.type === "review") {
+            step.content = slide.appendChild(el("div"));
+            renderReview(step);
           } else {
-            renderPrivacy(content);
+            renderPrivacy(slide);
           }
-          if (isLastStep()) {
-            renderSubmitExtras(content);
-            var submit = footer.appendChild(button("btn btn-primary", state.submitting ? "Wird gesendet …" : (form.submitLabel || "Absenden"), next));
-            submit.disabled = state.submitting;
-            focusTarget = (state.error && content.querySelector(".consent input")) || submit;
-          } else {
-            focusTarget = footer.appendChild(button("btn btn-primary", "Weiter", next));
-          }
-        } else {
-          var done = el("div", "done");
-          done.innerHTML = svg("check");
-          done.append(el("h3", "question", "Vielen Dank!"), el("p", "intro", form.thankYou || "Wir haben deine Angaben erhalten."));
-          if (state.preview) done.appendChild(el("p", "help", "Vorschau: Es wurde nichts gesendet."));
-          content.appendChild(done);
-          focusTarget = footer.appendChild(button("btn btn-primary", "Schließen", function () { closeForm(false); }));
+          if (index === state.steps.length - 1) renderSubmitExtras(slide);
+          ui.slides.appendChild(slide);
+        });
+
+        ui.slides.addEventListener("scroll", followScroll);
+        if ("onscrollend" in window) {
+          ui.slides.addEventListener("scrollend", function () {
+            if (activeForm !== state) return;
+            state.scrollTarget = null;
+            followScroll();
+          });
         }
+        ui.slides.addEventListener("keydown", function (event) {
+          if (event.key !== "Enter" || event.target.tagName === "BUTTON" || event.target.tagName === "A") return;
+          if (event.target.tagName === "TEXTAREA" && !(event.ctrlKey || event.metaKey)) return;
+          event.preventDefault();
+          next();
+        });
 
-        dialog.append(header, progress, body, footer);
-        formLayer.replaceChildren(dialog);
-        if (focus && focusTarget) focusTarget.focus();
+        var footer = el("div", "form-footer");
+        ui.back = button("btn btn-secondary btn-icon", null, back);
+        ui.back.setAttribute("aria-label", "Zurück");
+        ui.back.innerHTML = svg("arrowLeft");
+        ui.next = button("btn btn-primary", null, next);
+        footer.append(ui.back, ui.next);
+
+        state.node = el("div", "form");
+        state.node.append(header, ui.progress, ui.slides, footer);
+        updateChrome();
       }
 
-      function renderQuestion(step, content) {
+      // Progress and buttons for the current step.
+      function updateChrome() {
+        var state = activeForm;
+        var ui = state.ui;
+        var step = state.steps[state.index];
+        var last = state.index === state.steps.length - 1;
+
+        Array.prototype.forEach.call(ui.slides.children, function (slide, index) {
+          if (index === state.index) {
+            slide.setAttribute("aria-current", "step");
+          } else {
+            slide.removeAttribute("aria-current");
+          }
+        });
+
+        var percent = Math.round(state.index / state.steps.length * 100);
+        ui.bar.style.width = percent + "%";
+        ui.progress.setAttribute("aria-valuenow", String(percent));
+        ui.back.hidden = state.index === 0;
+
+        var label = "Weiter";
+        if (last) {
+          label = state.submitting ? "Wird gesendet …" : (state.form.submitLabel || "Absenden");
+        } else if (step.type === "intro") {
+          label = "Los geht’s";
+        } else if (step.type === "question" && state.returnToReview) {
+          label = "Zur Übersicht";
+        }
+        ui.next.replaceChildren(el("span", null, label));
+        if (!last) ui.next.insertAdjacentHTML("beforeend", svg("arrowRight"));
+        ui.next.disabled = state.submitting;
+        if (ui.error) ui.error.textContent = state.error;
+      }
+
+      function setStep(index) {
+        var state = activeForm;
+        if (index === state.index) return;
+        state.index = index;
+        var step = state.steps[index];
+        if (step.type === "review") {
+          state.returnToReview = false;
+          renderReview(step);
+        }
+        updateChrome();
+      }
+
+      function goTo(index, focus) {
+        var state = activeForm;
+        var slides = state.ui.slides;
+        setStep(index);
+        // Smooth scrolling passes the steps in between; they must not become the current step.
+        state.scrollTarget = index;
+        state.scrollUntil = Date.now() + 1000;
+        slides.scrollTo({ left: index * slides.clientWidth, behavior: reducedMotion.matches ? "auto" : "smooth" });
+        if (focus) focusStep();
+      }
+
+      var scrollFrame = null;
+
+      // Swiping changes the current step.
+      function followScroll() {
+        if (scrollFrame) return;
+        scrollFrame = window.requestAnimationFrame(function () {
+          scrollFrame = null;
+          var state = activeForm;
+          if (!state || state.done) return;
+          var slides = state.ui.slides;
+          if (!slides.clientWidth) return;
+
+          var index = Math.min(state.steps.length - 1, Math.round(Math.abs(slides.scrollLeft) / slides.clientWidth));
+          if (state.scrollTarget !== null) {
+            if (index !== state.scrollTarget && Date.now() < state.scrollUntil) return;
+            state.scrollTarget = null;
+          }
+          setStep(index);
+        });
+      }
+
+      // The panel is rebuilt when it opens again or the theme changes, which
+      // loses the scroll position of the slides.
+      function restoreScroll() {
+        var state = activeForm;
+        if (state.done) return;
+        state.scrollTarget = null;
+        state.ui.slides.scrollLeft = state.index * state.ui.slides.clientWidth;
+      }
+
+      function focusStep() {
+        var state = activeForm;
+        var target = (!state.done && state.steps[state.index].focus) || state.ui.next;
+        target.focus({ preventScroll: true });
+      }
+
+      function renderQuestion(step, slide) {
         var state = activeForm;
         var question = step.question;
         var id = "kh-q" + question.id;
         var describedBy = [];
 
-        content.appendChild(el("p", "step-count", "Frage " + step.number + " von " + state.form.questions.length));
-        var heading = content.appendChild(el("h3", "question", question.label));
+        slide.appendChild(el("p", "step-count", "Frage " + step.number + " von " + state.form.questions.length));
+        var heading = slide.appendChild(el("h3", "question", question.label));
         heading.id = id + "-label";
         if (!question.required) heading.appendChild(el("span", "optional", " (optional)"));
         if (question.help) {
-          content.appendChild(el("p", "help", question.help)).id = id + "-help";
+          slide.appendChild(el("p", "help", question.help)).id = id + "-help";
           describedBy.push(id + "-help");
         }
 
-        var error = el("p", "error", state.errors[question.id]);
-        error.id = id + "-error";
-        error.setAttribute("role", "alert");
-        describedBy.push(error.id);
+        step.error = el("p", "error");
+        step.error.id = id + "-error";
+        step.error.setAttribute("role", "alert");
+        describedBy.push(step.error.id);
 
         var field = buildField(question, id);
+        step.field = field.node;
         field.node.setAttribute("aria-labelledby", heading.id);
         field.node.setAttribute("aria-describedby", describedBy.join(" "));
-        if (state.errors[question.id]) field.node.setAttribute("aria-invalid", "true");
-        content.append(field.node, error);
-
-        content.addEventListener("keydown", function (event) {
-          if (event.key !== "Enter" || event.target.tagName === "BUTTON") return;
-          if (event.target.tagName === "TEXTAREA" && !(event.ctrlKey || event.metaKey)) return;
-          event.preventDefault();
-          next();
-        });
+        slide.append(field.node, step.error);
 
         return field.focus;
       }
@@ -495,39 +625,40 @@
         return { node: field, focus: field };
       }
 
-      function renderReview(content) {
+      function renderReview(step) {
         var state = activeForm;
 
-        content.append(el("h3", "question", "Stimmt alles so?"), el("p", "help", "Prüfe deine Angaben, bevor du sie absendest."));
+        step.content.replaceChildren(el("h3", "question", "Stimmt alles so?"), el("p", "help", "Prüfe deine Angaben, bevor du sie absendest."));
 
         var list = el("dl", "review");
-        state.steps.forEach(function (step, index) {
-          if (step.type !== "question") return;
-          var question = step.question;
+        state.steps.forEach(function (other, index) {
+          if (other.type !== "question") return;
+          var question = other.question;
           var answer = formatAnswer(question, state.answers[question.id]);
+          // Swiping skips the checks of the "Weiter" button.
+          var message = validate(question, state.answers[question.id]);
           var item = el("div", "review-item");
           var text = el("div", "review-text");
           text.append(el("dt", "review-label", question.label), el("dd", "review-value" + (answer ? "" : " review-value--empty"), answer || "Keine Angabe"));
+          if (message) text.appendChild(el("p", "error", message));
           var edit = button("edit", "Ändern", function () {
-            state.index = index;
             state.returnToReview = true;
             state.error = "";
-            renderForm(true);
+            goTo(index, true);
           });
           edit.setAttribute("aria-label", "Ändern: " + question.label);
           item.append(text, edit);
           list.appendChild(item);
         });
-        content.appendChild(list);
+        step.content.appendChild(list);
       }
 
-      function renderPrivacy(content) {
+      function renderPrivacy(slide) {
         var state = activeForm;
-        var form = state.form;
 
-        content.append(el("h3", "question", "Datenschutz"), el("p", "help", "Bitte lies die folgenden Hinweise, bevor du deine Angaben absendest."));
+        slide.append(el("h3", "question", "Datenschutz"), el("p", "help", "Bitte lies die folgenden Hinweise, bevor du deine Angaben absendest."));
 
-        var privacyUrl = safeUrl(form.privacyUrl);
+        var privacyUrl = safeUrl(privacy.privacyUrl);
         var privacyLink = null;
         if (privacyUrl) {
           privacyLink = el("a", null, "Datenschutzerklärung");
@@ -536,25 +667,24 @@
           privacyLink.rel = "noopener";
         }
 
-        if (form.consentText) {
+        if (privacy.consentText) {
           var consent = el("label", "consent");
-          var box = el("input");
+          var box = state.ui.consent = el("input");
           box.type = "checkbox";
-          box.checked = state.consent;
           box.addEventListener("change", function () { state.consent = box.checked; });
-          var text = el("span", null, form.consentText);
+          var text = el("span", null, privacy.consentText);
           if (privacyLink) text.append(" (", privacyLink, ")");
           consent.append(box, text);
-          content.appendChild(consent);
+          slide.appendChild(consent);
         } else if (privacyLink) {
           var notice = el("p", "privacy", "Informationen zum Umgang mit deinen Daten findest du in unserer ");
           notice.append(privacyLink, ".");
-          content.appendChild(notice);
+          slide.appendChild(notice);
         }
       }
 
-      // Honeypot and error message, shown on the step with the submit button.
-      function renderSubmitExtras(content) {
+      // Honeypot and error message, on the step with the submit button.
+      function renderSubmitExtras(slide) {
         var state = activeForm;
 
         // Honeypot: invisible for people, bots tend to fill it in.
@@ -564,56 +694,59 @@
         trapInput.name = "website";
         trapInput.tabIndex = -1;
         trapInput.autocomplete = "off";
-        trapInput.value = state.honeypot;
         trapInput.addEventListener("input", function () { state.honeypot = trapInput.value; });
         trap.appendChild(trapInput);
-        content.appendChild(trap);
+        slide.appendChild(trap);
 
-        var error = el("p", "error", state.error);
-        error.setAttribute("role", "alert");
-        content.appendChild(error);
+        state.ui.error = el("p", "error");
+        state.ui.error.setAttribute("role", "alert");
+        slide.appendChild(state.ui.error);
       }
 
-      function isLastStep() {
-        return activeForm.index === activeForm.steps.length - 1;
+      function setFieldError(step, message) {
+        var state = activeForm;
+        if (message) {
+          state.errors[step.question.id] = message;
+          step.field.setAttribute("aria-invalid", "true");
+        } else {
+          delete state.errors[step.question.id];
+          step.field.removeAttribute("aria-invalid");
+        }
+        step.error.textContent = message || "";
+      }
+
+      function checkStep(step) {
+        var message = validate(step.question, activeForm.answers[step.question.id]);
+        setFieldError(step, message);
+        return !message;
       }
 
       function next() {
         var state = activeForm;
-        var step = currentStep();
+        if (state.done) return closeForm(false);
 
-        if (step.type === "question") {
-          var message = validate(step.question, state.answers[step.question.id]);
-          if (message) return showFieldError(step.question, message);
-          delete state.errors[step.question.id];
-        }
-        if (isLastStep()) return submit();
+        var step = state.steps[state.index];
+        if (step.type === "question" && !checkStep(step)) return step.focus.focus({ preventScroll: true });
+        if (state.index === state.steps.length - 1) return submit();
 
-        if (state.returnToReview && step.type === "question") {
-          state.index = state.reviewIndex;
-          state.returnToReview = false;
-        } else {
-          state.index++;
-        }
-        renderForm(true);
+        goTo(state.returnToReview && step.type === "question" ? state.reviewIndex : state.index + 1, true);
       }
 
       function back() {
-        activeForm.index = Math.max(0, activeForm.index - 1);
         activeForm.returnToReview = false;
         activeForm.error = "";
-        renderForm(true);
+        goTo(Math.max(0, activeForm.index - 1), true);
       }
 
-      function showFieldError(question, message) {
-        activeForm.errors[question.id] = message;
-        var id = "kh-q" + question.id;
-        var error = formLayer.querySelector("#" + id + "-error");
-        if (error) error.textContent = message;
-        var field = formLayer.querySelector("#" + id) || formLayer.querySelector("[name='" + id + "']");
-        var described = formLayer.querySelector("[aria-describedby~='" + id + "-error']");
-        if (described) described.setAttribute("aria-invalid", "true");
-        if (field) field.focus();
+      // Jumps to the first question the client or the server rejected.
+      function showInvalidQuestion() {
+        var state = activeForm;
+        var index = state.steps.findIndex(function (step) { return step.type === "question" && state.errors[step.question.id]; });
+        if (index === -1) return false;
+
+        state.returnToReview = true;
+        goTo(index, true);
+        return true;
       }
 
       function submit() {
@@ -621,15 +754,19 @@
         var form = state.form;
         if (state.submitting) return;
 
-        if (form.consentText && !state.consent) {
+        // Swiping skips the checks of the "Weiter" button, so every answer is checked again.
+        state.steps.forEach(function (step) { if (step.type === "question") checkStep(step); });
+        if (showInvalidQuestion()) return;
+
+        if (privacy.consentText && !state.consent) {
           state.error = MESSAGES.consent;
-          return renderForm(true);
+          updateChrome();
+          return state.ui.consent.focus({ preventScroll: true });
         }
 
         if (!endpoint) {
-          state.done = true;
           state.preview = true;
-          return renderForm(true);
+          return showDone();
         }
 
         var body = new FormData();
@@ -647,7 +784,7 @@
 
         state.submitting = true;
         state.error = "";
-        renderForm(false);
+        updateChrome();
 
         fetch(endpoint + "/forms/" + encodeURIComponent(form.id) + "/submissions", { method: "POST", body: body, credentials: "omit" })
           .then(function (response) {
@@ -658,33 +795,48 @@
             state.submitting = false;
             var errors = result.json.errors || {};
 
-            if (result.ok) {
-              state.done = true;
-            } else if (errors.consent) {
+            if (result.ok) return showDone();
+
+            if (errors.consent) {
               state.error = errors.consent;
             } else if (Object.keys(errors).length) {
-              // Jump to the first question the server rejected.
-              state.errors = errors;
-              state.index = state.steps.findIndex(function (step) { return step.type === "question" && errors[step.question.id]; });
-              state.returnToReview = true;
-              if (state.index === -1) {
-                state.index = state.steps.length - 1;
-                state.error = MESSAGES.network;
-              }
+              state.steps.forEach(function (step) { if (step.type === "question") setFieldError(step, errors[step.question.id]); });
+              if (showInvalidQuestion()) return;
+              state.error = MESSAGES.network;
             } else {
               state.error = result.json.error || MESSAGES.network;
             }
-            renderForm(true);
+            updateChrome();
           })
           .catch(function () {
             if (activeForm !== state) return;
             state.submitting = false;
             state.error = MESSAGES.network;
-            renderForm(true);
+            updateChrome();
           });
       }
 
-      // Keep keyboard focus inside the form dialog.
+      // The thank-you message takes the place of the slides.
+      function showDone() {
+        var state = activeForm;
+        var ui = state.ui;
+        state.done = true;
+
+        var done = el("div", "done");
+        done.innerHTML = svg("check");
+        done.append(el("h3", "question", "Vielen Dank!"), el("p", "intro", state.form.thankYou || "Wir haben deine Angaben erhalten."));
+        if (state.preview) done.appendChild(el("p", "help", "Vorschau: Es wurde nichts gesendet."));
+        ui.slides.replaceWith(done);
+
+        ui.bar.style.width = "100%";
+        ui.progress.setAttribute("aria-valuenow", "100");
+        ui.back.hidden = true;
+        ui.next.replaceChildren(el("span", null, "Schließen"));
+        ui.next.disabled = false;
+        ui.next.focus();
+      }
+
+      // Keep keyboard focus inside the form dialog on the public hub page.
       formLayer.addEventListener("keydown", function (event) {
         if (event.key !== "Tab") return;
         var focusable = Array.prototype.filter.call(formLayer.querySelectorAll("button, input, textarea, a[href]"), function (node) {
@@ -706,7 +858,7 @@
       var previousOverflow = null;
 
       function lockScroll() {
-        var lock = !options.container && (!!activeForm || (open && fullscreen.matches));
+        var lock = !options.container && ((headless && !!activeForm) || (open && fullscreen.matches));
         var html = document.documentElement;
         if (lock && previousOverflow === null) {
           previousOverflow = html.style.overflow;
@@ -731,7 +883,7 @@
 
       document.addEventListener("keydown", function (event) {
         if (event.key !== "Escape" || !host.isConnected) return;
-        if (activeForm) {
+        if (activeForm && (headless || open)) {
           closeForm(true);
         } else if (open) {
           toggle(false, true);

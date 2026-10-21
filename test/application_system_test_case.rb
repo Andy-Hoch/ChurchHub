@@ -3,6 +3,8 @@ require "test_helper"
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1400 ] do |options|
     options.add_option("goog:loggingPrefs", { browser: "ALL" })
+    # Form steps then scroll into place instantly instead of smoothly.
+    options.add_argument("--force-prefers-reduced-motion")
   end
 
   # Shared CI runners can be briefly slow; Capybara's 2s default then fails

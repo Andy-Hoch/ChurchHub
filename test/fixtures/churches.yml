@@ -2,6 +2,7 @@ one:
   name: Gemeinde Eins
   slug: gemeinde-eins
   website_url: https://gemeinde-eins.example
+  consent_text: Ich bin mit der Speicherung einverstanden.
 
 two:
   name: Gemeinde Zwei

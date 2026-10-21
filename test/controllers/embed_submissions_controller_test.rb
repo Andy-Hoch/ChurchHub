@@ -69,6 +69,15 @@ class EmbedSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert response.parsed_body.dig("errors", "consent")
   end
 
+  test "needs no consent when the church has no consent text" do
+    churches(:one).update!(consent_text: nil)
+
+    assert_difference "FormSubmission.count" do
+      submit consent: "0"
+    end
+    assert_response :created
+  end
+
   test "silently drops spam" do
     assert_no_difference "FormSubmission.count" do
       submit website: "https://spam.example"

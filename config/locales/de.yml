@@ -20,6 +20,8 @@ de:
         name: Name
         slug: Kurzname
         website_url: Webseite
+        consent_text: Einwilligungstext
+        privacy_url: Link zur Datenschutzerklärung
       hub:
         title: Überschrift
         button_label: Button-Text
@@ -40,8 +42,6 @@ de:
         thank_you_message: Danke-Text
         submit_label: Text des Absenden-Buttons
         notification_emails: Benachrichtigungen an
-        consent_text: Einwilligungstext
-        privacy_url: Link zur Datenschutzerklärung
         retention_months: Aufbewahrungsdauer
       form_question:
         kind: Fragetyp

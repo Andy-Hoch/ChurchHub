@@ -2,7 +2,6 @@ prayer:
   church: one
   title: Gebetsanliegen
   intro: Wir beten gerne für dich.
-  consent_text: Ich bin mit der Speicherung einverstanden.
   notification_emails: pastor@example.com
 
 other:

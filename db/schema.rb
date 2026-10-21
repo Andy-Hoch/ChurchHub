@@ -10,13 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_13_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_21_100000) do
   create_table "churches", force: :cascade do |t|
     t.string "name", null: false
     t.string "slug", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "website_url"
+    t.text "consent_text"
+    t.string "privacy_url"
     t.index ["slug"], name: "index_churches_on_slug", unique: true
   end
 
@@ -50,8 +52,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_13_110000) do
     t.text "thank_you_message"
     t.string "submit_label"
     t.string "notification_emails"
-    t.text "consent_text"
-    t.string "privacy_url"
     t.integer "retention_months"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
