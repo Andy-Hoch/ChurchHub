@@ -11,11 +11,6 @@ class FormTest < ActiveSupport::TestCase
     assert_not form.valid?
   end
 
-  test "privacy url must be http" do
-    assert_not forms(:prayer).tap { |form| form.privacy_url = "javascript:alert(1)" }.valid?
-    assert forms(:prayer).tap { |form| form.privacy_url = "https://example.com/datenschutz" }.valid?
-  end
-
   test "changes invalidate the cached embed script" do
     hub = hubs(:one)
     hub.update_column(:updated_at, 1.day.ago)

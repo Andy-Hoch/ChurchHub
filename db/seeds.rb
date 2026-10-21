@@ -12,9 +12,9 @@ end
 
 church = Church.find_by(slug: "demo-gemeinde") || Church.create!(name: "Demo Gemeinde", slug: "demo-gemeinde")
 church.memberships.find_or_create_by!(user: user) { |membership| membership.role = :owner }
+church.update!(consent_text: "Ich bin einverstanden, dass meine Angaben zur Bearbeitung meines Anliegens gespeichert werden.") if church.consent_text.blank?
 
 prayer = church.forms.find_by(title: "Gebetsanliegen") || FormTemplate.find("prayer").build_for(church).tap do |form|
-  form.consent_text = "Ich bin einverstanden, dass meine Angaben zur Bearbeitung meines Anliegens gespeichert werden."
   form.notification_emails = user.email_address
   form.save!
 end

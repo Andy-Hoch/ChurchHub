@@ -18,6 +18,18 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
     assert_nil churches(:one).reload.website_url
   end
 
+  test "owner sets the privacy settings for all forms" do
+    patch church_path, params: { church: { consent_text: "Ich stimme zu.", privacy_url: " https://example.com/datenschutz " } }
+
+    assert_redirected_to edit_church_path
+    church = churches(:one).reload
+    assert_equal "Ich stimme zu.", church.consent_text
+    assert_equal "https://example.com/datenschutz", church.privacy_url
+
+    get edit_church_path
+    assert_select "textarea[name='church[consent_text]']", text: "Ich stimme zu."
+  end
+
   test "rejects an invalid church website" do
     patch church_path, params: { church: { website_url: "keine adresse" } }
 
