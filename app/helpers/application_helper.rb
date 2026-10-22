@@ -1,14 +1,23 @@
 module ApplicationHelper
-  def nav_link_to(name, path, badge: nil)
-    link_to path, class: "btn sidebar-menu__button", aria: { current: ("page" if current_page?(path)) } do
-      safe_join([ name, (tag.span(badge, class: "badge badge--primary mis-auto") if badge) ])
+  # Section links stay current on the pages below them, e.g. a form's questions and submissions.
+  def nav_link_to(name, path, badge: nil, section: false)
+    current = section ? request.path == path || request.path.start_with?("#{path}/") : current_page?(path)
+
+    link_to path, class: "btn sidebar-menu__button", title: name, aria: { current: ("page" if current) } do
+      safe_join([ tag.span(name, class: "sidebar-menu__label"), (tag.span(badge, class: "badge badge--primary mis-auto") if badge) ])
     end
   end
 
-  def unread_submissions_count
-    return 0 unless current_church
+  def sidebar_forms
+    @sidebar_forms ||= current_church ? current_church.forms.order(:title).to_a : []
+  end
 
-    FormSubmission.unread.joins(:form).where(forms: { church_id: current_church.id }).count
+  def unread_counts_by_form
+    @unread_counts_by_form ||= FormSubmission.unread.where(form: sidebar_forms).group(:form_id).count
+  end
+
+  def unread_submissions_count
+    unread_counts_by_form.values.sum
   end
 
   def field_error(record, attribute)

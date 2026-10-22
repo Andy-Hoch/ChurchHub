@@ -1,0 +1,17 @@
+<div class="time-roller" data-controller="time-roller" data-action="focusout->time-roller#closeOnFocusOut keydown.esc->time-roller#close">
+  <%= form.text_field attribute, required:, class: "input", inputmode: "numeric", autocomplete: "off", maxlength: 5, placeholder: "08:00",
+        pattern: "([01][0-9]|2[0-3]):[0-5][0-9]", title: "Uhrzeit als HH:MM, z. B. 08:00",
+        aria: { haspopup: "listbox", expanded: false },
+        data: { time_roller_target: "input", action: "focus->time-roller#open click->time-roller#open keydown.down->time-roller#open input->time-roller#sync", **data } %>
+
+  <div class="time-roller__panel" tabindex="-1" data-time-roller-target="panel" hidden>
+    <% { "Stunde" => (0..23), "Minute" => 0.step(55, 5) }.each do |unit, values| %>
+      <div class="time-roller__column" role="listbox" tabindex="0" aria-label="<%= unit %>" data-time-roller-target="column" data-action="scroll->time-roller#scrolled keydown->time-roller#step">
+        <% values.each do |value| %>
+          <div class="time-roller__item" role="option" aria-selected="false" data-value="<%= format("%02d", value) %>" data-action="click->time-roller#pick"><%= format("%02d", value) %></div>
+        <% end %>
+      </div>
+      <% if unit == "Stunde" %><span class="time-roller__separator" aria-hidden="true">:</span><% end %>
+    <% end %>
+  </div>
+</div>

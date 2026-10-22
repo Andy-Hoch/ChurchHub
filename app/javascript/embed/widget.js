@@ -56,7 +56,7 @@
     ".button:active { transform: scale(.97); }",
     ".button:focus-visible, .link:focus-visible, .close:focus-visible { outline: 2px solid var(--ph-primary); outline-offset: 2px; }",
     ".icon { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }",
-    ".panel { box-sizing: border-box; width: min(360px, calc(100vw - 40px)); max-height: min(560px, calc(100vh - 110px)); overflow: auto; background: light-dark(oklch(96.74% 0.0013 286.38), oklch(14.08% 0.0044 285.82)); color: light-dark(oklch(14.08% 0.0044 285.82), oklch(98.51% 0 0)); border: 1px solid light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); border-radius: var(--radius); box-shadow: 0 20px 25px -5px oklch(0% 0 0 / .15), 0 8px 10px -6px oklch(0% 0 0 / .1); transform-origin: bottom right; animation: ph-in .18s ease-out; }",
+    ".panel { box-sizing: border-box; width: min(360px, calc(100vw - 40px)); max-height: min(560px, calc(var(--ph-vvh, 100dvh) - 110px)); overflow: auto; background: light-dark(oklch(96.74% 0.0013 286.38), oklch(14.08% 0.0044 285.82)); color: light-dark(oklch(14.08% 0.0044 285.82), oklch(98.51% 0 0)); border: 1px solid light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); border-radius: var(--radius); box-shadow: 0 20px 25px -5px oklch(0% 0 0 / .15), 0 8px 10px -6px oklch(0% 0 0 / .1); transform-origin: bottom right; animation: ph-in .18s ease-out; }",
     ".launcher--left .panel { transform-origin: bottom left; }",
     ".panel[hidden] { display: none; }",
     ".header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 16px; background: var(--ph-primary); color: var(--ph-text); }",
@@ -72,16 +72,18 @@
     "@media (prefers-reduced-motion: reduce) { .link { transition: none; } }",
     ".empty { padding: 16px; margin: 0; color: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); }",
     "@keyframes ph-in { from { opacity: 0; transform: translateY(8px) scale(.98); } }",
-    "@media (max-width: 640px) { :host(:not([data-inline])) .panel { position: fixed; inset: 0; width: 100%; height: 100%; height: 100dvh; max-height: none; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; } :host(:not([data-inline])) .header { position: sticky; top: 0; padding-top: max(14px, env(safe-area-inset-top)); } :host(:not([data-inline])) .panel:not([hidden]) + .button { display: none; } :host(:not([data-inline])) .close { padding: 8px; } }",
+    // On phones the panel is a sheet over the visible area, with a gap above it.
+    "@media (max-width: 640px) { :host(:not([data-inline])) .launcher { --gap: max(12px, env(safe-area-inset-top)); } :host(:not([data-inline])) .launcher .panel { position: fixed; inset-inline: 0; top: calc(var(--ph-vvt, 0px) + var(--gap)); width: 100%; height: calc(var(--ph-vvh, 100dvh) - var(--gap)); max-height: none; border: 0; border-radius: var(--radius) var(--radius) 0 0; padding-bottom: env(safe-area-inset-bottom); overscroll-behavior: contain; } :host(:not([data-inline])) .launcher .header { position: sticky; top: 0; } :host(:not([data-inline])) .panel:not([hidden]) + .button { display: none; } :host(:not([data-inline])) .close { padding: 8px; } }",
 
-    ".panel--form { display: flex; flex-direction: column; height: min(560px, calc(100vh - 110px)); overflow: hidden; }",
-    ".backdrop { --radius: calc(var(--ph-radius) * 1px); color-scheme: var(--ph-scheme); font: 400 15px/1.4 var(--ph-font); position: fixed; inset: 0; z-index: 2147483001; display: flex; align-items: center; justify-content: center; padding: 20px; background: oklch(0% 0 0 / .45); animation: ph-fade .2s ease-out; }",
-    ":host([data-inline]) .backdrop { position: absolute; }",
-    ".backdrop .panel { height: min(560px, calc(100vh - 40px)); max-height: none; transform-origin: center; }",
-    "@media (max-width: 640px) { .backdrop { padding: 0; } .backdrop .panel { width: 100%; height: 100%; height: 100dvh; border: 0; border-radius: 0; padding-bottom: env(safe-area-inset-bottom); } .backdrop .header { padding-top: max(14px, env(safe-area-inset-top)); } }",
+    ".panel--form { display: flex; flex-direction: column; height: min(560px, calc(var(--ph-vvh, 100dvh) - 110px)); overflow: hidden; }",
+    ".backdrop { --radius: calc(var(--ph-radius) * 1px); color-scheme: var(--ph-scheme); font: 400 15px/1.4 var(--ph-font); position: fixed; inset-inline: 0; top: var(--ph-vvt, 0px); height: var(--ph-vvh, 100dvh); z-index: 2147483001; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 20px; background: oklch(0% 0 0 / .45); animation: ph-fade .2s ease-out; }",
+    ":host([data-inline]) .backdrop { position: absolute; inset: 0; height: auto; }",
+    ".backdrop .panel { height: min(560px, 100%); max-height: none; transform-origin: center; }",
+    "@media (max-width: 640px) { .backdrop { align-items: flex-end; padding: max(12px, env(safe-area-inset-top)) 0 0; } .backdrop .panel { width: 100%; height: 100%; border: 0; border-radius: var(--radius) var(--radius) 0 0; padding-bottom: env(safe-area-inset-bottom); } }",
 
     ".form { --border: light-dark(oklch(91.97% 0.004 286.32), oklch(37.03% 0.0119 285.81)); --muted: light-dark(oklch(55.17% 0.0138 285.94), oklch(71.18% 0.0129 286.07)); --negative: light-dark(oklch(57.71% 0.2152 27.33), oklch(70.4% 0.191 22.22)); flex: 1; min-height: 0; display: flex; flex-direction: column; background: light-dark(oklch(100% 0 0), oklch(21.03% 0.0059 285.89)); }",
     ".form *, .form *::before, .form *::after { box-sizing: border-box; }",
+    ".form .header { flex-shrink: 0; }",
     ".form .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }",
     ".progress { height: 4px; flex-shrink: 0; background: var(--border); }",
     ".progress-bar { height: 100%; background: var(--ph-primary); transition: width .25s ease; }",
@@ -332,17 +334,23 @@
 
       function openForm(form, trigger) {
         var steps = [];
-        if (form.intro) steps.push({ type: "intro" });
-        form.questions.forEach(function (question, index) {
-          steps.push({ type: "question", question: question, number: index + 1 });
-        });
-        steps.push({ type: "review" });
-        var reviewIndex = steps.length - 1;
-        // Consent text and/or privacy link get a step of their own right before sending.
-        if (privacy.consentText || safeUrl(privacy.privacyUrl)) steps.push({ type: "privacy" });
+        var reviewIndex = -1;
+        if (form.closedMessage) {
+          // A full form whose button stays visible only shows a notice.
+          steps.push({ type: "closed" });
+        } else {
+          if (form.intro) steps.push({ type: "intro" });
+          form.questions.forEach(function (question, index) {
+            steps.push({ type: "question", question: question, number: index + 1 });
+          });
+          steps.push({ type: "review" });
+          reviewIndex = steps.length - 1;
+          // Consent text and/or privacy link get a step of their own right before sending.
+          if (privacy.consentText || safeUrl(privacy.privacyUrl)) steps.push({ type: "privacy" });
+        }
 
         activeForm = {
-          reviewIndex: reviewIndex,
+          reviewIndex: reviewIndex, closed: Boolean(form.closedMessage),
           form: form, steps: steps, index: 0, answers: {}, errors: {}, consent: false, honeypot: "",
           returnToReview: false, submitting: false, done: false, error: "", startedAt: Date.now(), trigger: trigger,
           scrollTarget: null, scrollUntil: 0
@@ -422,10 +430,12 @@
           } else if (step.type === "review") {
             step.content = slide.appendChild(el("div"));
             renderReview(step);
+          } else if (step.type === "closed") {
+            slide.append(el("h3", "question", form.title), el("p", "intro", form.closedMessage));
           } else {
             renderPrivacy(slide);
           }
-          if (index === state.steps.length - 1) renderSubmitExtras(slide);
+          if (index === state.steps.length - 1 && !state.closed) renderSubmitExtras(slide);
           ui.slides.appendChild(slide);
         });
 
@@ -452,7 +462,9 @@
         footer.append(ui.back, ui.next);
 
         state.node = el("div", "form");
-        state.node.append(header, ui.progress, ui.slides, footer);
+        state.node.append(header);
+        if (!state.closed) state.node.appendChild(ui.progress);
+        state.node.append(ui.slides, footer);
         updateChrome();
       }
 
@@ -477,7 +489,9 @@
         ui.back.hidden = state.index === 0;
 
         var label = "Weiter";
-        if (last) {
+        if (state.closed) {
+          label = "Schließen";
+        } else if (last) {
           label = state.submitting ? "Wird gesendet …" : (state.form.submitLabel || "Absenden");
         } else if (step.type === "intro") {
           label = "Los geht’s";
@@ -723,7 +737,7 @@
 
       function next() {
         var state = activeForm;
-        if (state.done) return closeForm(false);
+        if (state.done || state.closed) return closeForm(false);
 
         var step = state.steps[state.index];
         if (step.type === "question" && !checkStep(step)) return step.focus.focus({ preventScroll: true });
@@ -867,6 +881,34 @@
           html.style.overflow = previousOverflow;
           previousOverflow = null;
         }
+        trackViewport(!options.container && ((headless && !!activeForm) || open));
+      }
+
+      // Fixed layers stick to the layout viewport, but toolbars and the
+      // on-screen keyboard shrink and shift the part that is actually visible.
+      // While a layer covers the page, its size and offset follow that part,
+      // so the header stays on screen.
+      var viewport = window.visualViewport;
+      var tracking = false;
+
+      function trackViewport(track) {
+        if (!viewport || track === tracking) return;
+        tracking = track;
+        if (track) {
+          viewport.addEventListener("resize", syncViewport);
+          viewport.addEventListener("scroll", syncViewport);
+          syncViewport();
+        } else {
+          viewport.removeEventListener("resize", syncViewport);
+          viewport.removeEventListener("scroll", syncViewport);
+          host.style.removeProperty("--ph-vvh");
+          host.style.removeProperty("--ph-vvt");
+        }
+      }
+
+      function syncViewport() {
+        host.style.setProperty("--ph-vvh", viewport.height + "px");
+        host.style.setProperty("--ph-vvt", viewport.offsetTop + "px");
       }
 
       if (fullscreen.addEventListener) fullscreen.addEventListener("change", lockScroll);

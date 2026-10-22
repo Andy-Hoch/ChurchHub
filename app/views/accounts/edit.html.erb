@@ -17,9 +17,34 @@
   </section>
 
   <section class="flex flex-col gap">
-    <h2 class="font-semibold text-lg">Konto löschen</h2>
+    <h2 class="font-semibold text-lg">Passwort ändern</h2>
 
-    <div class="card flex flex-col gap">
+    <%= form_with url: account_password_path, method: :patch, class: "card flex flex-col gap" do |form| %>
+      <div class="field">
+        <%= form.label :current_password, "Aktuelles Passwort", class: "field__label" %>
+        <%= form.password_field :current_password, required: true, autocomplete: "current-password", maxlength: 72, class: "input" %>
+      </div>
+      <div class="field">
+        <%= form.label :password, "Neues Passwort", class: "field__label" %>
+        <%= form.password_field :password, required: true, autocomplete: "new-password", minlength: 8, maxlength: 72, class: "input" %>
+      </div>
+      <div class="field">
+        <%= form.label :password_confirmation, "Neues Passwort wiederholen", class: "field__label" %>
+        <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", minlength: 8, maxlength: 72, class: "input" %>
+      </div>
+      <div class="card__footer">
+        <%= form.submit "Passwort ändern", class: "btn btn--primary" %>
+      </div>
+    <% end %>
+  </section>
+
+  <details class="disclosure">
+    <summary class="disclosure__summary">
+      <span class="disclosure__title">Konto löschen</span>
+      <span class="icon icon--chevron-right disclosure__icon" aria-hidden="true"></span>
+    </summary>
+
+    <div class="disclosure__content flex flex-col gap">
       <p class="text-sm">Löscht dein Konto endgültig. Das lässt sich nicht rückgängig machen. Mit deinen Kirchen passiert Folgendes:</p>
 
       <% if @churches.any? %>
@@ -45,15 +70,13 @@
         <p class="text-sm text-subtle">Du bist in keiner Kirche Mitglied.</p>
       <% end %>
 
-      <%= form_with url: account_path, method: :delete, class: "flex flex-col gap" do |form| %>
+      <%= form_with url: account_path, method: :delete, namespace: "account_deletion", class: "flex flex-col gap" do |form| %>
         <div class="field">
           <%= form.label :password, "Zum Bestätigen dein Passwort eingeben", class: "field__label" %>
           <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, class: "input" %>
         </div>
-        <div class="card__footer">
-          <%= form.submit "Konto endgültig löschen", class: "btn btn--negative" %>
-        </div>
+        <%= form.submit "Konto endgültig löschen", class: "btn btn--negative i-min" %>
       <% end %>
     </div>
-  </section>
+  </details>
 </div>

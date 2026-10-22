@@ -4,7 +4,8 @@ class FormsController < ApplicationController
 
   def index
     @forms = current_church.forms.order(:title)
-    @submission_counts = FormSubmission.where(form: @forms).group(:form_id).count
+    submission_counts = FormSubmission.where(form: @forms).group(:form_id).count
+    @forms.each { |form| form.submissions_count = submission_counts[form.id].to_i }
     @unread_counts = FormSubmission.unread.where(form: @forms).group(:form_id).count
   end
 

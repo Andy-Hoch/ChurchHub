@@ -8,6 +8,7 @@ class AccountsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_match "one@example.com", response.body
+    assert_match "Passwort ändern", response.body
     assert_match "Wird gelöscht", response.body
   end
 

@@ -22,7 +22,7 @@ class EmbedController < ActionController::Base
     # Only the Referer counts here: the response is cached per Referer (Vary).
     elsif !embedding_allowed_for?(@hub.church, host_of(request.referer))
       render js: "/* #{t(".not_allowed")} */"
-    elsif stale?([ @hub, @hub.church ], public: true)
+    elsif stale?(etag: [ @hub, @hub.church, @hub.availability_key ], last_modified: [ @hub.updated_at, @hub.church.updated_at ].max, public: true)
       @allowed_hosts = [ @hub.church.website_host, request.host ] if @hub.church.embed_restricted?
       render :show
     end

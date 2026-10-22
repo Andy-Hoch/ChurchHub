@@ -18,11 +18,15 @@
             <span class="font-medium"><%= link.title %></span>
             <% if link.kind_form? %><span class="badge">Formular</span><% end %>
             <% unless link.visible? %><span class="badge badge--secondary">Ausgeblendet</span><% end %>
+            <%= link_status_badge(link) %>
           </div>
           <% if link.kind_form? %>
             <span class="link-row__url"><%= link.form ? link.form.title : "Formular wurde gelöscht – wird nicht angezeigt" %></span>
           <% else %>
             <span class="link-row__url"><%= link.url %></span>
+          <% end %>
+          <% if (summary = link_schedule_summary(link)) %>
+            <span class="link-row__url"><%= summary %></span>
           <% end %>
         </div>
         <div class="link-row__actions">

@@ -64,3 +64,81 @@ class LinkFormTest < ActiveSupport::TestCase
     assert_equal [ "Nur das Gebetsteam", "Die ganze Gemeinde" ], payload[:form][:questions].third[:choices]
   end
 end
+
+class LinkScheduleTest < ActiveSupport::TestCase
+  def sunday_livestream(**attributes)
+    hubs(:one).links.create!(title: "Livestream", url: "https://example.com/live", schedule: "weekly", weekdays: %w[ 0 ], start_time: "08:00", end_time: "12:00", **attributes)
+  end
+
+  test "always shown without a schedule" do
+    assert links(:live).schedule_always?
+    assert links(:live).scheduled_at?(Time.zone.parse("2026-10-18 03:00"))
+  end
+
+  test "weekly links show on their weekdays between start and end time" do
+    link = sunday_livestream
+
+    assert link.scheduled_at?(Time.zone.parse("2026-10-18 08:00"))
+    assert link.scheduled_at?(Time.zone.parse("2026-10-18 11:59"))
+    assert_not link.scheduled_at?(Time.zone.parse("2026-10-18 07:59"))
+    assert_not link.scheduled_at?(Time.zone.parse("2026-10-18 12:00"))
+    assert_not link.scheduled_at?(Time.zone.parse("2026-10-19 09:00"))
+    assert link.scheduled_at?(Time.zone.parse("2026-10-25 09:00")), "Sonntag der Zeitumstellung"
+  end
+
+  test "biweekly links skip every other week, counted from the first week" do
+    link = sunday_livestream(schedule: "biweekly", visible_from: Time.zone.parse("2026-10-14 00:00"))
+
+    assert link.scheduled_at?(Time.zone.parse("2026-10-18 09:00"))
+    assert_not link.scheduled_at?(Time.zone.parse("2026-10-25 09:00"))
+    assert link.scheduled_at?(Time.zone.parse("2026-11-01 09:00"))
+    assert_not link.scheduled_at?(Time.zone.parse("2026-10-11 09:00")), "vor dem Start"
+  end
+
+  test "recurring and period links respect their bounds" do
+    link = sunday_livestream(visible_until: Time.zone.parse("2026-10-20 00:00"))
+    assert link.scheduled_at?(Time.zone.parse("2026-10-18 09:00"))
+    assert_not link.scheduled_at?(Time.zone.parse("2026-10-25 09:00"))
+    assert link.schedule_ended?(Time.zone.parse("2026-10-25 09:00"))
+
+    period = hubs(:one).links.create!(title: "Freizeit", url: "https://example.com/freizeit", schedule: "period", visible_from: Time.zone.parse("2026-11-01 10:00"))
+    assert_not period.scheduled_at?(Time.zone.parse("2026-11-01 09:59"))
+    assert period.scheduled_at?(Time.zone.parse("2027-01-01 00:00"))
+  end
+
+  test "hidden links stay hidden whatever the schedule" do
+    link = sunday_livestream(visible: false)
+
+    assert_not link.embeddable?(Time.zone.parse("2026-10-18 09:00"))
+  end
+
+  test "validates the schedule" do
+    link = hubs(:one).links.new(title: "Live", url: "https://example.com/live")
+
+    link.schedule = "period"
+    assert_not link.valid?
+    assert link.errors.added?(:visible_from, :period_blank)
+
+    link.assign_attributes(schedule: "weekly", weekdays: [ "" ], start_time: "12:00", end_time: "08:00")
+    assert_not link.valid?
+    assert link.errors.added?(:weekdays, :blank)
+    assert link.errors.added?(:end_time, :not_after_start)
+
+    link.assign_attributes(schedule: "biweekly", weekdays: %w[ 0 3 ], end_time: "13:00")
+    assert_not link.valid?
+    assert link.errors.added?(:visible_from, :first_week_blank)
+
+    link.visible_from = Time.current
+    assert link.valid?
+    assert_equal [ 0, 3 ], link.weekdays
+  end
+
+  test "drops schedule details that do not apply" do
+    link = sunday_livestream(visible_until: 1.year.from_now)
+    link.update!(schedule: "always")
+
+    assert_nil link.visible_until
+    assert_empty link.weekdays
+    assert_nil link.start_time
+  end
+end

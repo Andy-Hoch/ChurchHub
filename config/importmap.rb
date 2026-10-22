@@ -7,3 +7,4 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "sortablejs" # @1.15.7
 pin "@rails/request.js", to: "@rails--request.js.js" # @0.0.13
+pin "rolldate" # @1.4.0

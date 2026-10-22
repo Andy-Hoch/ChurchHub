@@ -36,6 +36,12 @@ de:
         url: Adresse
         kind: Art
         form: Formular
+        schedule: Anzeige
+        visible_from: Beginn
+        visible_until: Ende
+        weekdays: Wochentage
+        start_time: Uhrzeit von
+        end_time: Uhrzeit bis
       form:
         title: Titel
         intro: Begrüßungstext
@@ -43,6 +49,11 @@ de:
         submit_label: Text des Absenden-Buttons
         notification_emails: Benachrichtigungen an
         retention_months: Aufbewahrungsdauer
+        opens_at: Verfügbar ab
+        closes_at: Verfügbar bis
+        submission_limit: Höchstzahl an Einsendungen
+        when_full: Verhalten bei Höchstzahl
+        full_message: Hinweistext
       form_question:
         kind: Fragetyp
         label: Frage
@@ -52,6 +63,12 @@ de:
       membership:
         role: Rolle
     enums:
+      link:
+        schedule:
+          always: Immer
+          period: Zeitraum
+          weekly: Jede Woche
+          biweekly: Alle 2 Wochen
       form_question:
         kind:
           short_text: Kurzer Text
@@ -73,6 +90,8 @@ de:
           attributes:
             notification_emails:
               invalid_addresses: "enthält ungültige Adressen: %{addresses}"
+            closes_at:
+              not_after_start: muss nach „Verfügbar ab“ liegen
         form_question:
           attributes:
             choices:
@@ -91,6 +110,17 @@ de:
             yes_no: Bitte wähle Ja oder Nein.
             single_choice: Bitte wähle eine der Möglichkeiten.
             multiple_choice: Bitte wähle aus den Möglichkeiten.
+        link:
+          attributes:
+            visible_from:
+              period_blank: oder Ende muss angegeben werden
+              first_week_blank: muss bei „Alle 2 Wochen“ angegeben werden
+            visible_until:
+              not_after_start: muss nach dem Beginn liegen
+            weekdays:
+              blank: fehlen – bitte mindestens einen auswählen
+            end_time:
+              not_after_start: muss nach der Startzeit liegen
         membership:
           attributes:
             role:
@@ -114,6 +144,11 @@ de:
     destroy:
       notice: Dein Konto wurde gelöscht.
       wrong_password: Das Passwort ist falsch.
+    passwords:
+      update:
+        notice: Dein Passwort wurde geändert.
+        wrong_password: Das aktuelle Passwort ist falsch.
+        invalid: Die Passwörter stimmen nicht überein oder sind zu kurz (mindestens 8 Zeichen).
 
   churches:
     create:
@@ -137,7 +172,12 @@ de:
     not_found: Formular nicht gefunden.
     create:
       forbidden: Das Formular ist für diese Webseite nicht freigegeben.
+      closed: Dieses Formular nimmt derzeit keine Einsendungen an.
       consent_required: Bitte stimme der Datenverarbeitung zu.
+
+  form_availabilities:
+    update:
+      notice: Verfügbarkeit gespeichert.
 
   form_questions:
     create:
@@ -159,6 +199,7 @@ de:
       "no": nein
 
   forms:
+    full_message: Leider sind alle Plätze vergeben.
     create:
       notice: Formular angelegt.
     update:

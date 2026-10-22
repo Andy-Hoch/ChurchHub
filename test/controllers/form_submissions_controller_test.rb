@@ -46,7 +46,8 @@ class FormSubmissionsControllerTest < ActionDispatch::IntegrationTest
 
   test "shows the unread count in the navigation" do
     get forms_path
-    assert_select ".sidebar-menu__button .badge", text: "1"
+    assert_select ".sidebar-menu__button[href=?] .badge", forms_path, text: "1"
+    assert_select ".sidebar-menu__sub .sidebar-menu__button[href=?] .badge", form_path(forms(:prayer)), text: "1"
   end
 
   test "opening a submission marks it as read" do

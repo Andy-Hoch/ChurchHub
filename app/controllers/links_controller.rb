@@ -53,6 +53,6 @@ class LinksController < ApplicationController
     end
 
     def link_params
-      params.expect(link: %i[ title kind url form_id visible ])
+      params.expect(link: [ :title, :kind, :url, :form_id, :visible, :schedule, :visible_from, :visible_until, :start_time, :end_time, weekdays: [] ])
     end
 end
