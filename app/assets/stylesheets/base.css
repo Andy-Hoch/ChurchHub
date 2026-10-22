@@ -13,7 +13,8 @@
   --color-selected: light-dark(var(--sky-100), var(--sky-950));
   --color-selected-dark: light-dark(var(--blue-300), var(--blue-800));
   --color-highlight: light-dark(var(--yellow-200), var(--yellow-900));
-  --color-primary: light-dark(var(--zinc-900), var(--zinc-50));
+  --color-primary: light-dark(oklch(0.44 0.149 142.4953), oklch(0.8428 0.3211 142.4953));
+  --color-text-on-primary: light-dark(oklch(100% 0 0), var(--zinc-950));
   --color-secondary: light-dark(var(--zinc-100), var(--zinc-800));
 }
 
