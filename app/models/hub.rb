@@ -47,7 +47,29 @@ class Hub < ApplicationRecord
       title: title,
       theme: theme,
       privacy: church.privacy_payload,
-      links: links.select(&:embeddable?).map(&:embed_payload)
+      links: shown_links.map(&:embed_payload)
     }
   end
+
+  # The links visitors see right now. Depends on the time and on how many
+  # submissions limited forms have, not only on records the hub touches.
+  def shown_links
+    load_submission_counts
+    links.select(&:embeddable?)
+  end
+
+  # Part of the cache key of the embed script and the public page, so that
+  # scheduled links and full forms show up without any record changing.
+  def availability_key
+    shown_links.map { |link| link.kind_form? && link.form.full? ? "#{link.id}-full" : link.id }.join(",")
+  end
+
+  private
+    def load_submission_counts
+      forms = links.filter_map(&:form).select(&:submission_limit)
+      return if forms.empty?
+
+      counts = FormSubmission.where(form_id: forms.map(&:id)).group(:form_id).count
+      forms.each { |form| form.submissions_count = counts[form.id].to_i }
+    end
 end

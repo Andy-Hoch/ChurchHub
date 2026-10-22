@@ -137,4 +137,29 @@ class EmbedSubmissionsControllerTest < ActionDispatch::IntegrationTest
     assert_match "Wofür dürfen wir beten?", response.body
     assert_match "Nur das Gebetsteam", response.body
   end
+
+  test "accepts submissions up to the limit" do
+    forms(:prayer).update!(submission_limit: 3)
+
+    assert_difference -> { forms(:prayer).submissions.count } do
+      submit
+    end
+    assert_response :created
+
+    assert_no_difference "FormSubmission.count" do
+      submit
+    end
+    assert_response :unprocessable_entity
+    assert_equal "Dieses Formular nimmt derzeit keine Einsendungen an.", response.parsed_body["error"]
+  end
+
+  test "rejects submissions outside the availability" do
+    forms(:prayer).update!(closes_at: 1.minute.ago)
+
+    assert_no_difference "FormSubmission.count" do
+      submit
+    end
+    assert_response :unprocessable_entity
+    assert response.parsed_body["error"]
+  end
 end

@@ -53,4 +53,30 @@ class PublicHubsControllerTest < ActionDispatch::IntegrationTest
     assert_recognizes({ controller: "sessions", action: "new" }, "/session/new")
     assert_recognizes({ controller: "public_hubs", action: "show", slug: "gemeinde-eins" }, "/gemeinde-eins")
   end
+
+  test "shows scheduled links only in their time window" do
+    hubs(:one).links.create!(title: "Livestream", url: "https://example.com/stream", schedule: "period",
+      visible_from: Time.zone.parse("2026-10-18 08:00"), visible_until: Time.zone.parse("2026-10-18 12:00"))
+
+    travel_to Time.zone.parse("2026-10-18 07:00") do
+      get public_hub_path(churches(:one).slug)
+      assert_no_match "Livestream", response.body
+    end
+    etag = response.headers["ETag"]
+
+    travel_to Time.zone.parse("2026-10-18 09:00") do
+      get public_hub_path(churches(:one).slug), headers: { "If-None-Match" => etag }
+      assert_response :success
+      assert_match "Livestream", response.body
+    end
+  end
+
+  test "hides full forms" do
+    hubs(:one).links.create!(title: "Anmeldung", kind: "form", form: forms(:prayer))
+    forms(:prayer).update!(submission_limit: 2)
+
+    get public_hub_path(churches(:one).slug)
+
+    assert_no_match "Anmeldung", response.body
+  end
 end

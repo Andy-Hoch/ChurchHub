@@ -191,6 +191,38 @@ class FormsTest < ApplicationSystemTestCase
     assert_selector "button.link:focus", text: "Gebet"
   end
 
+  test "a full form with a notice only shows the notice in the launcher" do
+    hubs(:one).links.create!(title: "Anmeldung", kind: "form", form: forms(:prayer))
+    forms(:prayer).update!(submission_limit: 2, when_full: "notice", full_message: "Alle Plätze sind weg.")
+    open_launcher_form "Anmeldung"
+
+    assert_current_step ".intro", text: "Alle Plätze sind weg."
+    @launcher.assert_no_selector ".progress"
+    @launcher.assert_no_selector ".btn-secondary"
+    @launcher.find(".btn-primary", text: "Schließen").click
+
+    @launcher.assert_selector "button.link:focus", text: "Anmeldung"
+  end
+
+  test "opening a form from a date picked in the calendar" do
+    sign_in_as users(:one)
+    assert_selector "h1", text: "Links"
+    visit edit_form_availability_path(forms(:prayer))
+    wait_for_turbo
+
+    today = Date.current
+    find_field("Verfügbar ab (optional)").click
+    within ".date-picker" do
+      find("button[aria-label='#{I18n.l(today, format: "%A, %-d. %B %Y")}']").click
+      click_on "Fertig"
+    end
+    click_on "Speichern"
+
+    assert_text "Verfügbarkeit gespeichert."
+    assert_field "Verfügbar ab (optional)", with: "#{I18n.l(today, format: "%d.%m.%Y")} 00:00"
+    assert_equal today.beginning_of_day, forms(:prayer).reload.opens_at
+  end
+
   private
     def open_launcher_form(title)
       visit "/embed-demo.html?token=#{hubs(:one).public_token}"

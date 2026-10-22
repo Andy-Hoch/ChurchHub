@@ -1,0 +1,109 @@
+/****************************************************************
+* Date picker (rolldate, vendor/assets/stylesheets/rolldate.css)
+* in the app's colours, light and dark
+*****************************************************************/
+
+.RollDate__container.date-picker {
+  --rd-bg: var(--color-surface);
+  --rd-border: var(--color-border);
+  --rd-text-primary: var(--color-text);
+  --rd-text-secondary: var(--color-text-subtle);
+  --rd-text-disabled: var(--color-border-dark);
+  --rd-text-disabled-contrast: var(--color-text-subtle);
+  --rd-header-muted: var(--color-text-subtle);
+  --rd-weekday: var(--color-text-subtle);
+  --rd-hover-bg: var(--color-secondary);
+  --rd-hover-border: var(--color-border-dark);
+  --rd-button-icon: var(--color-text);
+  --rd-accent: var(--color-link);
+  --rd-accent-strong: var(--color-primary);
+  --rd-accent-dark: var(--color-primary);
+  --rd-accent-muted: var(--color-selected);
+  --rd-on-accent: var(--color-text-reversed);
+
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-lg);
+  font-family: inherit;
+  z-index: 50;
+}
+
+/****************************************************************
+* Time roller: hour and minute rolls in the same look
+*****************************************************************/
+
+.time-roller {
+  --time-roller-item-height: 2rem;
+
+  position: relative;
+}
+
+.time-roller__panel {
+  align-items: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-lg);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  gap: var(--size-1);
+  inset-block-start: calc(100% + var(--size-1));
+  inset-inline-start: 0;
+  padding: var(--size-2) var(--size-3);
+  position: absolute;
+  z-index: 50;
+
+  &[hidden] {
+    display: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.time-roller__column {
+  block-size: calc(3 * var(--time-roller-item-height));
+  border-radius: var(--rounded-md);
+  inline-size: 3.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-block: var(--time-roller-item-height);
+  position: relative;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+
+  /* The band behind the middle item, as in rolldate's rolls */
+  background:
+    linear-gradient(var(--color-secondary), var(--color-secondary))
+    center / 100% var(--time-roller-item-height) no-repeat;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-link);
+    outline-offset: 2px;
+  }
+}
+
+.time-roller__item {
+  align-items: center;
+  block-size: var(--time-roller-item-height);
+  color: var(--color-text-subtle);
+  cursor: pointer;
+  display: flex;
+  font-size: var(--text-sm);
+  font-variant-numeric: tabular-nums;
+  justify-content: center;
+  scroll-snap-align: center;
+
+  &[aria-selected="true"] {
+    color: var(--color-text);
+    font-weight: var(--font-semibold);
+  }
+}
+
+.time-roller__separator {
+  color: var(--color-text-subtle);
+  font-weight: var(--font-semibold);
+}

@@ -41,4 +41,22 @@ class LinksControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
     assert_equal "Andere Kirche", links(:other).reload.title
   end
+
+  test "saves a weekly schedule" do
+    post hub_links_path, params: { link: { title: "Livestream", url: "https://example.com/live", visible: "1",
+      schedule: "biweekly", weekdays: [ "", "0" ], start_time: "08:00", end_time: "12:00", visible_from: "2026-10-18T00:00" } }
+
+    link = hubs(:one).links.find_by!(title: "Livestream")
+    assert link.schedule_biweekly?
+    assert_equal [ 0 ], link.weekdays
+    assert_equal [ "08:00", "12:00" ], [ link.start_time, link.end_time ]
+    assert_equal Time.zone.parse("2026-10-18 00:00"), link.visible_from
+  end
+
+  test "shows the schedule in the list" do
+    links(:live).update!(schedule: "weekly", weekdays: [ 0 ], start_time: "08:00", end_time: "12:00")
+
+    get hub_path
+    assert_match "Jede Woche So 08:00–12:00", response.body
+  end
 end

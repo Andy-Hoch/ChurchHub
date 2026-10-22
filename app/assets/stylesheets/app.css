@@ -278,6 +278,52 @@
 }
 
 /****************************************************************
+* Disclosure (native details/summary accordion)
+*****************************************************************/
+
+.disclosure {
+  border: 1px solid var(--color-border);
+  border-radius: var(--rounded-md);
+}
+
+.disclosure__summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  font-size: var(--text-sm);
+  font-weight: var(--font-medium);
+  gap: var(--size-2);
+  justify-content: space-between;
+  list-style: none;
+  padding: var(--size-2) var(--size-3);
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+}
+
+.disclosure__title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-1);
+  min-inline-size: 0;
+}
+
+.disclosure__icon {
+  color: var(--color-text-subtle);
+  transition: rotate 150ms ease;
+
+  .disclosure[open] & {
+    rotate: 90deg;
+  }
+}
+
+.disclosure__content {
+  border-block-start: 1px solid var(--color-border);
+  padding: var(--size-3);
+}
+
+/****************************************************************
 * Tabs
 *****************************************************************/
 

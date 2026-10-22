@@ -1,6 +1,7 @@
 <% content_for :title, "Einstellungen – #{@form.title}" %>
 
 <%= render "header", form: @form, current: :settings %>
+<%= render "settings_nav", form: @form, current: :general %>
 
 <%= form_with model: @form, url: form_path(@form), method: :patch, class: "card flex flex-col gap" do |form| %>
   <div class="field">

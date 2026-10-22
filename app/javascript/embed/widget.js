@@ -332,17 +332,23 @@
 
       function openForm(form, trigger) {
         var steps = [];
-        if (form.intro) steps.push({ type: "intro" });
-        form.questions.forEach(function (question, index) {
-          steps.push({ type: "question", question: question, number: index + 1 });
-        });
-        steps.push({ type: "review" });
-        var reviewIndex = steps.length - 1;
-        // Consent text and/or privacy link get a step of their own right before sending.
-        if (privacy.consentText || safeUrl(privacy.privacyUrl)) steps.push({ type: "privacy" });
+        var reviewIndex = -1;
+        if (form.closedMessage) {
+          // A full form whose button stays visible only shows a notice.
+          steps.push({ type: "closed" });
+        } else {
+          if (form.intro) steps.push({ type: "intro" });
+          form.questions.forEach(function (question, index) {
+            steps.push({ type: "question", question: question, number: index + 1 });
+          });
+          steps.push({ type: "review" });
+          reviewIndex = steps.length - 1;
+          // Consent text and/or privacy link get a step of their own right before sending.
+          if (privacy.consentText || safeUrl(privacy.privacyUrl)) steps.push({ type: "privacy" });
+        }
 
         activeForm = {
-          reviewIndex: reviewIndex,
+          reviewIndex: reviewIndex, closed: Boolean(form.closedMessage),
           form: form, steps: steps, index: 0, answers: {}, errors: {}, consent: false, honeypot: "",
           returnToReview: false, submitting: false, done: false, error: "", startedAt: Date.now(), trigger: trigger,
           scrollTarget: null, scrollUntil: 0
@@ -422,10 +428,12 @@
           } else if (step.type === "review") {
             step.content = slide.appendChild(el("div"));
             renderReview(step);
+          } else if (step.type === "closed") {
+            slide.append(el("h3", "question", form.title), el("p", "intro", form.closedMessage));
           } else {
             renderPrivacy(slide);
           }
-          if (index === state.steps.length - 1) renderSubmitExtras(slide);
+          if (index === state.steps.length - 1 && !state.closed) renderSubmitExtras(slide);
           ui.slides.appendChild(slide);
         });
 
@@ -452,7 +460,9 @@
         footer.append(ui.back, ui.next);
 
         state.node = el("div", "form");
-        state.node.append(header, ui.progress, ui.slides, footer);
+        state.node.append(header);
+        if (!state.closed) state.node.appendChild(ui.progress);
+        state.node.append(ui.slides, footer);
         updateChrome();
       }
 
@@ -477,7 +487,9 @@
         ui.back.hidden = state.index === 0;
 
         var label = "Weiter";
-        if (last) {
+        if (state.closed) {
+          label = "Schließen";
+        } else if (last) {
           label = state.submitting ? "Wird gesendet …" : (state.form.submitLabel || "Absenden");
         } else if (step.type === "intro") {
           label = "Los geht’s";
@@ -723,7 +735,7 @@
 
       function next() {
         var state = activeForm;
-        if (state.done) return closeForm(false);
+        if (state.done || state.closed) return closeForm(false);
 
         var step = state.steps[state.index];
         if (step.type === "question" && !checkStep(step)) return step.focus.focus({ preventScroll: true });
