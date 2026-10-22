@@ -26,8 +26,21 @@
             <div class="sidebar-menu__items">
               <%= nav_link_to "Links", hub_path %>
               <%= nav_link_to "Design", edit_hub_path %>
-              <%= nav_link_to "Formulare", forms_path, badge: unread_submissions_count.nonzero? %>
               <%= nav_link_to "Einbinden", embed_hub_path %>
+            </div>
+          </div>
+
+          <div class="sidebar-menu__group">
+            <span class="sidebar-menu__group-label">Formulare</span>
+            <div class="sidebar-menu__items">
+              <%= nav_link_to "Alle Formulare", forms_path, badge: unread_submissions_count.nonzero? %>
+              <% if sidebar_forms.any? %>
+                <div class="sidebar-menu__sub">
+                  <% sidebar_forms.each do |form| %>
+                    <%= nav_link_to form.title, form_path(form), badge: unread_counts_by_form[form.id], section: true %>
+                  <% end %>
+                </div>
+              <% end %>
             </div>
           </div>
 

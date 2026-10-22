@@ -56,6 +56,18 @@
   row-gap: var(--size-1);
 }
 
+/* Long entries, e.g. form titles, end in an ellipsis instead of overflowing. */
+.sidebar-menu__label {
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-menu__button .badge {
+  flex-shrink: 0;
+}
+
 /****************************************************************
 * Auth
 *****************************************************************/
