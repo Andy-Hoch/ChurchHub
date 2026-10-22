@@ -79,10 +79,10 @@
         <div class="field">
           <%= form.label :email_address, "Mitglied hinzufügen", class: "field__label" %>
           <div class="flex gap">
-            <%= form.email_field :email_address, required: true, placeholder: "E-Mail-Adresse eines registrierten Kontos", class: "input" %>
-            <%= form.submit "Hinzufügen", class: "btn" %>
+            <%= form.email_field :email_address, required: true, disabled: true, placeholder: "E-Mail-Adresse eines registrierten Kontos", class: "input" %>
+            <%= form.submit "Hinzufügen", disabled: true, class: "btn" %>
           </div>
-          <p class="field__hint">Die Person muss bereits ein Konto haben. Neue Mitglieder sind Admins. Um die Kirche zu übergeben, machst du jemanden zum Besitzer und dich danach selbst zum Admin.</p>
+          <p class="field__hint"><strong>Bald verfügbar:</strong> Mitglieder hinzufügen ist noch nicht möglich. Die Person muss bereits ein Konto haben. Neue Mitglieder sind Admins. Um die Kirche zu übergeben, machst du jemanden zum Besitzer und dich danach selbst zum Admin.</p>
         </div>
       <% end %>
     <% end %>

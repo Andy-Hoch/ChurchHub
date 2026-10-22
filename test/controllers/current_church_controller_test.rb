@@ -44,6 +44,14 @@ class CurrentChurchControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Gemeinde Eins", churches(:one).reload.name
   end
 
+  test "the form for adding members is disabled until the feature is ready" do
+    get edit_church_path
+
+    assert_select "input[name=email_address][disabled]"
+    assert_select "input[type=submit][value=Hinzufügen][disabled]"
+    assert_match "Bald verfügbar", response.body
+  end
+
   test "owner adds and removes a member" do
     assert_difference -> { churches(:one).memberships.count } do
       post church_memberships_path, params: { email_address: "two@example.com" }
