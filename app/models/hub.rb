@@ -46,6 +46,7 @@ class Hub < ApplicationRecord
     {
       title: title,
       theme: theme,
+      privacy: church.privacy_payload,
       links: shown_links.map(&:embed_payload)
     }
   end

@@ -42,6 +42,8 @@ class FormsControllerTest < ActionDispatch::IntegrationTest
 
     get edit_form_path(forms(:prayer))
     assert_response :success
+    assert_select "a[href=?]", edit_church_path, text: "Kircheneinstellungen"
+    assert_select "[name='form[consent_text]']", count: 0
   end
 
   test "updates settings" do

@@ -9,6 +9,21 @@ class ChurchTest < ActiveSupport::TestCase
     assert church.hub.public_token.present?
   end
 
+  test "privacy url must be http" do
+    assert_not churches(:one).tap { |church| church.privacy_url = "javascript:alert(1)" }.valid?
+    assert churches(:one).tap { |church| church.privacy_url = "https://example.com/datenschutz" }.valid?
+  end
+
+  test "changing the privacy settings invalidates the cached embed script" do
+    hub = hubs(:one)
+    hub.update_column(:updated_at, 1.day.ago)
+
+    assert_changes -> { hub.reload.updated_at } do
+      churches(:one).update!(privacy_url: "https://example.com/datenschutz")
+    end
+    assert_equal({ consentText: "Ich bin mit der Speicherung einverstanden.", privacyUrl: "https://example.com/datenschutz" }, hub.embed_payload[:privacy])
+  end
+
   test "normalizes slug" do
     assert_equal "st-marien", Church.new(slug: "St. Marien").slug
   end

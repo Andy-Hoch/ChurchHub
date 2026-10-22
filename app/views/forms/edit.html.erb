@@ -38,19 +38,7 @@
   </div>
 
   <h2 class="font-medium mbs-2">Datenschutz</h2>
-  <div class="field">
-    <%= form.label :consent_text, "Einwilligungstext (optional)", class: "field__label" %>
-    <%= form.text_area :consent_text, rows: 2, maxlength: 1000, placeholder: "Ich bin einverstanden, dass meine Angaben zur Bearbeitung meiner Anfrage gespeichert werden.", class: "input" %>
-    <p class="field__hint">Wenn ausgefüllt, muss vor dem Absenden ein Häkchen gesetzt werden.</p>
-    <%= field_error(@form, :consent_text) %>
-  </div>
-
-  <div class="field">
-    <%= form.label :privacy_url, "Link zur Datenschutzerklärung (optional)", class: "field__label" %>
-    <%= form.url_field :privacy_url, placeholder: "https://", class: "input" %>
-    <p class="field__hint">Wird vor dem Absenden verlinkt – mit oder ohne Einwilligungstext.</p>
-    <%= field_error(@form, :privacy_url) %>
-  </div>
+  <p class="text-sm text-subtle">Einwilligungstext und Link zur Datenschutzerklärung gelten für alle Formulare und werden in den <%= link_to "Kircheneinstellungen", edit_church_path, class: "font-medium text-link" %> festgelegt.</p>
 
   <div class="field">
     <%= form.label :retention_months, "Einsendungen automatisch löschen", class: "field__label" %>

@@ -18,14 +18,19 @@ class Church < ApplicationRecord
     url = url.strip
     url.match?(%r{\Ahttps?://}i) ? url : "https://#{url}" if url.present?
   end
+  normalizes :privacy_url, with: ->(value) { value.strip.presence }
 
   validates :name, presence: true
   validates :slug, presence: true, uniqueness: true,
     format: { with: /\A#{SLUG_FORMAT}\z/ }, exclusion: { in: RESERVED_SLUGS }
+  validates :consent_text, length: { maximum: 1000 }
   validate :website_url_must_be_valid
+  validate :privacy_url_must_be_http
 
   before_validation :generate_slug, on: :create
   after_create :create_default_hub
+  # The embed script, which carries the privacy settings, is cached by the hub's timestamp.
+  after_update :touch_hub, if: -> { saved_change_to_consent_text? || saved_change_to_privacy_url? }
 
   # Saves the church together with the user's owner membership, so a church
   # is never left without anyone who can manage it.
@@ -52,6 +57,15 @@ class Church < ApplicationRecord
     host == website_host || host.end_with?(".#{website_host}")
   end
 
+  # Every form asks for consent when the church has a consent text.
+  def consent_required?
+    consent_text.present?
+  end
+
+  def privacy_payload
+    { consentText: consent_text.presence, privacyUrl: privacy_url.presence }
+  end
+
   private
     def website_uri
       URI.parse(website_url) if website_url.present?
@@ -66,6 +80,14 @@ class Church < ApplicationRecord
       valid = uri.is_a?(URI::HTTP) && uri.userinfo.nil? && uri.host.present? &&
         (uri.host.include?(".") || uri.host == "localhost")
       errors.add(:website_url, :invalid_website) unless valid
+    end
+
+    def privacy_url_must_be_http
+      errors.add(:privacy_url, :invalid) if privacy_url.present? && !HttpUrl.valid?(privacy_url)
+    end
+
+    def touch_hub
+      hub.touch if hub&.persisted?
     end
 
     def generate_slug

@@ -9,15 +9,14 @@ class Form < ApplicationRecord
   enum :when_full, { hide: "hide", notice: "notice" }, prefix: true, validate: true
 
   normalizes :notification_emails, with: ->(emails) { emails.split(/[\s,;]+/).compact_blank.map(&:downcase).uniq.join(", ").presence }
-  normalizes :privacy_url, :submit_label, with: ->(value) { value.strip.presence }
+  normalizes :submit_label, with: ->(value) { value.strip.presence }
 
   validates :title, presence: true, length: { maximum: 80 }
-  validates :intro, :thank_you_message, :consent_text, :full_message, length: { maximum: 1000 }
+  validates :intro, :thank_you_message, :full_message, length: { maximum: 1000 }
   validates :submit_label, length: { maximum: 30 }
   validates :retention_months, numericality: { only_integer: true, in: 1..120 }, allow_nil: true
   validates :submission_limit, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validate :notification_emails_must_be_valid
-  validate :privacy_url_must_be_http
   validate :closes_at_must_follow_opens_at
 
   # The embed script is cached by the hub's timestamp.
@@ -29,9 +28,7 @@ class Form < ApplicationRecord
     notification_emails.to_s.split(", ")
   end
 
-  def consent_required?
-    consent_text.present?
-  end
+  delegate :consent_required?, to: :church
 
   # Hubs load the counts of all their forms at once, see Hub#shown_links.
   attr_writer :submissions_count
@@ -79,8 +76,6 @@ class Form < ApplicationRecord
       intro: intro.presence,
       thankYou: thank_you_message.presence,
       submitLabel: submit_label.presence,
-      consentText: consent_text.presence,
-      privacyUrl: privacy_url.presence,
       closedMessage: (closed_message if full?),
       questions: questions.map(&:embed_payload)
     }
@@ -90,10 +85,6 @@ class Form < ApplicationRecord
     def notification_emails_must_be_valid
       invalid = notification_email_list.grep_v(URI::MailTo::EMAIL_REGEXP)
       errors.add(:notification_emails, :invalid_addresses, addresses: invalid.join(", ")) if invalid.any?
-    end
-
-    def privacy_url_must_be_http
-      errors.add(:privacy_url, :invalid) if privacy_url.present? && !HttpUrl.valid?(privacy_url)
     end
 
     def closes_at_must_follow_opens_at

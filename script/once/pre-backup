@@ -1,0 +1,12 @@
+#!/bin/sh -e
+
+# ONCE runs this before it copies /storage into a backup while the app keeps running.
+# Copying live SQLite files can catch them mid-write, so take a consistent snapshot of
+# every database next to it. post-restore swaps the snapshots back in.
+cd /rails/storage
+
+for db in *.sqlite3; do
+  [ -e "$db" ] || continue
+  sqlite3 "$db" ".backup '$db.backup-tmp'"
+  mv "$db.backup-tmp" "$db.backup"
+done

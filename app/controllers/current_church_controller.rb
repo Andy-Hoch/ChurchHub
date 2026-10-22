@@ -32,6 +32,6 @@ class CurrentChurchController < ApplicationController
 
   private
     def church_params
-      params.expect(church: %i[ name website_url slug ])
+      params.expect(church: %i[ name website_url slug consent_text privacy_url ])
     end
 end
