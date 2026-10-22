@@ -11,6 +11,14 @@ class FormsControllerTest < ActionDispatch::IntegrationTest
     assert_no_match "Anderes Formular", response.body
   end
 
+  test "lists the church's forms in the navigation" do
+    get edit_form_path(forms(:prayer))
+
+    assert_select ".sidebar-menu__sub .sidebar-menu__button[href=?][aria-current=page] .sidebar-menu__label", form_path(forms(:prayer)), text: "Gebetsanliegen"
+    assert_select ".sidebar-menu__button[href=?]:not([aria-current])", forms_path
+    assert_select ".sidebar-menu__button[href=?]", form_path(forms(:other)), count: 0
+  end
+
   test "creates a form from a template" do
     assert_difference -> { churches(:one).forms.count } do
       post forms_path, params: { template: "contact" }
