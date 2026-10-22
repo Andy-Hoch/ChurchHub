@@ -19,7 +19,7 @@
   --rd-accent-strong: var(--color-primary);
   --rd-accent-dark: var(--color-primary);
   --rd-accent-muted: var(--color-selected);
-  --rd-on-accent: var(--color-text-reversed);
+  --rd-on-accent: var(--color-text-on-primary);
 
   border-radius: var(--rounded-lg);
   box-shadow: var(--shadow-lg);

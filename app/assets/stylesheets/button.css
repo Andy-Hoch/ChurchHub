@@ -40,7 +40,7 @@
 .btn--primary {
   --btn-background: var(--color-primary);
   --btn-border-color: transparent;
-  --btn-color: var(--color-text-reversed);
+  --btn-color: var(--color-text-on-primary);
   --btn-hover-color: oklch(from var(--color-primary) l c h / .9);
 }
 
