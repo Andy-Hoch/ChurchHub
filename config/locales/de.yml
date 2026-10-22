@@ -209,11 +209,6 @@ de:
       notice: Neuer Einbettungs-Code erzeugt. Bitte das Snippet auf deiner Webseite austauschen.
 
   links:
-    schedule_titles:
-      always: immer
-      period: im Zeitraum
-      weekly: jede Woche
-      biweekly: alle 2 Wochen
     create:
       notice: Link hinzugefügt.
     update:

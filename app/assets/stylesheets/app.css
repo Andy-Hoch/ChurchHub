@@ -302,6 +302,13 @@
   }
 }
 
+.disclosure__title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-1);
+  min-inline-size: 0;
+}
+
 .disclosure__icon {
   color: var(--color-text-subtle);
   transition: rotate 150ms ease;

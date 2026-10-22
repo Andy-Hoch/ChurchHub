@@ -7,12 +7,12 @@
   <div class="field-row">
     <div class="field">
       <%= form.label :opens_at, "Verfügbar ab (optional)", class: "field__label" %>
-      <%= form.datetime_local_field :opens_at, class: "input" %>
+      <%= date_time_picker_field form, :opens_at %>
       <%= field_error(@form, :opens_at) %>
     </div>
     <div class="field">
       <%= form.label :closes_at, "Verfügbar bis (optional)", class: "field__label" %>
-      <%= form.datetime_local_field :closes_at, class: "input" %>
+      <%= date_time_picker_field form, :closes_at %>
       <%= field_error(@form, :closes_at) %>
     </div>
   </div>

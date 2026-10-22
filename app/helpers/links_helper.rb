@@ -10,17 +10,12 @@ module LinksHelper
     t(schedule, scope: "activerecord.enums.link.schedule")
   end
 
-  # Accordion title for one schedule option, e.g. "Button anzeigen (jede Woche)".
-  def schedule_title(schedule)
-    "Button anzeigen (#{t(schedule, scope: "links.schedule_titles")})"
-  end
-
-  # Accordion title for the saved schedule, with its details if it has any.
-  def link_schedule_title(link)
-    if (summary = link_schedule_summary(link).presence)
-      "Button anzeigen (#{summary})"
+  # Whether the button is scheduled at all, for the title of the schedule accordion.
+  def link_schedule_badge(link)
+    if link.schedule_always?
+      tag.span "Immer", class: "badge badge--secondary", data: { schedule_summary_target: "badge" }
     else
-      schedule_title(link.schedule)
+      tag.span "Zeitgesteuert", class: "badge badge--primary", data: { schedule_summary_target: "badge" }
     end
   end
 

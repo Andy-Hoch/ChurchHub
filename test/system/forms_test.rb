@@ -159,4 +159,23 @@ class FormsTest < ApplicationSystemTestCase
     launcher.find(".btn-primary", text: "Schließen").click
     assert_selector "button.link:focus", text: "Gebet"
   end
+
+  test "opening a form from a date picked in the calendar" do
+    sign_in_as users(:one)
+    assert_selector "h1", text: "Links"
+    visit edit_form_availability_path(forms(:prayer))
+    wait_for_turbo
+
+    today = Date.current
+    find_field("Verfügbar ab (optional)").click
+    within ".date-picker" do
+      find("button[aria-label='#{I18n.l(today, format: "%A, %-d. %B %Y")}']").click
+      click_on "Fertig"
+    end
+    click_on "Speichern"
+
+    assert_text "Verfügbarkeit gespeichert."
+    assert_field "Verfügbar ab (optional)", with: "#{I18n.l(today, format: "%d.%m.%Y")} 00:00"
+    assert_equal today.beginning_of_day, forms(:prayer).reload.opens_at
+  end
 end

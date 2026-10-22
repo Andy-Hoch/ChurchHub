@@ -36,9 +36,13 @@
     <%= field_error(link, :form) %>
   </div>
 
-  <details class="disclosure" data-controller="toggle-fields" <%= "open" if link.errors.attribute_names.intersect?(Link::Schedulable::ATTRIBUTES) %>>
+  <details class="disclosure" data-controller="toggle-fields schedule-summary" data-action="change->schedule-summary#update input->schedule-summary#update" <%= "open" if link.errors.attribute_names.intersect?(Link::Schedulable::ATTRIBUTES) %>>
     <summary class="disclosure__summary">
-      <span data-toggle-fields-target="summary"><%= link_schedule_title(link) %></span>
+      <span class="disclosure__title">
+        <span class="flex items-center gap-half">Button anzeigen <%= link_schedule_badge(link) %></span>
+        <% details = link_schedule_summary(link) %>
+        <span class="text-xs text-subtle" data-schedule-summary-target="details" <%= "hidden" if details.blank? %>><%= details %></span>
+      </span>
       <span class="icon icon--chevron-right disclosure__icon" aria-hidden="true"></span>
     </summary>
 
@@ -48,7 +52,7 @@
         <div class="choice-group">
           <% Link.schedules.each_key do |schedule| %>
             <label class="choice">
-              <%= form.radio_button :schedule, schedule, data: { toggle_fields_source: true, toggle_fields_summary: schedule_title(schedule), action: "toggle-fields#update" } %>
+              <%= form.radio_button :schedule, schedule, data: { toggle_fields_source: true, schedule_summary_target: "schedule", action: "toggle-fields#update" } %>
               <span><%= schedule_name(schedule) %></span>
             </label>
           <% end %>
@@ -61,7 +65,7 @@
           <div class="choice-group">
             <%= form.collection_check_boxes :weekdays, weekday_options, :last, :first do |box| %>
               <label class="choice">
-                <%= box.check_box %>
+                <%= box.check_box data: { schedule_summary_target: "weekday" } %>
                 <span><%= box.text %></span>
               </label>
             <% end %>
@@ -72,12 +76,12 @@
         <div class="field-row">
           <div class="field">
             <%= form.label :start_time, "Von (Uhrzeit)", class: "field__label" %>
-            <%= form.time_field :start_time, required: true, class: "input" %>
+            <%= time_roller_field form, :start_time, required: true, data: { schedule_summary_target: "startTime" } %>
             <%= field_error(link, :start_time) %>
           </div>
           <div class="field">
             <%= form.label :end_time, "Bis (Uhrzeit)", class: "field__label" %>
-            <%= form.time_field :end_time, required: true, class: "input" %>
+            <%= time_roller_field form, :end_time, required: true, data: { schedule_summary_target: "endTime" } %>
             <%= field_error(link, :end_time) %>
           </div>
         </div>
@@ -87,12 +91,12 @@
         <div class="field-row">
           <div class="field">
             <%= form.label :visible_from, "Ab", class: "field__label" %>
-            <%= form.datetime_local_field :visible_from, class: "input" %>
+            <%= date_time_picker_field form, :visible_from, data: { schedule_summary_target: "from" } %>
             <%= field_error(link, :visible_from) %>
           </div>
           <div class="field">
             <%= form.label :visible_until, "Bis", class: "field__label" %>
-            <%= form.datetime_local_field :visible_until, class: "input" %>
+            <%= date_time_picker_field form, :visible_until, data: { schedule_summary_target: "until" } %>
             <%= field_error(link, :visible_until) %>
           </div>
         </div>
