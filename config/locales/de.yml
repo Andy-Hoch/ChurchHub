@@ -144,6 +144,11 @@ de:
     destroy:
       notice: Dein Konto wurde gelöscht.
       wrong_password: Das Passwort ist falsch.
+    passwords:
+      update:
+        notice: Dein Passwort wurde geändert.
+        wrong_password: Das aktuelle Passwort ist falsch.
+        invalid: Die Passwörter stimmen nicht überein oder sind zu kurz (mindestens 8 Zeichen).
 
   churches:
     create:
