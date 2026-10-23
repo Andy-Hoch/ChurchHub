@@ -23,7 +23,7 @@
 .badge--primary {
   --badge-background: var(--color-primary);
   --badge-border-color: transparent;
-  --badge-color: var(--color-text-reversed);
+  --badge-color: var(--color-text-on-primary);
 }
 
 .badge--secondary {
