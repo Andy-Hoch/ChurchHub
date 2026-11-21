@@ -8,7 +8,7 @@ Für Betreiber und Entwickler: Aufbau der Anwendung, Datenmodell und Routen.
 
 | Baustein | Einsatz |
 | --- | --- |
-| **Ruby** 4.0.7 · **Rails** 8.1 | Anwendung. Rails-8-Authentifizierung (E-Mail und Passwort, `has_secure_password`) |
+| **Ruby** 4.0.10 · **Rails** 8.1 | Anwendung. Rails-8-Authentifizierung (E-Mail und Passwort, `has_secure_password`) |
 | **SQLite** | Datenbank für Anwendungsdaten. Zusätzlich je eine Datei für Cache, Job-Warteschlange und Cable |
 | **Solid Queue / Cache / Cable** | Hintergrundjobs, Zwischenspeicher (auch für Rate-Limits) und ActionCable, alles auf SQLite |
 | **Puma** + **Thruster** | Webserver. Thruster (Port 80 im Container) reicht an Puma (Port 3000) weiter und liefert Assets komprimiert und gecacht aus |
