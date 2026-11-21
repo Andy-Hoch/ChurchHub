@@ -10,7 +10,7 @@ Internetadresse, siehe [Installation im Internet](produktion.md).
 
 | Was | Version / Hinweis |
 | --- | --- |
-| **Ruby** | 4.0.7 (steht in `.ruby-version`). Am einfachsten mit einem Versionsmanager wie [mise](https://mise.jdx.dev), [rbenv](https://github.com/rbenv/rbenv) oder [asdf](https://asdf-vm.com). |
+| **Ruby** | 4.0.10 (steht in `.ruby-version`). Am einfachsten mit einem Versionsmanager wie [mise](https://mise.jdx.dev), [rbenv](https://github.com/rbenv/rbenv) oder [asdf](https://asdf-vm.com). |
 | **Bundler** | Kommt mit Ruby. |
 | **SQLite 3** | Als Datenbank. Auf macOS vorhanden, unter Debian/Ubuntu: `sudo apt install sqlite3 libsqlite3-dev`. |
 | **Git** | Zum Herunterladen des Codes. |
@@ -117,7 +117,7 @@ Dieselben Prüfungen laufen bei jedem Pull Request in GitHub Actions (`.github/w
 
 | Problem | Lösung |
 | --- | --- |
-| `Your Ruby version is x, but your Gemfile specified 4.0.7` | Ruby 4.0.7 installieren, z. B. `mise install ruby@4.0.7` bzw. `rbenv install 4.0.7`. |
+| `Your Ruby version is x, but your Gemfile specified 4.0.10` | Ruby 4.0.10 installieren, z. B. `mise install ruby@4.0.10` bzw. `rbenv install 4.0.10`. |
 | `bundle install` bricht bei `sqlite3` oder `psych` ab | Entwicklungsbibliotheken nachinstallieren (siehe Voraussetzungen). |
 | Port 3000 ist belegt | Mit `PORT=3001 bin/dev` auf einem anderen Port starten. |
 | Der Launcher erscheint auf der Demo-Seite nicht | Token prüfen und unter *Einbinden* kontrollieren, ob der Launcher aktiv ist. Die Demo-Seite läuft auf demselben Host wie der Hub und ist daher von der [Webseiten-Beschränkung](../benutzerhandbuch/einbinden.md#beschränkung-auf-eure-webseite) nicht betroffen. |
