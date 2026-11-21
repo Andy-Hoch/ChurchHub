@@ -30,7 +30,7 @@ Datenbank, kein Redis und kein Node.js nötig.
 | **Server** | Ein Linux-Server (z. B. Ubuntu 24.04) mit öffentlicher IP, SSH-Zugang und offenen Ports **80** und **443**. Der Ressourcenbedarf ist gering, ein kleiner VPS reicht in der Regel. |
 | **Domain** | Eine (Sub-)Domain wie `hub.eure-kirche.de` mit einem **DNS-A-Eintrag** auf die IP des Servers. Der Eintrag muss vor dem ersten Deployment wirksam sein, sonst kann kein Zertifikat ausgestellt werden. |
 | **Container-Registry** | Ein Ort für das Docker-Image, z. B. Docker Hub oder GitHub Container Registry (ghcr.io), samt Zugangs-Token. Nur für Weg A. |
-| **Ruby auf deinem Rechner** | Für Weg A und für das Erzeugen der Zugangsdaten (Schritt 2): Ruby 4.0.7 und `bundle install`, siehe [Lokale Installation](lokale-installation.md#voraussetzungen). |
+| **Ruby auf deinem Rechner** | Für Weg A und für das Erzeugen der Zugangsdaten (Schritt 2): Ruby 4.0.10 und `bundle install`, siehe [Lokale Installation](lokale-installation.md#voraussetzungen). |
 | **SMTP-Zugang** | Für den E-Mail-Versand (Passwort-Reset, Benachrichtigungen bei Einsendungen). Empfohlen, siehe [Konfiguration](konfiguration.md#e-mail-versand-smtp). |
 
 > **Hinweis zur Domain:** Der Launcher wird auf **euren Webseiten per HTTPS** eingebunden. Browser blockieren
